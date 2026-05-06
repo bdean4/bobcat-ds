@@ -3,1431 +3,1481 @@
 
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
-  <meta name="theme-color" content="#F47920"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-title" content="Bobcat DS"/>
-  <title>Bobcat Digital Station</title>
-  <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%;background:#F5F6F8}
-    #root{min-height:100%}
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta name="theme-color" content="#F47920"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="Bobcat DS"/>
+<title>Bobcat Digital Station</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:#F5F6F8;color:#111827;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#ddd;border-radius:4px}
+
+/* Layout */
+#app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+#header{background:#fff;border-bottom:1px solid #E4E6EA;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 1px 0 rgba(0,0,0,0.05)}
+#tabbar{background:#fff;border-bottom:1px solid #E4E6EA;display:flex;padding:0 4px}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 11px;background:none;border:none;border-bottom:3px solid transparent;color:#9CA3AF;cursor:pointer;font-size:10px;font-weight:700;letter-spacing:0.3px;font-family:inherit;transition:all 0.15s}
+.tab.active{color:#F47920;border-bottom-color:#F47920}
+.tab-icon{font-size:17px;opacity:0.5}
+.tab.active .tab-icon{opacity:1}
+#content{flex:1;overflow-y:auto;padding:16px;padding-bottom:32px}
+.screen{display:none}
+.screen.active{display:flex;flex-direction:column;gap:14px}
+
+/* Cards */
+.card{background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,0.08);padding:18px}
+.card-title{font-weight:800;font-size:16px;color:#111827;margin-bottom:14px}
+
+/* Buttons */
+.btn{border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn:active{transform:scale(0.97)}
+.btn-orange{background:#F47920;color:#fff;box-shadow:0 4px 14px rgba(244,121,32,0.3)}
+.btn-ghost{background:#F0F1F3;color:#374151;border:1.5px solid #E4E6EA}
+.btn-green{background:#16A34A;color:#fff}
+.btn-red{background:#DC2626;color:#fff}
+.btn-full{width:100%}
+.btn-sm{padding:7px 14px;font-size:12px;border-radius:8px}
+
+/* Inputs */
+input,textarea{border:1.5px solid #E4E6EA;border-radius:10px;padding:11px 14px;font-size:13px;color:#111827;outline:none;font-family:inherit;background:#F5F6F8;width:100%}
+input:focus,textarea:focus{border-color:#F47920}
+textarea{resize:none}
+
+/* Segmented control */
+.seg{background:#fff;border-radius:16px;padding:5px;box-shadow:0 1px 3px rgba(0,0,0,0.08);display:grid;gap:4px}
+.seg-3{grid-template-columns:1fr 1fr 1fr}
+.seg-2{grid-template-columns:1fr 1fr}
+.seg-btn{padding:10px 0;background:transparent;border:none;border-radius:10px;color:#6B7280;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;text-align:center}
+.seg-btn.active{background:#F47920;color:#fff}
+.seg-btn .seg-icon{font-size:18px;display:block;margin-bottom:2px}
+
+/* Stat cards */
+.stats-row{display:flex;gap:10px}
+.stat-card{flex:1;background:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);border:1.5px solid #ECEEF2}
+.stat-card.accent{border-color:rgba(244,121,32,0.3)}
+.stat-label{font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.stat-value{font-size:24px;font-weight:800;color:#111827;line-height:1}
+.stat-card.accent .stat-value{color:#F47920}
+.stat-sub{font-size:12px;color:#6B7280;margin-top:4px}
+
+/* Badge */
+.badge{display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700}
+.badge-green{background:#DCFCE7;color:#16A34A}
+.badge-orange{background:rgba(244,121,32,0.12);color:#F47920;border:1px solid #F47920}
+.badge-blue{background:#DBEAFE;color:#2563EB}
+.badge-red{background:#FEE2E2;color:#DC2626}
+.badge-gray{background:#F0F1F3;color:#6B7280}
+
+/* Toggle */
+.toggle-wrap{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.toggle{width:48px;height:28px;border-radius:14px;background:#E4E6EA;cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0;border:none}
+.toggle.on{background:#2563EB}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.2);transition:left 0.2s}
+.toggle.on .toggle-thumb{left:23px}
+
+/* Map canvas */
+#map-canvas{width:100%;height:300px;border-radius:16px;display:block;cursor:crosshair;box-shadow:0 4px 16px rgba(0,0,0,0.1)}
+.map-wrap{position:relative;border-radius:16px;overflow:hidden}
+.map-overlay-tr{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.map-overlay-tl{position:absolute;top:12px;left:12px;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.map-overlay-bl{position:absolute;bottom:12px;left:12px}
+.map-overlay-br{position:absolute;bottom:12px;right:12px;display:flex;gap:8px}
+.map-pill{background:rgba(255,255,255,0.95);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;box-shadow:0 1px 4px rgba(0,0,0,0.1)}
+
+/* Utility picker modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:24px 24px 0 0;padding:24px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto}
+.modal-handle{width:40px;height:4px;border-radius:2px;background:#E4E6EA;margin:0 auto 20px}
+.util-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.util-btn{padding:14px;border-radius:12px;border:2px solid transparent;cursor:pointer;font-family:inherit;font-weight:700;font-size:13px;display:flex;align-items:center;gap:10px;transition:all 0.15s;background:#F5F6F8}
+.util-btn:active{transform:scale(0.97)}
+
+/* Feature legend */
+.feature-group{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.feature-group-header{display:flex;align-items:center;gap:10px;padding:13px 16px}
+.feature-item{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-top:1px solid #E4E6EA}
+.feature-item-info{flex:1;min-width:0}
+.feature-item-label{font-size:12px;color:#6B7280;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.feature-item-note{font-size:11px;color:#9CA3AF;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.remove-btn{background:#F0F1F3;border:none;border-radius:8px;width:28px;height:28px;cursor:pointer;font-size:15px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+
+/* APWA accordion */
+.accordion{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.accordion-header{display:flex;justify-content:space-between;align-items:center;padding:15px 18px;cursor:pointer;font-weight:700;font-size:14px;border:none;background:none;width:100%;font-family:inherit;text-align:left}
+.accordion-body{display:none;padding:0 18px 18px;border-top:1px solid #E4E6EA}
+.accordion-body.open{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding-top:12px}
+.apwa-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:7px}
+
+/* Grade screen */
+.step-item{display:flex;gap:12px;margin-bottom:16px}
+.step-num{width:32px;height:32px;border-radius:50%;background:#F47920;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0}
+.step-body{flex:1}
+.step-title{font-weight:700;font-size:14px;margin-bottom:3px}
+.step-desc{font-size:13px;color:#6B7280;line-height:1.6}
+.stat-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat-box{background:#F5F6F8;border-radius:10px;padding:12px 8px;text-align:center}
+.stat-box-val{font-size:20px;font-weight:800;color:#111827}
+.stat-box-label{font-size:11px;color:#6B7280;margin-top:2px}
+.elev-display{background:linear-gradient(135deg,rgba(244,121,32,0.1),rgba(244,121,32,0.03));border:2px solid rgba(244,121,32,0.22);border-radius:16px;padding:16px 18px;display:flex;justify-content:space-between;align-items:center}
+.elev-big{font-size:38px;font-weight:900;color:#F47920;line-height:1}
+.bench-item{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:#F5F6F8;border-radius:10px;margin-bottom:8px}
+.bench-delta{font-size:22px;font-weight:900}
+
+/* Export */
+.format-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.format-btn{background:#fff;border:2px solid #E4E6EA;border-radius:16px;padding:16px 14px;cursor:pointer;text-align:left;font-family:inherit;position:relative;transition:all 0.15s;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.format-btn:active{transform:scale(0.97)}
+.format-btn.done{background:rgba(244,121,32,0.08);border-color:#F47920}
+.format-icon{font-size:26px;margin-bottom:6px}
+.format-name{font-size:14px;font-weight:800;color:#111827}
+.format-btn.done .format-name{color:#F47920}
+.format-desc{font-size:11px;color:#6B7280;margin-top:2px}
+.format-badge{position:absolute;top:10px;right:10px;border-radius:20px;padding:2px 8px;font-size:9px;font-weight:700}
+.format-done{position:absolute;bottom:10px;right:12px;font-size:11px;font-weight:700;color:#16A34A}
+.save-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.save-btn{padding:14px 8px;background:#F5F6F8;border:2px solid #E4E6EA;border-radius:10px;cursor:pointer;font-weight:700;font-size:12px;font-family:inherit;transition:all 0.15s;text-align:center}
+.save-btn.active{background:#F47920;border-color:#F47920;color:#fff}
+.save-icon{font-size:22px;display:block;margin-bottom:5px}
+
+/* Projects */
+.project-card{background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,0.08);overflow:hidden;border:2px solid #E4E6EA;margin-bottom:10px;transition:border 0.15s}
+.project-card.active-proj{border-color:#F47920}
+.project-card-body{padding:16px 18px}
+.project-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.project-tag{display:flex;align-items:center;gap:5px;background:#F5F6F8;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600}
+.project-actions{display:flex;gap:8px}
+
+/* Proximity alert */
+#prox-alert{display:none;background:#DC2626;border-radius:12px;padding:12px 16px;margin-bottom:0;flex-direction:column;gap:0;animation:slideDown 0.25s ease-out;box-shadow:0 4px 20px rgba(220,38,38,0.4)}
+#prox-alert.show{display:flex}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.prox-row{display:flex;align-items:center;gap:12px}
+.prox-icon{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.prox-info{flex:1}
+.prox-title{font-weight:800;font-size:13px;color:#fff}
+.prox-sub{font-size:12px;color:rgba(255,255,255,0.85);margin-top:2px}
+.prox-dist{text-align:right;flex-shrink:0}
+.prox-dist-num{font-size:24px;font-weight:900;color:#fff;line-height:1}
+.prox-dist-unit{font-size:10px;color:rgba(255,255,255,0.75);font-weight:600}
+
+/* Dot pulse animation */
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(0.8)}}
+.pulse-dot{width:8px;height:8px;border-radius:50%;background:#16A34A;animation:pulse 2s infinite;display:inline-block}
+.pulse-dot.orange{background:#F47920}
+.pulse-dot.red{background:#DC2626;animation-duration:0.8s}
+
+/* Info box */
+.info-box{border-radius:10px;padding:11px 14px;font-size:12px;line-height:1.6}
+.info-box.blue{background:#DBEAFE;color:#1E40AF}
+.info-box.green{background:#DCFCE7;color:#15803D}
+.info-box.orange{background:rgba(244,121,32,0.08);color:#C95E00;border:1px solid rgba(244,121,32,0.2)}
+
+/* Volume zones */
+.zone-card{background:#F5F6F8;border-radius:10px;padding:14px;margin-bottom:10px}
+.zone-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.zone-type-row{display:flex;gap:8px}
+.zone-type-btn{flex:1;padding:9px 0;border:1.5px solid #E4E6EA;border-radius:8px;background:#fff;cursor:pointer;font-weight:700;font-size:12px;font-family:inherit}
+.zone-type-btn.cut{background:#FEE2E2;border-color:#DC2626;color:#DC2626}
+.zone-type-btn.fill{background:#DCFCE7;border-color:#16A34A;color:#16A34A}
+.total-vol{background:linear-gradient(135deg,rgba(244,121,32,0.1),rgba(244,121,32,0.03));border:2px solid rgba(244,121,32,0.22);border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+
+/* Drone teaser */
+.drone-card{background:linear-gradient(135deg,#EFF6FF,#F0F9FF);border:2px dashed #93C5FD;border-radius:16px;padding:20px}
+.drone-title{font-weight:800;font-size:15px;color:#2563EB}
+.drone-badge{font-size:9px;font-weight:700;color:#93C5FD;text-transform:uppercase;letter-spacing:0.5px}
+.drone-desc{font-size:13px;color:#1E40AF;line-height:1.7;margin-top:8px}
+
+/* NMEA display */
+.nmea-raw{background:#1E1E1E;border-radius:8px;padding:10px 12px;font-size:10px;color:#86efac;font-family:‘Courier New’,monospace;word-break:break-all;line-height:1.7;margin-top:6px}
+</style>
+
 </head>
 <body>
-  <div id="root"></div>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script>
-(function(){
-  const {useState,useRef,useEffect} = React;
+<div id="app">
 
-// ─── TOKENS ──────────────────────────────────────────────────────────────────
-const T = {
-orange:”#F47920”, orangeGlow:“rgba(244,121,32,0.18)”, orangeD:”#C95E00”,
-bg:”#F5F6F8”, surface:”#FFFFFF”, surfaceAlt:”#F0F1F3”,
-border:”#E4E6EA”, borderSoft:”#ECEEF2”,
-text:”#111827”, textSub:”#6B7280”, textMuted:”#9CA3AF”,
-green:”#16A34A”, greenBg:”#DCFCE7”,
-red:”#DC2626”, redBg:”#FEE2E2”,
-blue:”#2563EB”, blueBg:”#DBEAFE”,
-shadow:“0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.04)”,
-shadowMd:“0 4px 16px rgba(0,0,0,0.10)”,
-shadowLg:“0 8px 32px rgba(0,0,0,0.16)”,
-radius:“16px”, radiusSm:“10px”, radiusXs:“7px”,
-};
+  <!-- HEADER -->
 
+  <div id="header">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:42px;height:42px;background:#F47920;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(244,121,32,0.35)">
+        <svg viewBox="0 0 32 32" width="24" height="24" fill="white"><path d="M5 26 L13 8 L16 14 L19 8 L27 26 Z" opacity="0.95"/><rect x="10" y="22" width="12" height="4" rx="2"/></svg>
+      </div>
+      <div>
+        <div style="font-size:18px;font-weight:900;letter-spacing:-0.5px;line-height:1">Bobcat</div>
+        <div style="font-size:10px;font-weight:700;color:#F47920;letter-spacing:1.2px;text-transform:uppercase">Digital Station</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span id="active-project-label" style="font-size:12px;font-weight:700;color:#F47920;background:rgba(244,121,32,0.12);border-radius:20px;padding:4px 12px;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:none"></span>
+      <div class="badge badge-green"><span class="pulse-dot"></span>GPS Fix</div>
+    </div>
+  </div>
+
+  <!-- TAB BAR -->
+
+  <div id="tabbar">
+    <button class="tab active" onclick="showTab('projects')"><span class="tab-icon">📁</span>Projects</button>
+    <button class="tab" onclick="showTab('map')"><span class="tab-icon">🗺️</span>Site Map</button>
+    <button class="tab" onclick="showTab('grade')"><span class="tab-icon">📡</span>Grade</button>
+    <button class="tab" onclick="showTab('export')"><span class="tab-icon">📤</span>Export</button>
+  </div>
+
+  <!-- CONTENT -->
+
+  <div id="content">
+
+```
+<!-- ═══ PROJECTS ═══ -->
+<div id="screen-projects" class="screen active">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <div style="font-weight:800;font-size:18px">Job Site Projects</div>
+    <button class="btn btn-orange btn-sm" onclick="toggleNewProject()">+ New Site</button>
+  </div>
+  <div id="new-project-form" style="display:none">
+    <div class="card" style="padding:16px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:10px">New Job Site</div>
+      <div style="display:flex;gap:8px">
+        <input id="new-proj-name" placeholder="e.g. Main St Utility Run" onkeydown="if(event.key==='Enter')createProject()"/>
+        <button class="btn btn-orange" style="padding:0 18px;white-space:nowrap" onclick="createProject()">Create</button>
+      </div>
+    </div>
+  </div>
+  <div id="projects-list"></div>
+</div>
+
+<!-- ═══ MAP ═══ -->
+<div id="screen-map" class="screen">
+
+  <!-- Proximity alert -->
+  <div id="prox-alert">
+    <div class="prox-row">
+      <div class="prox-icon" id="prox-icon">⚡</div>
+      <div class="prox-info">
+        <div class="prox-title" id="prox-title">Gas Line Nearby</div>
+        <div class="prox-sub">Proceed with extreme caution</div>
+      </div>
+      <div class="prox-dist">
+        <div class="prox-dist-num" id="prox-dist">2.1</div>
+        <div class="prox-dist-unit">METRES</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Map style -->
+  <div class="seg seg-3">
+    <button class="seg-btn active" onclick="setMapStyle('default',this)"><span class="seg-icon">🗺️</span>Default</button>
+    <button class="seg-btn" onclick="setMapStyle('satellite',this)"><span class="seg-icon">🛰️</span>Satellite</button>
+    <button class="seg-btn" onclick="setMapStyle('topo',this)"><span class="seg-icon">🏔️</span>Topo</button>
+  </div>
+
+  <!-- Draw mode -->
+  <div class="seg seg-3">
+    <button class="seg-btn active" id="mode-btn-perimeter" onclick="setMode('perimeter',this)"><span class="seg-icon">📏</span>Perimeter</button>
+    <button class="seg-btn" id="mode-btn-line" onclick="setMode('line',this)"><span class="seg-icon">〰️</span>Run Line</button>
+    <button class="seg-btn" id="mode-btn-features" onclick="setMode('features',this)"><span class="seg-icon">🔍</span>View All</button>
+  </div>
+
+  <!-- Utility type strip (line mode) -->
+  <div id="line-util-strip" style="display:none">
+    <div style="font-size:12px;font-weight:700;color:#6B7280;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Select Utility Type</div>
+    <div style="display:flex;gap:7px;overflow-x:auto;padding-bottom:4px" id="util-strip"></div>
+  </div>
+
+  <!-- Canvas -->
+  <div class="map-wrap">
+    <canvas id="map-canvas"></canvas>
+    <div class="map-overlay-tl">
+      <div id="machine-pill" style="display:none" class="map-pill">
+        <span>🚜</span><span id="machine-pill-text">Locating…</span><span class="pulse-dot orange"></span>
+      </div>
+    </div>
+    <div class="map-overlay-tr">
+      <div class="map-pill"><span class="pulse-dot"></span><span style="color:#16A34A;font-weight:600">GPS Active</span></div>
+    </div>
+    <div class="map-overlay-bl">
+      <div class="map-pill" style="font-size:10px;color:#6B7280">Hold = Utility &nbsp;·&nbsp; Tap = Draw</div>
+    </div>
+    <div class="map-overlay-br" id="map-actions"></div>
+  </div>
+
+  <!-- Measurements -->
+  <div id="measurements" style="display:none">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">📏 Perimeter</div>
+        <div class="stat-value" id="stat-perim">—</div>
+        <div class="stat-sub" id="stat-perim-sub"></div>
+      </div>
+      <div class="stat-card accent">
+        <div class="stat-label">📐 Area</div>
+        <div class="stat-value" id="stat-area">—</div>
+        <div class="stat-sub" id="stat-area-sub">Close shape first</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Volume btn -->
+  <div id="volume-btn-wrap" style="display:none">
+    <button class="card" style="width:100%;text-align:left;border:2px solid #E4E6EA;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:14px 18px" onclick="openVolumeModal()">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:22px">📐</span>
+        <div>
+          <div style="font-weight:700;font-size:14px">Volume Calculator</div>
+          <div style="font-size:12px;color:#6B7280;margin-top:1px" id="volume-btn-sub">Tap to add cut/fill depth zones</div>
+        </div>
+      </div>
+      <span style="font-size:18px;color:#F47920">›</span>
+    </button>
+  </div>
+
+  <!-- Machine tracking -->
+  <div class="card" style="padding:0;overflow:hidden">
+    <div style="padding:13px 16px;display:flex;align-items:center;gap:12px">
+      <div style="width:40px;height:40px;border-radius:11px;background:#DBEAFE;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🚜</div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:14px">Machine Tracking</div>
+        <div style="font-size:11px;color:#6B7280;margin-top:1px" id="machine-status-text">Off · 3 m proximity alerts when on</div>
+      </div>
+      <button class="toggle" id="machine-toggle" onclick="toggleMachine()"><div class="toggle-thumb"></div></button>
+    </div>
+  </div>
+
+  <!-- Feature summary -->
+  <div id="feature-summary" style="display:none" class="card" style="padding:14px 18px">
+    <div style="display:flex;align-items:center;gap:12px;padding:0">
+      <div style="width:44px;height:44px;border-radius:12px;background:rgba(244,121,32,0.1);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📍</div>
+      <div style="flex:1">
+        <div style="font-weight:800;font-size:15px" id="feature-count-text">0 Site Features</div>
+        <div style="font-size:12px;color:#6B7280;margin-top:2px">Weather-proof · Exportable · Crew-shareable</div>
+      </div>
+      <span class="pulse-dot"></span>
+    </div>
+  </div>
+
+  <div style="font-weight:800;font-size:16px">Site Features Layer</div>
+  <div id="feature-legend"></div>
+
+  <!-- APWA -->
+  <div class="accordion">
+    <button class="accordion-header" onclick="toggleAccordion(this)">
+      APWA Color Reference <span style="font-size:16px;color:#9CA3AF;transition:transform 0.2s" id="apwa-arrow">▾</span>
+    </button>
+    <div class="accordion-body" id="apwa-body"></div>
+  </div>
+
+  <button class="btn btn-ghost btn-full" onclick="clearSite()" id="clear-btn" style="display:none">🗑️ Clear Site & Start Over</button>
+</div>
+
+<!-- ═══ GRADE ═══ -->
+<div id="screen-grade" class="screen">
+  <div id="grade-idle">
+    <div class="card">
+      <div class="card-title">Connect Emlid RS3</div>
+      <div style="font-size:13px;color:#6B7280;margin-bottom:20px">Follow these steps before tapping Connect</div>
+      <div class="step-item"><div class="step-num">1</div><div class="step-body"><div class="step-title">Power on your Emlid RS3</div><div class="step-desc">Hold the power button until the LED flashes. The unit will broadcast a WiFi hotspot.</div></div></div>
+      <div class="step-item"><div class="step-num">2</div><div class="step-body"><div class="step-title">Join the RS3 hotspot</div><div class="step-desc">Open your device WiFi settings and connect to the network named reach:xx:xx. Password: emlidreach</div></div></div>
+      <div class="step-item" style="margin-bottom:16px"><div class="step-num">3</div><div class="step-body"><div class="step-title">Return here and connect</div><div class="step-desc">The app opens a direct TCP socket to the unit at 192.168.42.1:9001 and reads the live NMEA stream.</div></div></div>
+      <div class="info-box blue" style="margin-bottom:16px">💡 <strong>Tip:</strong> Configure NTRIP corrections after connecting for sub-centimeter RTK Fix accuracy.</div>
+      <button class="btn btn-orange btn-full" onclick="gradeConnect()">I'm connected to the RS3 hotspot — Connect</button>
+    </div>
+  </div>
+  <div id="grade-connected" style="display:none;flex-direction:column;gap:14px">
+    <!-- Status -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div>
+          <div style="font-weight:800;font-size:16px">Emlid RS3</div>
+          <div style="font-size:12px;color:#6B7280;margin-top:1px">192.168.42.1 : 9001 · NMEA stream</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="badge" id="fix-badge"><span class="pulse-dot" id="fix-dot"></span><span id="fix-text">RTK Fix</span></div>
+          <button class="btn btn-sm" style="background:#FEE2E2;color:#DC2626;border:none" onclick="gradeDisconnect()">Disconnect</button>
+        </div>
+      </div>
+      <div class="stat-grid-3" style="margin-bottom:14px">
+        <div class="stat-box"><div style="font-size:20px;margin-bottom:4px">🛰️</div><div class="stat-box-val" id="g-sats">—</div><div class="stat-box-label">Satellites</div></div>
+        <div class="stat-box"><div style="font-size:20px;margin-bottom:4px">📐</div><div class="stat-box-val" id="g-hdop">—</div><div class="stat-box-label">HDOP</div></div>
+        <div class="stat-box"><div style="font-size:20px;margin-bottom:4px">📶</div><div class="stat-box-val" id="g-fixq">—</div><div class="stat-box-label">Fix Quality</div></div>
+      </div>
+      <div class="elev-display">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Live Elevation (HAE)</div>
+          <div class="elev-big" id="g-elev">—</div>
+          <div style="font-size:13px;color:#6B7280;margin-top:6px" id="g-elev-ft"></div>
+        </div>
+        <div style="text-align:right;font-size:12px;color:#6B7280;line-height:2">
+          <div id="g-lat">—</div><div id="g-lng">—</div>
+        </div>
+      </div>
+      <button style="margin-top:12px;background:none;border:none;color:#9CA3AF;font-size:11px;cursor:pointer;font-family:inherit;padding:0" onclick="toggleNMEA()">▸ Show raw NMEA</button>
+      <div class="nmea-raw" id="nmea-raw" style="display:none"></div>
+    </div>
+    <!-- NTRIP -->
+    <div class="accordion">
+      <button class="accordion-header" onclick="toggleAccordion(this)">
+        🛰️ NTRIP Corrections <span style="font-size:16px;color:#9CA3AF">▾</span>
+      </button>
+      <div class="accordion-body" id="ntrip-body">
+        <div style="padding-top:12px;display:flex;flex-direction:column;gap:10px">
+          <div><div style="font-size:11px;font-weight:700;color:#6B7280;margin-bottom:4px;text-transform:uppercase">Caster Host</div><input id="ntrip-host" placeholder="e.g. ntrip.state.mn.us"/></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div><div style="font-size:11px;font-weight:700;color:#6B7280;margin-bottom:4px;text-transform:uppercase">Port</div><input id="ntrip-port" value="2101"/></div>
+            <div><div style="font-size:11px;font-weight:700;color:#6B7280;margin-bottom:4px;text-transform:uppercase">Mountpoint</div><input id="ntrip-mount" placeholder="e.g. MINN_RTCM3"/></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div><div style="font-size:11px;font-weight:700;color:#6B7280;margin-bottom:4px;text-transform:uppercase">Username</div><input id="ntrip-user"/></div>
+            <div><div style="font-size:11px;font-weight:700;color:#6B7280;margin-bottom:4px;text-transform:uppercase">Password</div><input type="password" id="ntrip-pass"/></div>
+          </div>
+          <button class="btn btn-orange btn-full" onclick="saveNtrip()">Save & Apply NTRIP Config</button>
+        </div>
+      </div>
+    </div>
+    <!-- Benchmarks -->
+    <div class="card">
+      <div class="card-title">Benchmarks & Grade Points</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input id="bm-name" placeholder="Label (e.g. BM-1)" style="flex:1"/>
+        <input id="bm-elev" type="number" placeholder="Elev (m)" style="width:100px"/>
+        <button class="btn btn-orange" style="padding:0 16px" onclick="addBench()">Set</button>
+      </div>
+      <button class="btn btn-ghost btn-full" style="margin-bottom:12px" onclick="snapBench()">📍 Snap Benchmark from Live Position</button>
+      <div id="bench-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ EXPORT ═══ -->
+<div id="screen-export" class="screen">
+  <div class="card">
+    <div class="card-title">Save Mode</div>
+    <div class="save-grid">
+      <button class="save-btn" onclick="setSaveMode('device',this)"><span class="save-icon">💾</span>On-Device</button>
+      <button class="save-btn" onclick="setSaveMode('cloud',this)"><span class="save-icon">☁️</span>Cloud</button>
+      <button class="save-btn active" onclick="setSaveMode('both',this)"><span class="save-icon">🔄</span>Both</button>
+    </div>
+    <div class="info-box green" style="margin-top:12px;display:flex;align-items:center;gap:8px" id="save-mode-info">
+      <span class="pulse-dot"></span> Auto-save on — your map is weather-proof
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Dataset Summary</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap" id="export-summary"></div>
+  </div>
+  <div style="font-weight:800;font-size:16px">Export Format</div>
+  <div class="format-grid" id="format-grid"></div>
+  <div class="drone-card">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <span style="font-size:26px">🚁</span>
+      <div>
+        <div class="drone-title">Drone Site Vision</div>
+        <div class="drone-badge">Coming Soon</div>
+      </div>
+    </div>
+    <div class="drone-desc">Pair with DJI Enterprise or Skydio to overlay utility maps in real time — no-dig zones, buried lines, and benchmarks visible from the air.</div>
+  </div>
+</div>
+```
+
+  </div><!-- end content -->
+</div><!-- end app -->
+
+<!-- UTILITY PICKER MODAL -->
+
+<div class="modal-bg" id="util-modal" onclick="closeUtilModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div style="font-weight:800;font-size:16px">Place Utility Marker</div>
+    <div style="font-size:13px;color:#6B7280;margin-top:4px">Select the type to drop a pin at this location</div>
+    <div class="util-grid" id="util-grid"></div>
+  </div>
+</div>
+
+<!-- VOLUME MODAL -->
+
+<div class="modal-bg" id="volume-modal" onclick="closeVolumeModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div style="font-weight:800;font-size:18px">Volume Calculator</div>
+    <div style="font-size:13px;color:#6B7280;margin-top:4px;margin-bottom:20px" id="vol-area-label"></div>
+    <div id="zone-list"></div>
+    <button class="btn btn-ghost btn-full" style="margin-bottom:14px" onclick="addZone()">+ Add Zone</button>
+    <div class="total-vol" id="total-vol-display" style="display:none">
+      <div style="font-size:13px;font-weight:600;color:#6B7280">Total Est. Volume</div>
+      <div style="font-size:26px;font-weight:900;color:#F47920" id="total-vol-num">—</div>
+    </div>
+    <button class="btn btn-orange btn-full" onclick="saveVolume()">Save Volume Data</button>
+  </div>
+</div>
+
+<script>
+// ─── STATE ────────────────────────────────────────────────────────────────────
 const UTILS = [
-{ id:“gas”,      label:“Gas / Oil”,    color:”#CA8A04”, bg:”#FEF9C3”, emoji:“⚡”, dot:”#FACC15” },
-{ id:“electric”, label:“Electric”,     color:”#DC2626”, bg:”#FEE2E2”, emoji:“🔌”, dot:”#EF4444” },
-{ id:“water”,    label:“Water”,        color:”#1D4ED8”, bg:”#DBEAFE”, emoji:“💧”, dot:”#3B82F6” },
-{ id:“sewer”,    label:“Sewer”,        color:”#15803D”, bg:”#DCFCE7”, emoji:“🌿”, dot:”#22C55E” },
-{ id:“telecom”,  label:“Telecom”,      color:”#C2410C”, bg:”#FFEDD5”, emoji:“📡”, dot:”#F97316” },
-{ id:“drain”,    label:“Storm Drain”,  color:”#0E7490”, bg:”#CFFAFE”, emoji:“🌊”, dot:”#06B6D4” },
-{ id:“manhole”,  label:“Manhole”,      color:”#7C3AED”, bg:”#EDE9FE”, emoji:“🔘”, dot:”#A855F7” },
-{ id:“nodig”,    label:“No-Dig Zone”,  color:”#B91C1C”, bg:”#FEE2E2”, emoji:“⛔”, dot:”#EF4444” },
+  {id:'gas',      label:'Gas / Oil',    color:'#CA8A04', bg:'#FEF9C3', emoji:'⚡', dot:'#FACC15'},
+  {id:'electric', label:'Electric',     color:'#DC2626', bg:'#FEE2E2', emoji:'🔌', dot:'#EF4444'},
+  {id:'water',    label:'Water',        color:'#1D4ED8', bg:'#DBEAFE', emoji:'💧', dot:'#3B82F6'},
+  {id:'sewer',    label:'Sewer',        color:'#15803D', bg:'#DCFCE7', emoji:'🌿', dot:'#22C55E'},
+  {id:'telecom',  label:'Telecom',      color:'#C2410C', bg:'#FFEDD5', emoji:'📡', dot:'#F97316'},
+  {id:'drain',    label:'Storm Drain',  color:'#0E7490', bg:'#CFFAFE', emoji:'🌊', dot:'#06B6D4'},
+  {id:'manhole',  label:'Manhole',      color:'#7C3AED', bg:'#EDE9FE', emoji:'🔘', dot:'#A855F7'},
+  {id:'nodig',    label:'No-Dig Zone',  color:'#B91C1C', bg:'#FEE2E2', emoji:'⛔', dot:'#EF4444'},
 ];
 
-const MAP_STYLES = [
-{ id:“default”,   label:“Default”,   desc:“Clean street map” },
-{ id:“satellite”, label:“Satellite”, desc:“Aerial imagery” },
-{ id:“topo”,      label:“Topo”,      desc:“Elevation contours” },
+const FORMATS = [
+  {name:'DXF',    desc:'AutoCAD / Civil 3D',  icon:'📐', badge:'Industry Std', bc:'#1D4ED8'},
+  {name:'SHP',    desc:'Esri / ArcGIS',        icon:'🗺️', badge:'GIS Ready',   bc:'#15803D'},
+  {name:'LandXML',desc:'Survey & Site Design', icon:'🏗️', badge:'Survey Grade',bc:'#7C3AED'},
+  {name:'KMZ',    desc:'Google Earth',         icon:'🌍', badge:'',            bc:'#0E7490'},
+  {name:'GeoJSON',desc:'Web GIS / Mapbox',     icon:'🔗', badge:'Open Format', bc:'#C2410C'},
+  {name:'CSV',    desc:'Raw coordinates',      icon:'📊', badge:'',            bc:'#374151'},
 ];
+
+const MOCK = {lat:44.428, lng:-95.376};
+
+let projects = [{
+  id: 1, name: 'Main St Utility Run',
+  created: new Date().toLocaleDateString(),
+  perimPts: [], closed: false, features: [], zones: [], mapStyle: 'default'
+}];
+let activeId = 1;
+let mapMode = 'perimeter';
+let mapStyle = 'default';
+let linePts = [];
+let activeUtil = 'gas';
+let pendingPin = null; // {x,y} canvas coords for util picker
+let machineEnabled = false;
+let machinePos = null;
+let machineSimAngle = 0;
+let machineSimTimer = null;
+let doneFormat = null;
+let saveMode = 'both';
+
+// Grade state
+let gradeConnected = false;
+let gradeData = null;
+let gradeSimTimer = null;
+let gradeTick = 0;
+let benches = [];
+let showNmeaRaw = false;
+
+// Volume state
+let zones = [];
+
+function getActive() { return projects.find(p=>p.id===activeId)||projects[0]; }
 
 // ─── GEO MATH ─────────────────────────────────────────────────────────────────
 function haversine(a,b){
-const R=6371000,r=x=>x*Math.PI/180;
-const dLat=r(b.lat-a.lat),dLng=r(b.lng-a.lng);
-const x=Math.sin(dLat/2)**2+Math.cos(r(a.lat))*Math.cos(r(b.lat))*Math.sin(dLng/2)**2;
-return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+  const R=6371000,r=x=>x*Math.PI/180;
+  const dLat=r(b.lat-a.lat),dLng=r(b.lng-a.lng);
+  const x=Math.sin(dLat/2)**2+Math.cos(r(a.lat))*Math.cos(r(b.lat))*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
 }
 function polyArea(pts){
-if(pts.length<3)return 0;
-const ref=pts[0];
-const xy=pts.map(p=>({
-x:haversine({lat:ref.lat,lng:ref.lng},{lat:ref.lat,lng:p.lng})*(p.lng>=ref.lng?1:-1),
-y:haversine({lat:ref.lat,lng:ref.lng},{lat:p.lat,lng:ref.lng})*(p.lat>=ref.lat?1:-1),
-}));
-let a=0;
-for(let i=0;i<xy.length;i++){const j=(i+1)%xy.length;a+=xy[i].x*xy[j].y-xy[j].x*xy[i].y;}
-return Math.abs(a/2);
+  if(pts.length<3)return 0;
+  const ref=pts[0];
+  const xy=pts.map(p=>({
+    x:haversine({lat:ref.lat,lng:ref.lng},{lat:ref.lat,lng:p.lng})*(p.lng>=ref.lng?1:-1),
+    y:haversine({lat:ref.lat,lng:ref.lng},{lat:p.lat,lng:ref.lng})*(p.lat>=ref.lat?1:-1),
+  }));
+  let a=0;
+  for(let i=0;i<xy.length;i++){const j=(i+1)%xy.length;a+=xy[i].x*xy[j].y-xy[j].x*xy[i].y;}
+  return Math.abs(a/2);
 }
 function perimM(pts){
-if(pts.length<2)return 0;
-let d=0;for(let i=0;i<pts.length;i++)d+=haversine(pts[i],pts[(i+1)%pts.length]);
-return d;
+  if(pts.length<2)return 0;
+  let d=0;for(let i=0;i<pts.length;i++)d+=haversine(pts[i],pts[(i+1)%pts.length]);
+  return d;
 }
 const toAc=m=>m/4046.86, toSqFt=m=>m*10.7639, toFt=m=>m*3.28084;
-const fmt=(n,d=1)=>Number(n).toLocaleString(undefined,{maximumFractionDigits:d,minimumFractionDigits:d});
+function fmt(n,d=1){return Number(n).toLocaleString(undefined,{maximumFractionDigits:d,minimumFractionDigits:d});}
 
-// ─── PROJECTION ───────────────────────────────────────────────────────────────
-const MOCK={lat:44.428,lng:-95.376};
-function buildRef(perimPts,features,linePts){
-const pts=[…perimPts];
-features.forEach(f=>{if(f.lat!=null)pts.push({lat:f.lat,lng:f.lng});if(f.pts)pts.push(…f.pts);});
-if(linePts.length)pts.push(…linePts);
-return pts.length?pts:[MOCK,{lat:MOCK.lat+0.001,lng:MOCK.lng+0.001}];
+// ─── PROJECTION ────────────────────────────────────────────────────────────────
+function buildRef(p,f,l){
+  const pts=[...p];
+  f.forEach(ft=>{if(ft.lat!=null)pts.push({lat:ft.lat,lng:ft.lng});if(ft.pts)pts.push(...ft.pts);});
+  if(l.length)pts.push(...l);
+  return pts.length?pts:[MOCK,{lat:MOCK.lat+0.001,lng:MOCK.lng+0.001}];
 }
 function project(ref,p,W,H){
-const pad=56,lats=ref.map(r=>r.lat),lngs=ref.map(r=>r.lng);
-const minLat=Math.min(…lats),maxLat=Math.max(…lats);
-const minLng=Math.min(…lngs),maxLng=Math.max(…lngs);
-const sc=Math.min((W-pad*2)/(maxLng-minLng||0.001),(H-pad*2)/(maxLat-minLat||0.001));
-const ox=(W-(maxLng-minLng)*sc)/2,oy=(H-(maxLat-minLat)*sc)/2;
-return{x:(p.lng-minLng)*sc+ox,y:H-((p.lat-minLat)*sc+oy)};
+  const pad=56,lats=ref.map(r=>r.lat),lngs=ref.map(r=>r.lng);
+  const minLat=Math.min(...lats),maxLat=Math.max(...lats);
+  const minLng=Math.min(...lngs),maxLng=Math.max(...lngs);
+  const sc=Math.min((W-pad*2)/(maxLng-minLng||0.001),(H-pad*2)/(maxLat-minLat||0.001));
+  const ox=(W-(maxLng-minLng)*sc)/2,oy=(H-(maxLat-minLat)*sc)/2;
+  return{x:(p.lng-minLng)*sc+ox,y:H-((p.lat-minLat)*sc+oy)};
 }
 function unproject(ref,px,py,W,H){
-const pad=56,lats=ref.map(r=>r.lat),lngs=ref.map(r=>r.lng);
-const minLat=Math.min(…lats),maxLat=Math.max(…lats);
-const minLng=Math.min(…lngs),maxLng=Math.max(…lngs);
-const sc=Math.min((W-pad*2)/(maxLng-minLng||0.001),(H-pad*2)/(maxLat-minLat||0.001));
-const ox=(W-(maxLng-minLng)*sc)/2,oy=(H-(maxLat-minLat)*sc)/2;
-return{lat:(H-py-oy)/sc+minLat,lng:(px-ox)/sc+minLng};
+  const pad=56,lats=ref.map(r=>r.lat),lngs=ref.map(r=>r.lng);
+  const minLat=Math.min(...lats),maxLat=Math.max(...lats);
+  const minLng=Math.min(...lngs),maxLng=Math.max(...lngs);
+  const sc=Math.min((W-pad*2)/(maxLng-minLng||0.001),(H-pad*2)/(maxLat-minLat||0.001));
+  const ox=(W-(maxLng-minLng)*sc)/2,oy=(H-(maxLat-minLat)*sc)/2;
+  return{lat:(H-py-oy)/sc+minLat,lng:(px-ox)/sc+minLng};
 }
 function roundRect(ctx,x,y,w,h,r){
-ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
-ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
-ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
-ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();
 }
 
-// ─── BLANK PROJECT ────────────────────────────────────────────────────────────
-function newProject(name=“Untitled Site”){
-return{id:Date.now(),name,created:new Date().toLocaleDateString(),perimPts:[],closed:false,features:[],zones:[],mapStyle:“default”};
+// ─── CANVAS ────────────────────────────────────────────────────────────────────
+const canvas = document.getElementById('map-canvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+
+function resizeCanvas(){
+  const wrap = canvas.parentElement;
+  W = wrap.clientWidth;
+  H = 300;
+  canvas.width = W;
+  canvas.height = H;
+  drawMap();
 }
 
-// ─── RADIAL PICKER ────────────────────────────────────────────────────────────
-function RadialPicker({sx,sy,onPick,onClose}){
-const RAD=84;
-return(
-React.createElement(“div”,{“style”:{position:“fixed”,inset:0,zIndex:300,background:“rgba(0,0,0,0.32)”,backdropFilter:“blur(3px)”},“onPointerDown”:onClose},React.createElement(“div”,{“style”:{position:“absolute”,left:sx,top:sy,width:0,height:0}},React.createElement(“div”,{“style”:{position:“absolute”,left:-22,top:-22,width:44,height:44,borderRadius:“50%”,
-background:T.orange,boxShadow:`0 0 0 4px white,0 4px 24px rgba(244,121,32,0.45)`,
-display:“flex”,alignItems:“center”,justifyContent:“center”,pointerEvents:“none”}},React.createElement(“svg”,{“width”:“18”,“height”:“18”,“viewBox”:“0 0 24 24”,“fill”:“none”,“stroke”:“white”,“strokeWidth”:“2.5”},React.createElement(“path”,{“d”:“M12 5v14M5 12h14”}))),React.createElement(“div”,{“style”:{position:“absolute”,left:RAD+16,top:-36,background:“white”,borderRadius:12,
-padding:“9px 15px”,boxShadow:T.shadowMd,whiteSpace:“nowrap”,pointerEvents:“none”}},React.createElement(“div”,{“style”:{fontSize:13,fontWeight:700,color:T.text}},“Place Utility Marker”),React.createElement(“div”,{“style”:{fontSize:11,color:T.textSub,marginTop:2}},“Tap a type to drop a pin”),React.createElement(“div”,{“style”:{position:“absolute”,left:-5,top:“50%”,marginTop:-5,width:10,height:10,
-background:“white”,transform:“rotate(45deg)”,boxShadow:”-1px 1px 3px rgba(0,0,0,0.06)”}})),UTILS.map((u,i)=>{
-const angle=(i/UTILS.length)*2*Math.PI-Math.PI/2;
-const cx=Math.cos(angle)*RAD,cy=Math.sin(angle)*RAD;
-return(
-<button key={u.id} onPointerDown={e=>{e.stopPropagation();onPick(u);}}
-style={{position:“absolute”,left:cx-29,top:cy-29,width:58,height:58,borderRadius:“50%”,
-border:“2.5px solid white”,background:u.bg,cursor:“pointer”,
-display:“flex”,flexDirection:“column”,alignItems:“center”,justifyContent:“center”,
-boxShadow:“0 4px 16px rgba(0,0,0,0.18)”,pointerEvents:“all”,gap:1}}>
-<span style={{fontSize:22}}>{u.emoji}</span>
-<span style={{fontSize:7,fontWeight:700,color:u.color,textTransform:“uppercase”,letterSpacing:0.3}}>{u.id}</span>
-</button>
-);
-})))
-);
-}
+function drawMap(){
+  if(!ctx||!W) return;
+  ctx.clearRect(0,0,W,H);
+  const proj_active = getActive();
+  const {perimPts, closed, features} = proj_active;
+  const ref = buildRef(perimPts, features, linePts);
 
-// ─── PHOTO PIN MODAL ──────────────────────────────────────────────────────────
-function PhotoPinModal({feature,onSave,onClose}){
-const[note,setNote]=useState(feature.note||””);
-const[photoPreview,setPhotoPreview]=useState(feature.photo||null);
-const fileRef=useRef(null);
-const u=UTILS.find(x=>x.id===feature.type)||UTILS[0];
-
-const handleFile=e=>{
-const file=e.target.files[0];
-if(!file)return;
-const reader=new FileReader();
-reader.onload=ev=>setPhotoPreview(ev.target.result);
-reader.readAsDataURL(file);
-};
-
-return(
-React.createElement(“div”,{“style”:{position:“fixed”,inset:0,zIndex:400,background:“rgba(0,0,0,0.5)”,backdropFilter:“blur(4px)”,display:“flex”,alignItems:“flex-end”,justifyContent:“center”},“onPointerDown”:onClose},React.createElement(“div”,{“style”:{background:“white”,borderRadius:“24px 24px 0 0”,padding:24,width:“100%”,maxWidth:480,boxShadow:T.shadowLg,maxHeight:“80vh”,overflowY:“auto”},“onPointerDown”:e=>e.stopPropagation()},/* Handle */,React.createElement(“div”,{“style”:{width:40,height:4,borderRadius:2,background:T.border,margin:“0 auto 20px”}}),React.createElement(“div”,{“style”:{display:“flex”,alignItems:“center”,gap:10,marginBottom:20}},React.createElement(“div”,{“style”:{width:42,height:42,borderRadius:12,background:u.bg,display:“flex”,alignItems:“center”,justifyContent:“center”,fontSize:22}},u.emoji),React.createElement(“div”,null,React.createElement(“div”,{“style”:{fontWeight:800,fontSize:16,color:T.text}},u.label),React.createElement(“div”,{“style”:{fontSize:12,color:T.textSub,marginTop:1}},feature.lat?.toFixed(5),”,”,feature.lng?.toFixed(5)))),/* Photo area */,photoPreview?(
-<div style={{position:“relative”,marginBottom:14}}>
-<img src={photoPreview} alt=“site” style={{width:“100%”,height:180,objectFit:“cover”,borderRadius:T.radiusSm}}/>
-<button onClick={()=>setPhotoPreview(null)}
-style={{position:“absolute”,top:8,right:8,background:“rgba(0,0,0,0.55)”,border:“none”,borderRadius:“50%”,width:30,height:30,color:“white”,cursor:“pointer”,fontSize:16,display:“flex”,alignItems:“center”,justifyContent:“center”}}>×</button>
-</div>
-):(
-<button onClick={()=>fileRef.current.click()}
-style={{width:“100%”,height:120,background:T.bg,border:`2px dashed ${T.border}`,borderRadius:T.radiusSm,cursor:“pointer”,display:“flex”,flexDirection:“column”,alignItems:“center”,justifyContent:“center”,gap:8,marginBottom:14}}>
-<span style={{fontSize:32}}>📷</span>
-<span style={{fontSize:13,fontWeight:600,color:T.textSub}}>Tap to attach a site photo</span>
-</button>
-),React.createElement(“input”,{“ref”:fileRef,“type”:“file”,“accept”:“image/*”,“capture”:“environment”,“style”:{display:“none”},“onChange”:handleFile}),/* Notes */,React.createElement(“textarea”,{“value”:note,“onChange”:e=>setNote(e.target.value),“placeholder”:“Add a note — depth, condition, access point…”,“style”:{width:“100%”,border:`1.5px solid ${T.border}`,borderRadius:T.radiusSm,color:T.text,padding:“11px 14px”,fontSize:13,outline:“none”,fontFamily:“inherit”,background:T.bg,resize:“none”,height:80,marginBottom:14}}),React.createElement(“button”,{“onClick”:()=>onSave({…feature,note,photo:photoPreview}),“style”:{width:“100%”,background:T.orange,border:“none”,borderRadius:T.radiusSm,color:“white”,padding:14,fontSize:15,fontWeight:700,cursor:“pointer”,boxShadow:`0 4px 16px rgba(244,121,32,0.3)`}},“Save Pin”)))
-);
-}
-
-// ─── VOLUME ZONE MODAL ────────────────────────────────────────────────────────
-function VolumeModal({area, zones, onSave, onClose}){
-const[zoneList,setZoneList]=useState(zones.length?zones:[{id:Date.now(),label:“Zone A”,depth:””,type:“cut”}]);
-
-const addZone=()=>setZoneList(z=>[…z,{id:Date.now(),label:`Zone ${String.fromCharCode(65+z.length)}`,depth:””,type:“cut”}]);
-const update=(id,field,val)=>setZoneList(z=>z.map(z=>z.id===id?{…z,[field]:val}:z));
-const remove=id=>setZoneList(z=>z.filter(x=>x.id!==id));
-
-const totalVol=zoneList.reduce((s,z)=>{
-const d=parseFloat(z.depth)||0;
-return s+(area*d*(1/zoneList.length));
-},0);
-
-return(
-React.createElement(“div”,{“style”:{position:“fixed”,inset:0,zIndex:400,background:“rgba(0,0,0,0.5)”,backdropFilter:“blur(4px)”,display:“flex”,alignItems:“flex-end”,justifyContent:“center”},“onPointerDown”:onClose},React.createElement(“div”,{“style”:{background:“white”,borderRadius:“24px 24px 0 0”,padding:24,width:“100%”,maxWidth:480,boxShadow:T.shadowLg,maxHeight:“85vh”,overflowY:“auto”},“onPointerDown”:e=>e.stopPropagation()},React.createElement(“div”,{“style”:{width:40,height:4,borderRadius:2,background:T.border,margin:“0 auto 20px”}}),React.createElement(“div”,{“style”:{fontWeight:800,fontSize:18,color:T.text,marginBottom:4}},“Volume Calculator”),React.createElement(“div”,{“style”:{fontSize:13,color:T.textSub,marginBottom:20}},“Site area:”,fmt(toAc(area),3),“ac (”,fmt(toSqFt(area),0),“sq ft)”),zoneList.map((z,i)=>(
-<div key={z.id} style={{background:T.bg,borderRadius:T.radiusSm,padding:14,marginBottom:10}}>
-<div style={{display:“flex”,justifyContent:“space-between”,alignItems:“center”,marginBottom:10}}>
-<input value={z.label} onChange={e=>update(z.id,“label”,e.target.value)}
-style={{fontWeight:700,fontSize:14,color:T.text,border:“none”,background:“transparent”,outline:“none”,fontFamily:“inherit”,width:120}}/>
-{zoneList.length>1&&(
-<button onClick={()=>remove(z.id)} style={{background:“none”,border:“none”,color:T.textMuted,cursor:“pointer”,fontSize:16}}>×</button>
-)}
-</div>
-<div style={{display:“grid”,gridTemplateColumns:“1fr 1fr”,gap:10}}>
-<div>
-<div style={{fontSize:11,fontWeight:600,color:T.textSub,marginBottom:5}}>AVG DEPTH (m)</div>
-<input type=“number” value={z.depth} onChange={e=>update(z.id,“depth”,e.target.value)} placeholder=“0.00”
-style={{width:“100%”,border:`1.5px solid ${T.border}`,borderRadius:T.radiusXs,padding:“9px 12px”,fontSize:14,fontWeight:700,color:T.text,outline:“none”,fontFamily:“inherit”,background:“white”}}/>
-</div>
-<div>
-<div style={{fontSize:11,fontWeight:600,color:T.textSub,marginBottom:5}}>TYPE</div>
-<div style={{display:“flex”,gap:6}}>
-{[“cut”,“fill”].map(t=>(
-<button key={t} onClick={()=>update(z.id,“type”,t)}
-style={{flex:1,padding:“9px 0”,background:z.type===t?(t===“cut”?T.red:T.green):“white”,border:`1.5px solid ${z.type===t?(t==="cut"?T.red:T.green):T.border}`,borderRadius:T.radiusXs,color:z.type===t?“white”:T.textSub,fontSize:12,fontWeight:700,cursor:“pointer”,fontFamily:“inherit”}}>
-{t===“cut”?“▼ Cut”:“▲ Fill”}
-</button>
-))}
-</div>
-</div>
-</div>
-{z.depth&&(
-<div style={{marginTop:10,fontSize:12,color:T.textSub}}>
-Zone volume: <strong style={{color:z.type===“cut”?T.red:T.green}}>
-{fmt((area/zoneList.length)*parseFloat(z.depth),1)} m³
-</strong>
- ({fmt(toSqFt(area/zoneList.length)*parseFloat(z.depth)*0.0283168,1)} yd³)
-</div>
-)}
-</div>
-)),React.createElement(“button”,{“onClick”:addZone,“style”:{width:“100%”,background:T.bg,border:`1.5px dashed ${T.border}`,borderRadius:T.radiusSm,color:T.textSub,padding:11,fontSize:13,fontWeight:600,cursor:“pointer”,marginBottom:16,fontFamily:“inherit”}},”+ Add Zone”),totalVol>0&&(
-<div style={{background:`linear-gradient(135deg,rgba(244,121,32,0.1),rgba(244,121,32,0.03))`,border:`2px solid rgba(244,121,32,0.25)`,borderRadius:T.radiusSm,padding:“14px 18px”,marginBottom:16,display:“flex”,justifyContent:“space-between”,alignItems:“center”}}>
-<div style={{fontSize:13,fontWeight:600,color:T.textSub}}>Total Est. Volume</div>
-<div style={{fontSize:26,fontWeight:900,color:T.orange}}>{fmt(totalVol,1)} m³</div>
-</div>
-),React.createElement(“button”,{“onClick”:()=>onSave(zoneList),“style”:{width:“100%”,background:T.orange,border:“none”,borderRadius:T.radiusSm,color:“white”,padding:14,fontSize:15,fontWeight:700,cursor:“pointer”,boxShadow:`0 4px 16px rgba(244,121,32,0.3)`}},“Save Volume Data”)))
-);
-}
-
-// ─── MACHINE RS3 HOOK ─────────────────────────────────────────────────────────
-// Tries: (1) RS3 WebSocket at custom IP:port, (2) browser GPS, (3) simulator
-function useMachinePosition(enabled, ip, port){
-const[pos,setPos]=useState(null);
-const[source,setSource]=useState(“none”);
-const wsRef=useRef(null);
-const simRef=useRef(null);
-const watchRef=useRef(null);
-
-useEffect(()=>{
-if(!enabled){
-wsRef.current?.close(); clearInterval(simRef.current);
-navigator.geolocation?.clearWatch(watchRef.current);
-setPos(null); setSource(“none”); return;
-}
-let settled=false;
-
-```
-function startSim(){
-  setSource("sim"); let angle=0;
-  simRef.current=setInterval(()=>{
-    angle+=0.04;
-    setPos({lat:MOCK.lat+Math.sin(angle)*0.00025, lng:MOCK.lng+Math.cos(angle)*0.00025,
-      elev:312.1+Math.sin(angle*2)*0.3, fixType:"RTK Fix", fixQ:4, heading:((angle*180/Math.PI)%360+360)%360});
-  },800);
-}
-
-function tryGPS(){
-  if(!navigator.geolocation){startSim();return;}
-  watchRef.current=navigator.geolocation.watchPosition(
-    gp=>{settled=true;setSource("gps");
-      setPos({lat:gp.coords.latitude,lng:gp.coords.longitude,
-        elev:gp.coords.altitude||0,fixType:"GPS",fixQ:1,
-        heading:gp.coords.heading||0});},
-    ()=>startSim(),{enableHighAccuracy:true,maximumAge:1000});
-}
-
-try{
-  const ws=new WebSocket(`ws://${ip}:${port}`);
-  ws.onopen=()=>{settled=true;setSource("rs3");};
-  ws.onmessage=e=>e.data.split("\n").forEach(l=>{const p=parseGGA(l.trim());if(p){setPos(p);}});
-  ws.onerror=()=>{if(!settled)tryGPS();};
-  wsRef.current=ws;
-}catch{tryGPS();}
-
-return()=>{
-  wsRef.current?.close(); clearInterval(simRef.current);
-  navigator.geolocation?.clearWatch(watchRef.current);
-};
-```
-
-},[enabled,ip,port]);
-
-return{pos,source};
-}
-
-// ─── PROXIMITY CHECK ──────────────────────────────────────────────────────────
-const PROX_M=3;
-function nearestAlert(machinePos, features){
-if(!machinePos||!features.length) return null;
-let nearest=null, minDist=Infinity;
-features.forEach(f=>{
-const pts=f.lat!=null?[{lat:f.lat,lng:f.lng}]:(f.pts||[]);
-pts.forEach(p=>{
-const d=haversine(machinePos,p);
-if(d<minDist){minDist=d; nearest={feature:f,dist:d};}
-});
-});
-return nearest&&nearest.dist<=PROX_M ? nearest : null;
-}
-
-// ─── MAP CANVAS ───────────────────────────────────────────────────────────────
-function MapCanvas({project:proj,features,onAddPerim,onUndo,onClose,onAddFeature,onUpdateFeature,mapMode,activeUtil,linePts,onAddLinePt,onFinishLine,mapStyle,machinePos,machineEnabled}){
-const cvsRef=useRef(null);
-const pressRef=useRef(null);
-const[hover,setHover]=useState(null);
-const[radial,setRadial]=useState(null);
-const[selectedPin,setSelectedPin]=useState(null);
-const W=800,H=460;
-const{perimPts,closed}=proj;
-const proxAlert=nearestAlert(machinePos,features);
-
-const getEvPx=e=>{
-const c=cvsRef.current;if(!c)return{px:0,py:0};
-const rect=c.getBoundingClientRect();
-return{px:(e.clientX-rect.left)*(W/rect.width),py:(e.clientY-rect.top)*(H/rect.height)};
-};
-
-// ── draw ───────────────────────────────────────────────────────────────────
-useEffect(()=>{
-const canvas=cvsRef.current;if(!canvas)return;
-const ctx=canvas.getContext(“2d”);
-ctx.clearRect(0,0,W,H);
-const ref=buildRef(perimPts,features,linePts);
-
-```
-// Background by map style
-if(mapStyle==="satellite"){
-  ctx.fillStyle="#2D3A2E";ctx.fillRect(0,0,W,H);
-  // field patches
-  const patches=[
-    {x:0,y:0,w:W*0.55,h:H*0.45,c:"#3A4F2C"},{x:W*0.55,y:0,w:W*0.45,h:H*0.42,c:"#2E3D20"},
-    {x:0,y:H*0.45,w:W*0.6,h:H*0.55,c:"#354428"},{x:W*0.6,y:H*0.42,w:W*0.4,h:H*0.58,c:"#293820"},
-  ];
-  patches.forEach(p=>{ctx.fillStyle=p.c;ctx.fillRect(p.x,p.y,p.w,p.h);});
-  ctx.strokeStyle="rgba(255,255,255,0.15)";ctx.lineWidth=1;
-  for(let x=0;x<W;x+=60){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-  for(let y=0;y<H;y+=60){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-  // roads
-  ctx.strokeStyle="rgba(120,100,60,0.7)";ctx.lineWidth=7;ctx.setLineDash([]);
-  ctx.beginPath();ctx.moveTo(0,H*0.4);ctx.lineTo(W,H*0.4);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(W*0.62,0);ctx.lineTo(W*0.62,H);ctx.stroke();
-} else if(mapStyle==="topo"){
-  ctx.fillStyle="#EEE8D5";ctx.fillRect(0,0,W,H);
-  // contour lines
-  ctx.strokeStyle="rgba(180,150,80,0.35)";ctx.lineWidth=1;ctx.setLineDash([]);
-  for(let i=0;i<8;i++){
-    ctx.beginPath();
-    ctx.ellipse(W*0.4,H*0.5,80+i*40,50+i*28,0.3,0,Math.PI*2);
-    ctx.stroke();
-  }
-  ctx.strokeStyle="rgba(160,130,60,0.5)";ctx.lineWidth=1.5;
-  ctx.beginPath();ctx.ellipse(W*0.4,H*0.5,80,50,0.3,0,Math.PI*2);ctx.stroke();
-  ctx.fillStyle="rgba(180,150,80,0.2)";ctx.fill();
-  // roads
-  ctx.strokeStyle="rgba(200,160,80,0.8)";ctx.lineWidth=6;ctx.setLineDash([]);
-  ctx.beginPath();ctx.moveTo(0,H*0.4);ctx.lineTo(W,H*0.4);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(W*0.62,0);ctx.lineTo(W*0.62,H);ctx.stroke();
-  ctx.strokeStyle="rgba(160,120,60,0.4)";ctx.lineWidth=1;ctx.setLineDash([6,6]);
-  ctx.beginPath();ctx.moveTo(0,H*0.4);ctx.lineTo(W,H*0.4);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(W*0.62,0);ctx.lineTo(W*0.62,H);ctx.stroke();
-  ctx.setLineDash([]);
-} else {
-  // Default
-  ctx.fillStyle="#E8ECF0";ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle="rgba(255,255,255,0.65)";ctx.lineWidth=1;
-  for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-  for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-  ctx.strokeStyle="rgba(255,255,255,0.9)";ctx.lineWidth=8;ctx.setLineDash([]);
-  ctx.beginPath();ctx.moveTo(0,H*0.4);ctx.lineTo(W,H*0.4);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(W*0.62,0);ctx.lineTo(W*0.62,H);ctx.stroke();
-  ctx.strokeStyle="rgba(200,200,200,0.5)";ctx.lineWidth=1;ctx.setLineDash([8,8]);
-  ctx.beginPath();ctx.moveTo(0,H*0.4);ctx.lineTo(W,H*0.4);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(W*0.62,0);ctx.lineTo(W*0.62,H);ctx.stroke();
-  ctx.setLineDash([]);
-}
-
-// Empty hint
-if(!perimPts.length&&!features.length&&!linePts.length){
-  const labelColor=mapStyle==="satellite"?"rgba(255,255,255,0.7)":"rgba(0,0,0,0.22)";
-  ctx.fillStyle=labelColor;ctx.font="600 14px DM Sans,system-ui";
-  ctx.textAlign="center";ctx.textBaseline="middle";
-  ctx.fillText("Hold to place a utility  ·  Tap to draw your site boundary",W/2,H/2-8);
-  ctx.font="400 12px DM Sans,system-ui";
-  ctx.fillStyle=mapStyle==="satellite"?"rgba(255,255,255,0.45)":"rgba(0,0,0,0.14)";
-  ctx.fillText("Perimeters, utility lines & markers — all in one map",W/2,H/2+14);
-  return;
-}
-
-// Polygon fill
-if(perimPts.length>2&&closed){
-  const xys=perimPts.map(p=>project(ref,p,W,H));
-  ctx.beginPath();ctx.moveTo(xys[0].x,xys[0].y);
-  xys.forEach(p=>ctx.lineTo(p.x,p.y));ctx.closePath();
-  ctx.fillStyle="rgba(244,121,32,0.13)";ctx.fill();
-}
-
-// Perimeter outline
-if(perimPts.length>1){
-  const xys=perimPts.map(p=>project(ref,p,W,H));
-  ctx.beginPath();ctx.moveTo(xys[0].x,xys[0].y);
-  xys.forEach(p=>ctx.lineTo(p.x,p.y));
-  if(closed)ctx.closePath();
-  ctx.strokeStyle=T.orange;ctx.lineWidth=closed?3:2.5;
-  ctx.setLineDash(closed?[]:[8,5]);ctx.stroke();ctx.setLineDash([]);
-
-  if(hover&&!closed&&mapMode==="perimeter"){
-    const last=xys[xys.length-1],h=project(ref,hover,W,H);
-    ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(h.x,h.y);
-    ctx.strokeStyle="rgba(244,121,32,0.4)";ctx.lineWidth=2;
-    ctx.setLineDash([5,5]);ctx.stroke();ctx.setLineDash([]);
-  }
-
-  const segs=closed?perimPts.length:perimPts.length-1;
-  for(let i=0;i<segs;i++){
-    const a=xys[i],b=xys[(i+1)%xys.length];
-    const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
-    const d=haversine(perimPts[i],perimPts[(i+1)%perimPts.length]);
-    const txt=d<1000?`${d.toFixed(1)} m`:`${(d/1000).toFixed(2)} km`;
-    ctx.font="600 11px DM Sans,system-ui";
-    const tw=ctx.measureText(txt).width;
-    ctx.fillStyle="white";ctx.shadowBlur=8;ctx.shadowColor="rgba(0,0,0,0.12)";
-    roundRect(ctx,mx-tw/2-8,my-10,tw+16,20,6);ctx.fill();ctx.shadowBlur=0;
-    ctx.fillStyle=T.orange;ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(txt,mx,my);
-  }
-
-  perimPts.forEach((p,i)=>{
-    const{x,y}=project(ref,p,W,H);
-    ctx.shadowBlur=12;ctx.shadowColor="rgba(244,121,32,0.35)";
-    ctx.beginPath();ctx.arc(x,y,i===0?12:8,0,Math.PI*2);
-    ctx.fillStyle=T.orange;ctx.fill();ctx.shadowBlur=0;
-    ctx.strokeStyle="white";ctx.lineWidth=2.5;ctx.stroke();
-    ctx.fillStyle="white";ctx.font=`bold ${i===0?11:10}px DM Sans,system-ui`;
-    ctx.textAlign="center";ctx.textBaseline="middle";
-    ctx.fillText(i===0?"A":String(i+1),x,y);
-  });
-}
-
-// Active line
-if(mapMode==="line"&&linePts.length>0){
-  const u=UTILS.find(u=>u.id===activeUtil)||UTILS[0];
-  const xys=linePts.map(p=>project(ref,p,W,H));
-  ctx.beginPath();ctx.moveTo(xys[0].x,xys[0].y);
-  xys.forEach(p=>ctx.lineTo(p.x,p.y));
-  if(hover){const h=project(ref,hover,W,H);ctx.lineTo(h.x,h.y);}
-  ctx.strokeStyle=u.dot;ctx.lineWidth=4;ctx.setLineDash([10,6]);
-  ctx.shadowBlur=8;ctx.shadowColor=u.dot+"88";
-  ctx.stroke();ctx.setLineDash([]);ctx.shadowBlur=0;
-  xys.forEach(({x,y})=>{ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fillStyle=u.dot;ctx.fill();ctx.strokeStyle="white";ctx.lineWidth=1.5;ctx.stroke();});
-}
-
-// Saved feature lines
-features.filter(f=>f.pts?.length>1).forEach(f=>{
-  const u=UTILS.find(u=>u.id===f.type)||UTILS[0];
-  const xys=f.pts.map(p=>project(ref,p,W,H));
-  ctx.beginPath();ctx.moveTo(xys[0].x,xys[0].y);
-  xys.forEach(p=>ctx.lineTo(p.x,p.y));
-  ctx.strokeStyle=u.dot;ctx.lineWidth=4;ctx.setLineDash([12,6]);
-  ctx.shadowBlur=6;ctx.shadowColor=u.dot+"77";
-  ctx.stroke();ctx.setLineDash([]);ctx.shadowBlur=0;
-  [xys[0],xys[xys.length-1]].forEach(({x,y})=>{
-    ctx.beginPath();ctx.arc(x,y,6,0,Math.PI*2);ctx.fillStyle=u.dot;ctx.fill();ctx.strokeStyle="white";ctx.lineWidth=2;ctx.stroke();
-  });
-  const mid=xys[Math.floor(xys.length/2)];
-  ctx.font="600 10px DM Sans,system-ui";
-  const tw=ctx.measureText(u.label).width;
-  ctx.fillStyle=u.bg;ctx.shadowBlur=5;ctx.shadowColor="rgba(0,0,0,0.1)";
-  roundRect(ctx,mid.x-tw/2-10,mid.y-22,tw+20,18,6);ctx.fill();ctx.shadowBlur=0;
-  ctx.fillStyle=u.color;ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(u.label,mid.x,mid.y-13);
-});
-
-// Feature point pins
-features.filter(f=>f.lat!=null).forEach(f=>{
-  const u=UTILS.find(u=>u.id===f.type)||UTILS[0];
-  const{x,y}=project(ref,{lat:f.lat,lng:f.lng},W,H);
-  ctx.beginPath();ctx.arc(x,y,22,0,Math.PI*2);
-  ctx.fillStyle=u.bg+"BB";ctx.fill();
-  ctx.shadowBlur=10;ctx.shadowColor=u.dot+"55";
-  ctx.beginPath();ctx.arc(x,y,14,0,Math.PI*2);
-  ctx.fillStyle=u.bg;ctx.fill();
-  ctx.strokeStyle=u.dot;ctx.lineWidth=2.5;ctx.stroke();
-  ctx.shadowBlur=0;
-  ctx.font="16px system-ui";ctx.textAlign="center";ctx.textBaseline="middle";
-  ctx.fillText(u.emoji,x,y+1);
-  // Photo badge
-  if(f.photo){
-    ctx.beginPath();ctx.arc(x+10,y-10,7,0,Math.PI*2);
-    ctx.fillStyle=T.blue;ctx.fill();ctx.strokeStyle="white";ctx.lineWidth=1.5;ctx.stroke();
-    ctx.font="9px system-ui";ctx.textAlign="center";ctx.textBaseline="middle";
-    ctx.fillStyle="white";ctx.fillText("📷",x+10,y-10);
-  }
-});
-
-// ── Machine position dot ─────────────────────────────────────────────────
-if(machinePos){
-  const{x,y}=project(ref,{lat:machinePos.lat,lng:machinePos.lng},W,H);
-  const alert=nearestAlert(machinePos,features);
-
-  // Proximity ring — red pulse when in alert zone
-  if(alert){
-    ctx.beginPath();ctx.arc(x,y,28,0,Math.PI*2);
-    ctx.fillStyle="rgba(220,38,38,0.18)";ctx.fill();
-    ctx.beginPath();ctx.arc(x,y,20,0,Math.PI*2);
-    ctx.strokeStyle="rgba(220,38,38,0.5)";ctx.lineWidth=2;ctx.setLineDash([4,3]);ctx.stroke();ctx.setLineDash([]);
+  // Background
+  if(mapStyle==='satellite'){
+    ctx.fillStyle='#2D3A2E'; ctx.fillRect(0,0,W,H);
+    [{x:0,y:0,w:W*.55,h:H*.45,c:'#3A4F2C'},{x:W*.55,y:0,w:W*.45,h:H*.42,c:'#2E3D20'},
+     {x:0,y:H*.45,w:W*.6,h:H*.55,c:'#354428'},{x:W*.6,y:H*.42,w:W*.4,h:H*.58,c:'#293820'}]
+    .forEach(p=>{ctx.fillStyle=p.c;ctx.fillRect(p.x,p.y,p.w,p.h);});
+    ctx.strokeStyle='rgba(255,255,255,0.1)';ctx.lineWidth=1;
+    for(let x=0;x<W;x+=60){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    ctx.strokeStyle='rgba(120,100,60,0.7)';ctx.lineWidth=7;ctx.setLineDash([]);
+    ctx.beginPath();ctx.moveTo(0,H*.4);ctx.lineTo(W,H*.4);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(W*.62,0);ctx.lineTo(W*.62,H);ctx.stroke();
+  } else if(mapStyle==='topo'){
+    ctx.fillStyle='#EEE8D5';ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle='rgba(180,150,80,0.35)';ctx.lineWidth=1;
+    for(let i=0;i<8;i++){ctx.beginPath();ctx.ellipse(W*.4,H*.5,70+i*35,45+i*24,0.3,0,Math.PI*2);ctx.stroke();}
+    ctx.strokeStyle='rgba(200,160,80,0.8)';ctx.lineWidth=6;ctx.setLineDash([]);
+    ctx.beginPath();ctx.moveTo(0,H*.4);ctx.lineTo(W,H*.4);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(W*.62,0);ctx.lineTo(W*.62,H);ctx.stroke();
+    ctx.strokeStyle='rgba(160,120,60,0.4)';ctx.lineWidth=1;ctx.setLineDash([6,6]);
+    ctx.beginPath();ctx.moveTo(0,H*.4);ctx.lineTo(W,H*.4);ctx.stroke();
+    ctx.setLineDash([]);
   } else {
-    // Normal accuracy ring
-    ctx.beginPath();ctx.arc(x,y,22,0,Math.PI*2);
-    ctx.fillStyle="rgba(37,99,235,0.12)";ctx.fill();
+    ctx.fillStyle='#E8ECF0';ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle='rgba(255,255,255,0.65)';ctx.lineWidth=1;
+    for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+    ctx.strokeStyle='rgba(255,255,255,0.9)';ctx.lineWidth=8;ctx.setLineDash([]);
+    ctx.beginPath();ctx.moveTo(0,H*.4);ctx.lineTo(W,H*.4);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(W*.62,0);ctx.lineTo(W*.62,H);ctx.stroke();
+    ctx.strokeStyle='rgba(200,200,200,0.5)';ctx.lineWidth=1;ctx.setLineDash([8,8]);
+    ctx.beginPath();ctx.moveTo(0,H*.4);ctx.lineTo(W,H*.4);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(W*.62,0);ctx.lineTo(W*.62,H);ctx.stroke();
+    ctx.setLineDash([]);
   }
 
-  // Heading cone (if available)
-  if(machinePos.heading!=null&&machinePos.heading!==0){
-    const hdg=(machinePos.heading-90)*Math.PI/180;
-    ctx.beginPath();
-    ctx.moveTo(x,y);
-    ctx.arc(x,y,30,hdg-0.4,hdg+0.4);
-    ctx.closePath();
-    ctx.fillStyle=alert?"rgba(220,38,38,0.25)":"rgba(37,99,235,0.2)";
-    ctx.fill();
+  // Empty hint
+  if(!perimPts.length&&!features.length&&!linePts.length){
+    const col=mapStyle==='satellite'?'rgba(255,255,255,0.6)':'rgba(0,0,0,0.22)';
+    ctx.fillStyle=col;ctx.font='600 13px Segoe UI,system-ui';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('Hold = Place utility  ·  Tap = Draw boundary',W/2,H/2-8);
+    ctx.font='400 11px Segoe UI,system-ui';
+    ctx.fillStyle=mapStyle==='satellite'?'rgba(255,255,255,0.35)':'rgba(0,0,0,0.14)';
+    ctx.fillText('Perimeters, utility lines & markers in one map',W/2,H/2+14);
+    return;
   }
 
-  // Outer ring
-  ctx.shadowBlur=14;ctx.shadowColor=alert?"rgba(220,38,38,0.5)":"rgba(37,99,235,0.4)";
-  ctx.beginPath();ctx.arc(x,y,13,0,Math.PI*2);
-  ctx.fillStyle=alert?T.red:T.blue;ctx.fill();ctx.shadowBlur=0;
-  // White border
-  ctx.strokeStyle="white";ctx.lineWidth=3;ctx.stroke();
-  // Inner dot
-  ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);
-  ctx.fillStyle="white";ctx.fill();
+  // Polygon fill
+  if(perimPts.length>2&&closed){
+    const xys=perimPts.map(p=>project(ref,p,W,H));
+    ctx.beginPath();ctx.moveTo(xys[0].x,xys[0].y);
+    xys.forEach(p=>ctx.lineTo(p.x,p.y));ctx.closePath();
+    ctx.fillStyle='rgba(244,121,32,0.12)';ctx.fill();
+  }
 
-  // Machine label tag
-  const tag="🚜 Machine";
-  ctx.font="600 11px DM Sans,system-ui";
-  const tw=ctx.measureText(tag).width;
-  ctx.shadowBlur=6;ctx.shadowColor="rgba(0,0,0,0.15)";
-  roundRect(ctx,x-tw/2-8,y-34,tw+16,20,5);
-  ctx.fillStyle=alert?T.red:T.blue;ctx.fill();ctx.shadowBlur=0;
-  ctx.fillStyle="white";ctx.textAlign="center";ctx.textBaseline="middle";
-  ctx.fillText(tag,x,y-24);
+  // Perimeter
+  if(perimPts.length>1){
+    const xys=perimPts.map(p=>project(ref,p,W,H));
+    ctx.beginPath();ctx.moveTo(xys[0].x,xys[0].y);
+    xys.forEach(p=>ctx.lineTo(p.x,p.y));
+    if(closed)ctx.closePath();
+    ctx.strokeStyle='#F47920';ctx.lineWidth=closed?3:2.5;
+    ctx.setLineDash(closed?[]:[8,5]);ctx.stroke();ctx.setLineDash([]);
+
+    // Segment labels
+    const segs=closed?perimPts.length:perimPts.length-1;
+    for(let i=0;i<segs;i++){
+      const a=xys[i],b=xys[(i+1)%xys.length];
+      const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+      const d=haversine(perimPts[i],perimPts[(i+1)%perimPts.length]);
+      const txt=d<1000?`${d.toFixed(1)} m`:`${(d/1000).toFixed(2)} km`;
+      ctx.font='600 10px Segoe UI,system-ui';
+      const tw=ctx.measureText(txt).width;
+      ctx.fillStyle='white';ctx.shadowBlur=6;ctx.shadowColor='rgba(0,0,0,0.1)';
+      roundRect(ctx,mx-tw/2-7,my-9,tw+14,18,5);ctx.fill();ctx.shadowBlur=0;
+      ctx.fillStyle='#F47920';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(txt,mx,my);
+    }
+
+    // Nodes
+    perimPts.forEach((p,i)=>{
+      const{x,y}=project(ref,p,W,H);
+      ctx.shadowBlur=10;ctx.shadowColor='rgba(244,121,32,0.3)';
+      ctx.beginPath();ctx.arc(x,y,i===0?11:7,0,Math.PI*2);
+      ctx.fillStyle='#F47920';ctx.fill();ctx.shadowBlur=0;
+      ctx.strokeStyle='white';ctx.lineWidth=2.5;ctx.stroke();
+      ctx.fillStyle='white';ctx.font=`bold ${i===0?10:9}px Segoe UI,system-ui`;
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(i===0?'A':String(i+1),x,y);
+    });
+  }
+
+  // Active line
+  if(mapMode==='line'&&linePts.length>0){
+    const u=UTILS.find(u=>u.id===activeUtil)||UTILS[0];
+    const xys=linePts.map(p=>project(ref,p,W,H));
+    ctx.beginPath();ctx.moveTo(xys[0].x,xys[0].y);
+    xys.forEach(p=>ctx.lineTo(p.x,p.y));
+    ctx.strokeStyle=u.dot;ctx.lineWidth=4;ctx.setLineDash([10,6]);
+    ctx.shadowBlur=6;ctx.shadowColor=u.dot+'88';
+    ctx.stroke();ctx.setLineDash([]);ctx.shadowBlur=0;
+    xys.forEach(({x,y})=>{ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fillStyle=u.dot;ctx.fill();ctx.strokeStyle='white';ctx.lineWidth=1.5;ctx.stroke();});
+  }
+
+  // Saved feature lines
+  features.filter(f=>f.pts&&f.pts.length>1).forEach(f=>{
+    const u=UTILS.find(u=>u.id===f.type)||UTILS[0];
+    const xys=f.pts.map(p=>project(ref,p,W,H));
+    ctx.beginPath();ctx.moveTo(xys[0].x,xys[0].y);
+    xys.forEach(p=>ctx.lineTo(p.x,p.y));
+    ctx.strokeStyle=u.dot;ctx.lineWidth=4;ctx.setLineDash([12,6]);
+    ctx.shadowBlur=5;ctx.shadowColor=u.dot+'77';
+    ctx.stroke();ctx.setLineDash([]);ctx.shadowBlur=0;
+    [xys[0],xys[xys.length-1]].forEach(({x,y})=>{ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fillStyle=u.dot;ctx.fill();ctx.strokeStyle='white';ctx.lineWidth=2;ctx.stroke();});
+    const mid=xys[Math.floor(xys.length/2)];
+    ctx.font='600 10px Segoe UI,system-ui';
+    const tw=ctx.measureText(u.label).width;
+    ctx.fillStyle=u.bg;ctx.shadowBlur=4;ctx.shadowColor='rgba(0,0,0,0.1)';
+    roundRect(ctx,mid.x-tw/2-9,mid.y-21,tw+18,16,5);ctx.fill();ctx.shadowBlur=0;
+    ctx.fillStyle=u.color;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(u.label,mid.x,mid.y-13);
+  });
+
+  // Feature point pins
+  features.filter(f=>f.lat!=null).forEach(f=>{
+    const u=UTILS.find(u=>u.id===f.type)||UTILS[0];
+    const{x,y}=project(ref,{lat:f.lat,lng:f.lng},W,H);
+    ctx.beginPath();ctx.arc(x,y,20,0,Math.PI*2);ctx.fillStyle=u.bg+'BB';ctx.fill();
+    ctx.shadowBlur=8;ctx.shadowColor=u.dot+'44';
+    ctx.beginPath();ctx.arc(x,y,13,0,Math.PI*2);ctx.fillStyle=u.bg;ctx.fill();
+    ctx.strokeStyle=u.dot;ctx.lineWidth=2.5;ctx.stroke();ctx.shadowBlur=0;
+    ctx.font='14px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(u.emoji,x,y+1);
+    if(f.photo){
+      ctx.beginPath();ctx.arc(x+9,y-9,7,0,Math.PI*2);ctx.fillStyle='#2563EB';ctx.fill();ctx.strokeStyle='white';ctx.lineWidth=1.5;ctx.stroke();
+      ctx.font='8px system-ui';ctx.fillStyle='white';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('📷',x+9,y-9);
+    }
+  });
+
+  // Machine dot
+  if(machineEnabled&&machinePos){
+    const prox=nearestAlert();
+    const{x,y}=project(ref,{lat:machinePos.lat,lng:machinePos.lng},W,H);
+    // Ring
+    ctx.beginPath();ctx.arc(x,y,20,0,Math.PI*2);
+    ctx.fillStyle=prox?'rgba(220,38,38,0.15)':'rgba(37,99,235,0.12)';ctx.fill();
+    // Dot
+    ctx.shadowBlur=12;ctx.shadowColor=prox?'rgba(220,38,38,0.4)':'rgba(37,99,235,0.35)';
+    ctx.beginPath();ctx.arc(x,y,12,0,Math.PI*2);
+    ctx.fillStyle=prox?'#DC2626':'#2563EB';ctx.fill();ctx.shadowBlur=0;
+    ctx.strokeStyle='white';ctx.lineWidth=3;ctx.stroke();
+    ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();
+    // Label
+    ctx.font='600 10px Segoe UI,system-ui';
+    const tag='🚜 Machine';const tw=ctx.measureText(tag).width;
+    ctx.shadowBlur=5;ctx.shadowColor='rgba(0,0,0,0.12)';
+    roundRect(ctx,x-tw/2-7,y-32,tw+14,18,5);ctx.fillStyle=prox?'#DC2626':'#2563EB';ctx.fill();ctx.shadowBlur=0;
+    ctx.fillStyle='white';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(tag,x,y-23);
+  }
 }
-```
 
-},[perimPts,closed,hover,features,mapMode,activeUtil,linePts,mapStyle,machinePos]);
-
-// Track touch start so we can distinguish tap/hold from scroll
-const touchStartRef=useRef(null);
-
-const handleDown=e=>{
-const{px,py}=getEvPx(e);
-touchStartRef.current={px,py,sx:e.clientX,sy:e.clientY};
-pressRef.current=setTimeout(()=>{
-pressRef.current=null;
-setRadial({sx:e.clientX,sy:e.clientY,px,py});
-},430);
-};
-
-const handleUp=e=>{
-if(pressRef.current){clearTimeout(pressRef.current);pressRef.current=null;}
-else return;
-if(radial)return;
-const{px,py}=getEvPx(e);
-// If finger moved more than 8px it was a scroll attempt — ignore
-if(touchStartRef.current){
-const dx=Math.abs(e.clientX-touchStartRef.current.sx);
-const dy=Math.abs(e.clientY-touchStartRef.current.sy);
-if(dx>8||dy>8)return;
+// ─── PROXIMITY ─────────────────────────────────────────────────────────────────
+function nearestAlert(){
+  if(!machinePos) return null;
+  const features=getActive().features;
+  let nearest=null,minDist=Infinity;
+  features.forEach(f=>{
+    const pts=f.lat!=null?[{lat:f.lat,lng:f.lng}]:(f.pts||[]);
+    pts.forEach(p=>{
+      const d=haversine(machinePos,p);
+      if(d<minDist){minDist=d;nearest={feature:f,dist:d};}
+    });
+  });
+  return nearest&&nearest.dist<=3?nearest:null;
 }
-const ref=buildRef(perimPts,features,linePts);
 
-```
-// Check tap on existing pin
-const tappedPin=features.find(f=>{
-  if(f.lat==null)return false;
-  const{x,y}=project(ref,{lat:f.lat,lng:f.lng},W,H);
-  return Math.hypot(px-x,py-y)<20;
+function updateProxAlert(){
+  const alert=nearestAlert();
+  const el=document.getElementById('prox-alert');
+  if(alert&&machineEnabled){
+    const u=UTILS.find(u=>u.id===alert.feature.type)||UTILS[0];
+    document.getElementById('prox-icon').textContent=u.emoji;
+    document.getElementById('prox-title').textContent=`⚠️ ${alert.feature.label} Nearby`;
+    document.getElementById('prox-dist').textContent=alert.dist.toFixed(1);
+    el.classList.add('show');
+  } else {
+    el.classList.remove('show');
+  }
+}
+
+// ─── CANVAS EVENTS ─────────────────────────────────────────────────────────────
+let pressTimer=null, touchStartY=0, touchStartX=0;
+
+function getCanvasXY(e){
+  const rect=canvas.getBoundingClientRect();
+  const clientX=e.touches?e.touches[0].clientX:e.clientX;
+  const clientY=e.touches?e.touches[0].clientY:e.clientY;
+  return{px:(clientX-rect.left)*(W/rect.width),py:(clientY-rect.top)*(H/rect.height),clientX,clientY};
+}
+
+canvas.addEventListener('mousedown',e=>{
+  const{px,py}=getCanvasXY(e);
+  touchStartX=e.clientX;touchStartY=e.clientY;
+  pressTimer=setTimeout(()=>{pressTimer=null;openUtilModal(px,py);},450);
 });
-if(tappedPin){setSelectedPin(tappedPin);return;}
 
-const pt=unproject(ref,px,py,W,H);
-if(mapMode==="perimeter"){
-  if(closed)return;
-  if(perimPts.length>2){const fp=project(ref,perimPts[0],W,H);if(Math.hypot(px-fp.x,py-fp.y)<24){onClose();return;}}
-  onAddPerim(pt);
-} else if(mapMode==="line"){
-  onAddLinePt(pt);
-}
-```
+canvas.addEventListener('touchstart',e=>{
+  const{px,py,clientX,clientY}=getCanvasXY(e);
+  touchStartX=clientX;touchStartY=clientY;
+  pressTimer=setTimeout(()=>{pressTimer=null;openUtilModal(px,py);},450);
+},{passive:true});
 
-};
+canvas.addEventListener('touchmove',e=>{
+  if(!pressTimer)return;
+  const dy=Math.abs(e.touches[0].clientY-touchStartY);
+  if(dy>10){clearTimeout(pressTimer);pressTimer=null;}
+},{passive:true});
 
-const handleMove=e=>{
-// If this is a touch and has moved significantly, cancel the long-press and let page scroll
-if(touchStartRef.current&&e.pointerType===“touch”){
-const dy=Math.abs(e.clientY-touchStartRef.current.sy);
-if(dy>10){
-if(pressRef.current){clearTimeout(pressRef.current);pressRef.current=null;}
-setHover(null);
-return; // don’t call preventDefault — let the scroll happen
-}
-}
-if(pressRef.current){clearTimeout(pressRef.current);pressRef.current=null;}
-const{px,py}=getEvPx(e);
-const ref=buildRef(perimPts,features,linePts);
-setHover(unproject(ref,px,py,W,H));
-};
+function handleTap(px,py,clientX,clientY){
+  if(pressTimer){clearTimeout(pressTimer);pressTimer=null;}
+  else return;
+  const dx=Math.abs(clientX-touchStartX),dy=Math.abs(clientY-touchStartY);
+  if(dx>8||dy>8)return;
+  const proj=getActive();
+  const {perimPts,closed,features}=proj;
+  const ref=buildRef(perimPts,features,linePts);
 
-const handleLeave=()=>{
-if(pressRef.current){clearTimeout(pressRef.current);pressRef.current=null;}
-touchStartRef.current=null;
-setHover(null);
-};
+  // Check tap on existing pin
+  const tapped=features.find(f=>{
+    if(f.lat==null)return false;
+    const{x,y}=project(ref,{lat:f.lat,lng:f.lng},W,H);
+    return Math.hypot(px-x,py-y)<22;
+  });
+  if(tapped){showPinEdit(tapped);return;}
 
-const pickUtil=u=>{
-const ref=buildRef(perimPts,features,linePts);
-const pt=unproject(ref,radial.px,radial.py,W,H);
-const newFeature={type:u.id,lat:pt.lat,lng:pt.lng,label:u.label,id:Date.now()};
-onAddFeature(newFeature);
-setSelectedPin(newFeature);
-setRadial(null);
-};
-
-return(
-React.createElement(“div”,{“style”:{position:“relative”,width:“100%”,height:“100%”,borderRadius:T.radius,overflow:“hidden”}},React.createElement(“canvas”,{“ref”:cvsRef,“width”:W,“height”:H,“onPointerDown”:handleDown,“onPointerUp”:handleUp,“onPointerMove”:handleMove,“onPointerLeave”:handleLeave,“style”:{width:“100%”,height:“100%”,cursor:“crosshair”,display:“block”,touchAction:“pan-y”}}),/* GPS badge */,React.createElement(“div”,{“style”:{position:“absolute”,top:12,right:12,background:“white”,borderRadius:20,padding:“6px 13px”,display:“flex”,alignItems:“center”,gap:7,boxShadow:T.shadow}},React.createElement(“span”,{“style”:{width:8,height:8,borderRadius:“50%”,background:T.green,display:“inline-block”,animation:“gpsPulse 2s infinite”}}),React.createElement(“span”,{“style”:{fontSize:12,fontWeight:600,color:T.green}},“GPS Active”)),/* Machine status pill */,machineEnabled&&(
-<div style={{position:“absolute”,top:12,left:12,background:machinePos?“rgba(37,99,235,0.92)”:“rgba(0,0,0,0.55)”,borderRadius:20,padding:“6px 12px”,display:“flex”,alignItems:“center”,gap:6,boxShadow:T.shadow}}>
-<span style={{fontSize:13}}>🚜</span>
-<span style={{fontSize:11,fontWeight:700,color:“white”}}>
-{machinePos?`Machine · ${machinePos.fixType}`:“Locating machine…”}
-</span>
-{machinePos&&<span style={{width:6,height:6,borderRadius:“50%”,background:“white”,animation:“gpsPulse 1.5s infinite”}}/>}
-</div>
-),/* ── PROXIMITY ALERT BANNER ── */,proxAlert&&(
-<div style={{position:“absolute”,top:machineEnabled?52:12,left:12,right:12,
-background:T.red,borderRadius:12,padding:“11px 16px”,
-boxShadow:“0 4px 20px rgba(220,38,38,0.45)”,
-display:“flex”,alignItems:“center”,gap:12,animation:“alertSlide 0.25s ease-out”}}>
-{/* Icon */}
-<div style={{width:36,height:36,borderRadius:“50%”,background:“rgba(255,255,255,0.2)”,
-display:“flex”,alignItems:“center”,justifyContent:“center”,fontSize:18,flexShrink:0}}>
-{(UTILS.find(u=>u.id===proxAlert.feature.type)||UTILS[0]).emoji}
-</div>
-<div style={{flex:1,minWidth:0}}>
-<div style={{fontWeight:800,fontSize:13,color:“white”,lineHeight:1}}>
-⚠️ {proxAlert.feature.label} Nearby
-</div>
-<div style={{fontSize:12,color:“rgba(255,255,255,0.85)”,marginTop:3}}>
-{proxAlert.dist.toFixed(1)} m away · Proceed with caution
-</div>
-</div>
-<div style={{textAlign:“right”,flexShrink:0}}>
-<div style={{fontSize:22,fontWeight:900,color:“white”,lineHeight:1}}>
-{proxAlert.dist.toFixed(1)}
-</div>
-<div style={{fontSize:10,color:“rgba(255,255,255,0.75)”,fontWeight:600}}>METRES</div>
-</div>
-</div>
-),/* Action buttons */,React.createElement(“div”,{“style”:{position:“absolute”,bottom:12,right:12,display:“flex”,gap:8}},perimPts.length>0&&!closed&&mapMode===“perimeter”&&(
-<button onPointerDown={e=>{e.stopPropagation();onUndo();}}
-style={{background:“white”,border:“none”,borderRadius:22,padding:“9px 18px”,fontWeight:700,fontSize:13,color:T.text,boxShadow:T.shadowMd,cursor:“pointer”,fontFamily:“inherit”}}>
-↩ Undo
-</button>
-),perimPts.length>2&&!closed&&mapMode===“perimeter”&&(
-<button onPointerDown={e=>{e.stopPropagation();onClose();}}
-style={{background:T.orange,border:“none”,borderRadius:22,padding:“9px 20px”,fontWeight:700,fontSize:13,color:“white”,boxShadow:`0 4px 16px rgba(244,121,32,0.35)`,cursor:“pointer”,fontFamily:“inherit”}}>
-Close Shape ✓
-</button>
-),mapMode===“line”&&linePts.length>1&&(
-<button onPointerDown={e=>{e.stopPropagation();onFinishLine();}}
-style={{background:T.green,border:“none”,borderRadius:22,padding:“9px 20px”,fontWeight:700,fontSize:13,color:“white”,boxShadow:“0 4px 16px rgba(22,163,74,0.3)”,cursor:“pointer”,fontFamily:“inherit”}}>
-Save Line ✓
-</button>
-)),React.createElement(“div”,{“style”:{position:“absolute”,bottom:12,left:12,background:“rgba(255,255,255,0.92)”,borderRadius:20,padding:“6px 14px”,boxShadow:T.shadow}},React.createElement(“span”,{“style”:{fontSize:11,fontWeight:600,color:T.textSub}},“Hold = Place utility  ·  Tap = Draw  ·  Tap pin = Edit”)),radial&&<RadialPicker sx={radial.sx} sy={radial.sy} onPick={pickUtil} onClose={()=>setRadial(null)}/>,selectedPin&&(
-<PhotoPinModal
-feature={selectedPin}
-onSave={updated=>{onUpdateFeature(updated);setSelectedPin(null);}}
-onClose={()=>setSelectedPin(null)}
-/>
-))
-);
+  const pt=unproject(ref,px,py,W,H);
+  if(mapMode==='perimeter'){
+    if(closed)return;
+    if(perimPts.length>2){
+      const fp=project(ref,perimPts[0],W,H);
+      if(Math.hypot(px-fp.x,py-fp.y)<24){closePerimleter();return;}
+    }
+    proj.perimPts.push(pt);
+    updateMeasurements();drawMap();updateMapActions();updateFeatureSummary();
+    document.getElementById('clear-btn').style.display='block';
+  } else if(mapMode==='line'){
+    linePts.push(pt);
+    drawMap();updateMapActions();
+  }
 }
 
-// ─── PROJECTS SCREEN ──────────────────────────────────────────────────────────
-function ProjectsScreen({projects,activeId,onSelect,onCreate,onDelete}){
-const[newName,setNewName]=useState(””);
-const[showNew,setShowNew]=useState(false);
+canvas.addEventListener('mouseup',e=>{
+  const{px,py}=getCanvasXY(e);
+  handleTap(px,py,e.clientX,e.clientY);
+});
+canvas.addEventListener('touchend',e=>{
+  const{px,py}=getCanvasXY({clientX:e.changedTouches[0].clientX,clientY:e.changedTouches[0].clientY});
+  handleTap(px,py,e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+});
 
-const create=()=>{
-if(!newName.trim())return;
-onCreate(newName.trim());
-setNewName(””);setShowNew(false);
-};
-
-return(
-React.createElement(“div”,{“style”:{display:“flex”,flexDirection:“column”,gap:14}},React.createElement(“div”,{“style”:{display:“flex”,justifyContent:“space-between”,alignItems:“center”}},React.createElement(“div”,{“style”:{fontWeight:800,fontSize:18,color:T.text}},“Job Site Projects”),React.createElement(“button”,{“onClick”:()=>setShowNew(s=>!s),“style”:{background:T.orange,border:“none”,borderRadius:22,padding:“8px 18px”,color:“white”,fontWeight:700,fontSize:13,cursor:“pointer”,boxShadow:`0 4px 12px rgba(244,121,32,0.3)`,fontFamily:“inherit”}},”+ New Site”)),showNew&&(
-<div style={{background:T.surface,borderRadius:T.radius,padding:16,boxShadow:T.shadow}}>
-<div style={{fontWeight:700,fontSize:14,color:T.text,marginBottom:10}}>New Job Site</div>
-<div style={{display:“flex”,gap:8}}>
-<input value={newName} onChange={e=>setNewName(e.target.value)}
-onKeyDown={e=>e.key===“Enter”&&create()}
-placeholder=“e.g.  Main St Utility Run, Lot 14 Grading…”
-style={{flex:1,border:`1.5px solid ${T.border}`,borderRadius:T.radiusSm,padding:“11px 14px”,fontSize:13,color:T.text,outline:“none”,fontFamily:“inherit”,background:T.bg}}
-autoFocus/>
-<button onClick={create}
-style={{background:T.orange,border:“none”,borderRadius:T.radiusSm,color:“white”,padding:“0 20px”,fontWeight:700,fontSize:14,cursor:“pointer”,fontFamily:“inherit”}}>
-Create
-</button>
-</div>
-</div>
-),!projects.length&&(
-<div style={{background:T.surface,borderRadius:T.radius,padding:36,textAlign:“center”,boxShadow:T.shadow}}>
-<div style={{fontSize:40,marginBottom:12}}>🏗️</div>
-<div style={{fontWeight:700,fontSize:15,color:T.text,marginBottom:6}}>No projects yet</div>
-<div style={{fontSize:13,color:T.textSub}}>Tap “+ New Site” to start mapping your first job site</div>
-</div>
-),projects.map(p=>{
-const isActive=p.id===activeId;
-const featureCount=p.features.length;
-const hasPerim=p.perimPts.length>2;
-return(
-<div key={p.id} style={{background:T.surface,borderRadius:T.radius,boxShadow:T.shadow,overflow:“hidden”,border:`2px solid ${isActive?T.orange:T.border}`,transition:“border 0.15s”}}>
-<div style={{padding:“16px 18px”}}>
-<div style={{display:“flex”,justifyContent:“space-between”,alignItems:“flex-start”,marginBottom:10}}>
-<div style={{flex:1}}>
-<div style={{fontWeight:800,fontSize:15,color:T.text}}>{p.name}</div>
-<div style={{fontSize:12,color:T.textSub,marginTop:2}}>Created {p.created}</div>
-</div>
-{isActive&&<span style={{background:T.orangeGlow,border:`1px solid ${T.orange}`,borderRadius:20,padding:“3px 10px”,fontSize:11,fontWeight:700,color:T.orange,flexShrink:0}}>Active</span>}
-</div>
-<div style={{display:“flex”,gap:8,marginBottom:14,flexWrap:“wrap”}}>
-{[
-[hasPerim?“Perimeter mapped”:“No perimeter”,hasPerim?T.green:T.textMuted,“📏”],
-[`${featureCount} feature${featureCount!==1?"s":""}`,featureCount>0?T.blue:T.textMuted,“📍”],
-[p.zones?.length?`${p.zones.length} vol zone${p.zones.length!==1?"s":""}` :“No volume data”,p.zones?.length?T.orange:T.textMuted,“📐”],
-].map(([label,color,ic])=>(
-<div key={label} style={{display:“flex”,alignItems:“center”,gap:5,background:T.bg,borderRadius:20,padding:“4px 10px”}}>
-<span style={{fontSize:12}}>{ic}</span>
-<span style={{fontSize:11,fontWeight:600,color}}>{label}</span>
-</div>
-))}
-</div>
-<div style={{display:“flex”,gap:8}}>
-<button onClick={()=>onSelect(p.id)}
-style={{flex:1,background:isActive?T.orangeGlow:T.bg,border:`1.5px solid ${isActive?T.orange:T.border}`,borderRadius:T.radiusSm,padding:“10px 0”,fontWeight:700,fontSize:13,color:isActive?T.orange:T.text,cursor:“pointer”,fontFamily:“inherit”}}>
-{isActive?“Currently Editing”:“Open Site”}
-</button>
-{projects.length>1&&(
-<button onClick={()=>onDelete(p.id)}
-style={{background:T.bg,border:`1.5px solid ${T.border}`,borderRadius:T.radiusSm,padding:“10px 14px”,fontWeight:700,fontSize:13,color:T.red,cursor:“pointer”,fontFamily:“inherit”}}>
-Delete
-</button>
-)}
-</div>
-</div>
-</div>
-);
-}))
-);
+// ─── MAP ACTIONS ───────────────────────────────────────────────────────────────
+function updateMapActions(){
+  const{perimPts,closed}=getActive();
+  const el=document.getElementById('map-actions');
+  let html='';
+  if(perimPts.length>0&&!closed&&mapMode==='perimeter'){
+    html+=`<button class="map-pill" style="cursor:pointer;font-weight:700;color:#111" onclick="undoPerim()">↩ Undo</button>`;
+  }
+  if(perimPts.length>2&&!closed&&mapMode==='perimeter'){
+    html+=`<button class="map-pill" style="cursor:pointer;background:#F47920;color:white;font-weight:700" onclick="closePerimleter()">Close ✓</button>`;
+  }
+  if(mapMode==='line'&&linePts.length>1){
+    html+=`<button class="map-pill" style="cursor:pointer;background:#16A34A;color:white;font-weight:700" onclick="finishLine()">Save Line ✓</button>`;
+  }
+  el.innerHTML=html;
 }
 
-// ─── STAT CARD ────────────────────────────────────────────────────────────────
-function StatCard({label,value,sub,accent,icon}){
-return(
-React.createElement(“div”,{“style”:{background:T.surface,borderRadius:T.radius,padding:“16px 18px”,boxShadow:T.shadow,border:`1.5px solid ${accent?T.orange+"33":T.borderSoft}`,flex:1}},React.createElement(“div”,{“style”:{display:“flex”,alignItems:“center”,gap:6,marginBottom:8}},icon&&<span style={{fontSize:16}}>{icon}</span>,React.createElement(“span”,{“style”:{fontSize:11,fontWeight:700,color:T.textMuted,textTransform:“uppercase”,letterSpacing:0.6}},label)),React.createElement(“div”,{“style”:{fontSize:24,fontWeight:800,color:accent?T.orange:T.text,lineHeight:1}},value||”—”),sub&&<div style={{fontSize:12,color:T.textSub,marginTop:4}}>{sub}</div>)
-);
+function undoPerim(){getActive().perimPts.pop();updateMeasurements();drawMap();updateMapActions();}
+function closePerimleter(){getActive().closed=true;updateMeasurements();drawMap();updateMapActions();updateVolumeBtn();}
+function finishLine(){
+  if(linePts.length<2)return;
+  const u=UTILS.find(u=>u.id===activeUtil)||UTILS[0];
+  getActive().features.push({type:activeUtil,pts:[...linePts],label:u.label,id:Date.now()});
+  linePts=[];drawMap();updateMapActions();updateFeatureLegend();updateFeatureSummary();
+}
+
+// ─── MEASUREMENTS ──────────────────────────────────────────────────────────────
+function updateMeasurements(){
+  const{perimPts,closed}=getActive();
+  const measEl=document.getElementById('measurements');
+  if(perimPts.length>1){
+    measEl.style.display='block';
+    const pm=perimM(perimPts);
+    document.getElementById('stat-perim').textContent=`${fmt(pm)} m`;
+    document.getElementById('stat-perim-sub').textContent=`${fmt(toFt(pm),0)} ft`;
+    const area=polyArea(perimPts);
+    if(closed&&area>0){
+      document.getElementById('stat-area').textContent=`${fmt(toAc(area),3)} ac`;
+      document.getElementById('stat-area-sub').textContent=`${fmt(toSqFt(area),0)} sq ft`;
+    } else {
+      document.getElementById('stat-area').textContent='—';
+      document.getElementById('stat-area-sub').textContent='Close shape first';
+    }
+  } else {
+    measEl.style.display='none';
+  }
+}
+
+function updateVolumeBtn(){
+  const{perimPts,closed,zones}=getActive();
+  const el=document.getElementById('volume-btn-wrap');
+  const area=polyArea(perimPts);
+  if(closed&&area>0){
+    el.style.display='block';
+    document.getElementById('volume-btn-sub').textContent=
+      zones&&zones.length?`${zones.length} zone${zones.length!==1?'s':''} defined`:'Tap to add cut/fill depth zones';
+  } else {
+    el.style.display='none';
+  }
+}
+
+// ─── MAP CONTROLS ─────────────────────────────────────────────────────────────
+function setMapStyle(style, btn){
+  mapStyle=style;
+  getActive().mapStyle=style;
+  document.querySelectorAll('#screen-map .seg:nth-of-type(1) .seg-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  drawMap();
+}
+
+function setMode(mode, btn){
+  mapMode=mode;
+  document.querySelectorAll('#screen-map .seg:nth-of-type(2) .seg-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const strip=document.getElementById('line-util-strip');
+  strip.style.display=mode==='line'?'block':'none';
+  if(mode!=='line'){linePts=[];}
+  drawMap();updateMapActions();
+}
+
+function clearSite(){
+  const p=getActive();
+  p.perimPts=[];p.closed=false;p.features=[];p.zones=[];
+  linePts=[];
+  updateMeasurements();updateVolumeBtn();updateFeatureLegend();updateFeatureSummary();
+  drawMap();updateMapActions();
+  document.getElementById('clear-btn').style.display='none';
+  document.getElementById('prox-alert').classList.remove('show');
+}
+
+// ─── UTILITY PICKER ───────────────────────────────────────────────────────────
+let pendingCanvasXY=null;
+
+function openUtilModal(px,py){
+  pendingCanvasXY={px,py};
+  document.getElementById('util-modal').classList.add('open');
+}
+function closeUtilModal(){document.getElementById('util-modal').classList.remove('open');}
+
+function placeUtil(u){
+  if(!pendingCanvasXY)return;
+  const{perimPts,features}=getActive();
+  const ref=buildRef(perimPts,features,linePts);
+  const pt=unproject(ref,pendingCanvasXY.px,pendingCanvasXY.py,W,H);
+  const feat={type:u.id,lat:pt.lat,lng:pt.lng,label:u.label,id:Date.now()};
+  getActive().features.push(feat);
+  closeUtilModal();
+  drawMap();updateFeatureLegend();updateFeatureSummary();
+  document.getElementById('clear-btn').style.display='block';
+}
+
+// ─── PIN EDIT (simple prompt-based for pure JS) ──────────────────────────────
+function showPinEdit(feat){
+  const note=prompt(`Note for ${feat.label}:`,feat.note||'');
+  if(note!==null)feat.note=note;
+  updateFeatureLegend();drawMap();
 }
 
 // ─── FEATURE LEGEND ───────────────────────────────────────────────────────────
-function FeatureLegend({features,onRemove,onEdit}){
-if(!features.length)return(
-React.createElement(“div”,{“style”:{background:T.surface,borderRadius:T.radius,padding:28,textAlign:“center”,boxShadow:T.shadow}},React.createElement(“div”,{“style”:{fontSize:34,marginBottom:10}},“🏗️”),React.createElement(“div”,{“style”:{fontWeight:700,fontSize:15,color:T.text,marginBottom:6}},“No features placed yet”),React.createElement(“div”,{“style”:{fontSize:13,color:T.textSub,lineHeight:1.6}},“Hold anywhere on the map to open the”,React.createElement(“br”,null),“utility picker and drop a marker or trace a line”))
-);
-const grouped={};
-features.forEach(f=>{if(!grouped[f.type])grouped[f.type]=[];grouped[f.type].push(f);});
-return(
-React.createElement(“div”,{“style”:{display:“flex”,flexDirection:“column”,gap:10}},Object.entries(grouped).map(([type,items])=>{
-const u=UTILS.find(x=>x.id===type)||UTILS[0];
-return(
-<div key={type} style={{background:T.surface,borderRadius:T.radius,overflow:“hidden”,boxShadow:T.shadow}}>
-<div style={{display:“flex”,alignItems:“center”,gap:10,padding:“13px 16px”,background:u.bg}}>
-<span style={{width:10,height:10,borderRadius:“50%”,background:u.dot,flexShrink:0}}/>
-<span style={{fontSize:14,fontWeight:700,color:u.color}}>{u.emoji} {u.label}</span>
-<span style={{marginLeft:“auto”,background:“white”,borderRadius:20,padding:“2px 10px”,fontSize:11,fontWeight:700,color:u.color}}>{items.length}</span>
-</div>
-{items.map(f=>(
-<div key={f.id} style={{display:“flex”,justifyContent:“space-between”,alignItems:“center”,padding:“10px 14px”,borderTop:`1px solid ${T.border}`,gap:8}}>
-<div style={{flex:1,minWidth:0}}>
-<div style={{fontSize:12,color:T.textSub,overflow:“hidden”,textOverflow:“ellipsis”,whiteSpace:“nowrap”}}>
-{f.pts?`Line · ${f.pts.length} nodes`:`${f.lat?.toFixed(5)}, ${f.lng?.toFixed(5)}`}
-</div>
-{f.note&&<div style={{fontSize:11,color:T.textMuted,marginTop:2,overflow:“hidden”,textOverflow:“ellipsis”,whiteSpace:“nowrap”}}>📝 {f.note}</div>}
-</div>
-<div style={{display:“flex”,gap:6,flexShrink:0}}>
-{f.lat!=null&&(
-<button onClick={()=>onEdit(f)} style={{background:T.blueBg,border:“none”,borderRadius:8,color:T.blue,cursor:“pointer”,width:30,height:30,display:“flex”,alignItems:“center”,justifyContent:“center”,fontSize:13}}>
-{f.photo?“📷”:“📝”}
-</button>
-)}
-<button onClick={()=>onRemove(f.id)} style={{background:T.surfaceAlt,border:“none”,borderRadius:8,color:T.textMuted,cursor:“pointer”,width:30,height:30,display:“flex”,alignItems:“center”,justifyContent:“center”,fontSize:15}}>×</button>
-</div>
-</div>
-))}
-</div>
-);
-}))
-);
+function updateFeatureLegend(){
+  const features=getActive().features;
+  const el=document.getElementById('feature-legend');
+  if(!features.length){
+    el.innerHTML=`<div class="card" style="text-align:center;padding:28px">
+      <div style="font-size:34px;margin-bottom:10px">🏗️</div>
+      <div style="font-weight:700;font-size:15px;margin-bottom:6px">No features placed yet</div>
+      <div style="font-size:13px;color:#6B7280;line-height:1.6">Hold anywhere on the map to open the utility picker</div>
+    </div>`;
+    return;
+  }
+  const grouped={};
+  features.forEach(f=>{if(!grouped[f.type])grouped[f.type]=[];grouped[f.type].push(f);});
+  el.innerHTML=Object.entries(grouped).map(([type,items])=>{
+    const u=UTILS.find(x=>x.id===type)||UTILS[0];
+    return `<div class="feature-group" style="border-top:3px solid ${u.dot}">
+      <div class="feature-group-header" style="background:${u.bg}">
+        <span style="width:10px;height:10px;border-radius:50%;background:${u.dot};flex-shrink:0;display:inline-block"></span>
+        <span style="font-size:14px;font-weight:700;color:${u.color}">${u.emoji} ${u.label}</span>
+        <span style="margin-left:auto;background:white;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700;color:${u.color}">${items.length}</span>
+      </div>
+      ${items.map(f=>`
+        <div class="feature-item">
+          <div class="feature-item-info">
+            <div class="feature-item-label">${f.pts?`Line · ${f.pts.length} nodes`:`${f.lat.toFixed(5)}, ${f.lng.toFixed(5)}`}</div>
+            ${f.note?`<div class="feature-item-note">📝 ${f.note}</div>`:''}
+          </div>
+          <button class="remove-btn" onclick="removeFeature(${f.id})">×</button>
+        </div>`).join('')}
+    </div>`;
+  }).join('');
 }
 
-// ─── APWA ACCORDION ──────────────────────────────────────────────────────────
-function APWAAccordion(){
-const[open,setOpen]=useState(false);
-return(
-React.createElement(“div”,{“style”:{background:T.surface,borderRadius:T.radius,overflow:“hidden”,boxShadow:T.shadow}},React.createElement(“button”,{“onClick”:()=>setOpen(o=>!o),“style”:{width:“100%”,background:“none”,border:“none”,padding:“15px 18px”,display:“flex”,justifyContent:“space-between”,alignItems:“center”,cursor:“pointer”,fontFamily:“inherit”}},React.createElement(“span”,{“style”:{fontWeight:700,fontSize:14,color:T.text}},“APWA Color Reference”),React.createElement(“span”,{“style”:{fontSize:16,color:T.textMuted,display:“inline-block”,transform:open?“rotate(180deg)”:“rotate(0deg)”,transition:“transform 0.2s”}},“▾”)),open&&(
-<div style={{padding:“4px 18px 18px”,display:“grid”,gridTemplateColumns:“1fr 1fr”,gap:8,borderTop:`1px solid ${T.border}`}}>
-{UTILS.map(u=>(
-<div key={u.id} style={{display:“flex”,alignItems:“center”,gap:9,padding:“8px 10px”,background:u.bg,borderRadius:T.radiusXs}}>
-<span style={{width:10,height:10,borderRadius:“50%”,background:u.dot,flexShrink:0}}/>
-<span style={{fontSize:12,fontWeight:600,color:u.color}}>{u.emoji} {u.label}</span>
-</div>
-))}
-</div>
-))
-);
+function removeFeature(id){
+  const p=getActive();
+  p.features=p.features.filter(f=>f.id!==id);
+  updateFeatureLegend();updateFeatureSummary();drawMap();
 }
 
-// ─── NMEA PARSER ──────────────────────────────────────────────────────────────
-// Parses GGA sentences: $GPGGA or $GNGGA
-// $GNGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47
-function parseGGA(line){
-if(!line.startsWith(”$GNGGA”)&&!line.startsWith(”$GPGGA”))return null;
-const p=line.split(”,”);
-if(p.length<15)return null;
-const fixQ=parseInt(p[6]);
-if(!fixQ||fixQ===0)return null;
-const latRaw=parseFloat(p[2]),latDir=p[3];
-const lngRaw=parseFloat(p[4]),lngDir=p[5];
-if(isNaN(latRaw)||isNaN(lngRaw))return null;
-const lat=(Math.floor(latRaw/100)+(latRaw%100)/60)*(latDir===“S”?-1:1);
-const lng=(Math.floor(lngRaw/100)+(lngRaw%100)/60)*(lngDir===“W”?-1:1);
-const sats=parseInt(p[7])||0;
-const hdop=parseFloat(p[8])||99;
-const alt=parseFloat(p[9])||0;   // orthometric height (HAE + geoid sep below)
-const geoid=parseFloat(p[11])||0;
-const elev=alt+geoid; // approx ellipsoidal height
-// Fix quality: 1=GPS, 2=DGPS, 4=RTK fix, 5=RTK float
-const fixType=fixQ===4?“RTK Fix”:fixQ===5?“RTK Float”:fixQ===2?“DGPS”:“GPS”;
-return{lat,lng,elev,sats,hdop,fixType,fixQ};
+function updateFeatureSummary(){
+  const features=getActive().features;
+  const el=document.getElementById('feature-summary');
+  if(features.length){
+    el.style.display='block';
+    document.getElementById('feature-count-text').textContent=
+      `${features.length} Site Feature${features.length!==1?'s':''}`;
+  } else {
+    el.style.display='none';
+  }
+}
+
+// ─── ACCORDION ─────────────────────────────────────────────────────────────────
+function toggleAccordion(btn){
+  const body=btn.nextElementSibling;
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open');
+  const arrow=btn.querySelector('span:last-child');
+  if(arrow)arrow.style.transform=isOpen?'rotate(0deg)':'rotate(180deg)';
+}
+
+// ─── APWA REFERENCE ────────────────────────────────────────────────────────────
+function buildAPWA(){
+  document.getElementById('apwa-body').innerHTML=UTILS.map(u=>
+    `<div class="apwa-item" style="background:${u.bg}">
+      <span style="width:10px;height:10px;border-radius:50%;background:${u.dot};display:inline-block;flex-shrink:0"></span>
+      <span style="font-size:12px;font-weight:600;color:${u.color}">${u.emoji} ${u.label}</span>
+    </div>`).join('');
+}
+
+// ─── UTIL STRIP ────────────────────────────────────────────────────────────────
+function buildUtilStrip(){
+  document.getElementById('util-strip').innerHTML=UTILS.filter(u=>u.id!=='nodig').map(u=>
+    `<button onclick="setActiveUtil('${u.id}',this)" id="util-strip-${u.id}"
+      style="flex-shrink:0;padding:7px 14px;background:${u.id===activeUtil?u.bg:'white'};
+      border:2px solid ${u.id===activeUtil?u.dot:'#E4E6EA'};border-radius:20px;
+      color:${u.id===activeUtil?u.color:'#6B7280'};font-size:12px;font-weight:700;
+      cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;white-space:nowrap">
+      ${u.emoji} ${u.label}</button>`).join('');
+}
+
+function setActiveUtil(id, btn){
+  activeUtil=id;buildUtilStrip();
+}
+
+function buildUtilGrid(){
+  document.getElementById('util-grid').innerHTML=UTILS.map(u=>
+    `<button class="util-btn" style="border-color:${u.dot};background:${u.bg}"
+      onclick="placeUtil({id:'${u.id}',label:'${u.label}',emoji:'${u.emoji}'})">
+      <span style="font-size:22px">${u.emoji}</span>
+      <span style="color:${u.color}">${u.label}</span>
+    </button>`).join('');
+}
+
+// ─── MACHINE TRACKING ──────────────────────────────────────────────────────────
+function toggleMachine(){
+  machineEnabled=!machineEnabled;
+  const toggle=document.getElementById('machine-toggle');
+  const pill=document.getElementById('machine-pill');
+  toggle.classList.toggle('on',machineEnabled);
+  if(machineEnabled){
+    pill.style.display='flex';
+    startMachineSim();
+  } else {
+    pill.style.display='none';
+    stopMachineSim();
+    machinePos=null;
+    document.getElementById('machine-status-text').textContent='Off · 3 m proximity alerts when on';
+    document.getElementById('prox-alert').classList.remove('show');
+    drawMap();
+  }
+}
+
+function startMachineSim(){
+  stopMachineSim();
+  machineSimAngle=0;
+  machineSimTimer=setInterval(()=>{
+    machineSimAngle+=0.04;
+    machinePos={
+      lat:MOCK.lat+Math.sin(machineSimAngle)*0.00025,
+      lng:MOCK.lng+Math.cos(machineSimAngle)*0.00025,
+      elev:312.1+Math.sin(machineSimAngle*2)*0.3,
+      heading:((machineSimAngle*180/Math.PI)%360+360)%360
+    };
+    document.getElementById('machine-status-text').textContent=
+      `Simulated · RTK Fix · ${machinePos.lat.toFixed(6)}N`;
+    document.getElementById('machine-pill-text').textContent='Machine · RTK Fix';
+    updateProxAlert();
+    drawMap();
+  },800);
+}
+
+function stopMachineSim(){
+  if(machineSimTimer){clearInterval(machineSimTimer);machineSimTimer=null;}
+}
+
+// ─── PROJECTS ──────────────────────────────────────────────────────────────────
+function toggleNewProject(){
+  const el=document.getElementById('new-project-form');
+  el.style.display=el.style.display==='none'?'block':'none';
+  if(el.style.display==='block')document.getElementById('new-proj-name').focus();
+}
+
+function createProject(){
+  const name=document.getElementById('new-proj-name').value.trim();
+  if(!name)return;
+  const p={id:Date.now(),name,created:new Date().toLocaleDateString(),perimPts:[],closed:false,features:[],zones:[],mapStyle:'default'};
+  projects.push(p);
+  selectProject(p.id);
+  document.getElementById('new-proj-name').value='';
+  document.getElementById('new-project-form').style.display='none';
+  renderProjects();
+  showTab('map');
+}
+
+function selectProject(id){
+  activeId=id;
+  linePts=[];
+  const p=getActive();
+  mapStyle=p.mapStyle||'default';
+  document.getElementById('active-project-label').textContent=p.name;
+  document.getElementById('active-project-label').style.display='block';
+  updateMeasurements();updateVolumeBtn();updateFeatureLegend();updateFeatureSummary();
+  drawMap();updateMapActions();
+  document.getElementById('clear-btn').style.display=
+    (p.perimPts.length||p.features.length)?'block':'none';
+  renderProjects();
+}
+
+function deleteProject(id){
+  if(projects.length===1)return;
+  projects=projects.filter(p=>p.id!==id);
+  if(activeId===id)selectProject(projects[0].id);
+  renderProjects();
+}
+
+function renderProjects(){
+  const el=document.getElementById('projects-list');
+  if(!projects.length){
+    el.innerHTML=`<div class="card" style="text-align:center;padding:36px">
+      <div style="font-size:40px;margin-bottom:12px">🏗️</div>
+      <div style="font-weight:700;font-size:15px;margin-bottom:6px">No projects yet</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML=projects.map(p=>{
+    const isActive=p.id===activeId;
+    const hasPerim=p.perimPts.length>2;
+    const fc=p.features.length;
+    const vz=p.zones&&p.zones.length;
+    return `<div class="project-card ${isActive?'active-proj':''}">
+      <div class="project-card-body">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+          <div>
+            <div style="font-weight:800;font-size:15px">${p.name}</div>
+            <div style="font-size:12px;color:#6B7280;margin-top:2px">Created ${p.created}</div>
+          </div>
+          ${isActive?`<span class="badge badge-orange">Active</span>`:''}
+        </div>
+        <div class="project-tags">
+          <span class="project-tag" style="color:${hasPerim?'#16A34A':'#9CA3AF'}">📏 ${hasPerim?'Perimeter mapped':'No perimeter'}</span>
+          <span class="project-tag" style="color:${fc>0?'#2563EB':'#9CA3AF'}">📍 ${fc} feature${fc!==1?'s':''}</span>
+          <span class="project-tag" style="color:${vz?'#F47920':'#9CA3AF'}">📐 ${vz?vz+' vol zone'+(vz!==1?'s':''):'No volume data'}</span>
+        </div>
+        <div class="project-actions">
+          <button class="btn ${isActive?'btn-orange':'btn-ghost'}" style="flex:1;padding:10px 0;font-size:13px" onclick="selectProject(${p.id});showTab('map')">
+            ${isActive?'Currently Editing':'Open Site'}
+          </button>
+          ${projects.length>1?`<button class="btn btn-ghost" style="padding:10px 14px;font-size:13px;color:#DC2626" onclick="deleteProject(${p.id})">Delete</button>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── VOLUME MODAL ──────────────────────────────────────────────────────────────
+function openVolumeModal(){
+  zones=[...(getActive().zones||[])];
+  if(!zones.length)zones=[{id:Date.now(),label:'Zone A',depth:'',type:'cut'}];
+  renderZones();
+  const area=polyArea(getActive().perimPts);
+  document.getElementById('vol-area-label').textContent=
+    `Site area: ${fmt(toAc(area),3)} ac (${fmt(toSqFt(area),0)} sq ft)`;
+  document.getElementById('volume-modal').classList.add('open');
+}
+function closeVolumeModal(){document.getElementById('volume-modal').classList.remove('open');}
+
+function addZone(){
+  zones.push({id:Date.now(),label:`Zone ${String.fromCharCode(65+zones.length)}`,depth:'',type:'cut'});
+  renderZones();
+}
+
+function renderZones(){
+  const area=polyArea(getActive().perimPts);
+  const el=document.getElementById('zone-list');
+  el.innerHTML=zones.map((z,i)=>{
+    const vol=z.depth?((area/zones.length)*parseFloat(z.depth)):0;
+    return `<div class="zone-card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <input value="${z.label}" onchange="zones[${i}].label=this.value" style="font-weight:700;font-size:14px;border:none;background:transparent;width:120px;padding:0"/>
+        ${zones.length>1?`<button onclick="zones.splice(${i},1);renderZones()" style="background:none;border:none;color:#9CA3AF;cursor:pointer;font-size:16px">×</button>`:''}
+      </div>
+      <div class="zone-row">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:#6B7280;margin-bottom:5px;text-transform:uppercase">Avg Depth (m)</div>
+          <input type="number" value="${z.depth}" placeholder="0.00" onchange="zones[${i}].depth=this.value;renderZones()" style="font-size:14px;font-weight:700"/>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:#6B7280;margin-bottom:5px;text-transform:uppercase">Type</div>
+          <div class="zone-type-row">
+            <button class="zone-type-btn ${z.type==='cut'?'cut':''}" onclick="zones[${i}].type='cut';renderZones()">▼ Cut</button>
+            <button class="zone-type-btn ${z.type==='fill'?'fill':''}" onclick="zones[${i}].type='fill';renderZones()">▲ Fill</button>
+          </div>
+        </div>
+      </div>
+      ${vol?`<div style="margin-top:10px;font-size:12px;color:#6B7280">Zone volume: <strong style="color:${z.type==='cut'?'#DC2626':'#16A34A'}">${fmt(vol,1)} m³</strong></div>`:''}
+    </div>`;
+  }).join('');
+
+  const totalVol=zones.reduce((s,z)=>s+(z.depth?(area/zones.length)*parseFloat(z.depth):0),0);
+  const tvEl=document.getElementById('total-vol-display');
+  if(totalVol>0){
+    tvEl.style.display='flex';
+    document.getElementById('total-vol-num').textContent=`${fmt(totalVol,1)} m³`;
+  } else {
+    tvEl.style.display='none';
+  }
+}
+
+function saveVolume(){
+  getActive().zones=[...zones];
+  closeVolumeModal();updateVolumeBtn();
 }
 
 // ─── GRADE SCREEN ─────────────────────────────────────────────────────────────
-// Real Emlid RS3 connection flow:
-//   Step 1 — Join the RS3 WiFi hotspot (SSID: reach:xx:xx, PW: emlidreach)
-//   Step 2 — App opens WebSocket to ws://192.168.42.1:9001 (RS3 NMEA TCP output)
-//   Step 3 — Stream NMEA GGA sentences, parse live lat/lng/elev/fix status
-//   Step 4 — User can also configure NTRIP caster credentials for corrections
-// In demo mode (no real RS3 on network) we simulate the NMEA stream.
-function GradeScreen(){
-// Connection state machine: idle → wifi_guide → connecting → connected
-const[stage,setStage]=useState(“idle”);
-const[fixData,setFixData]=useState(null);      // parsed NMEA
-const[ntripOpen,setNtripOpen]=useState(false);
-const[ntrip,setNtrip]=useState({host:””,port:“2101”,mount:””,user:””,pass:””});
-const[ntripSaved,setNtripSaved]=useState(false);
-const[benches,setBenches]=useState([]);
-const[nb,setNb]=useState({name:””,elev:””});
-const[rawNmea,setRawNmea]=useState(””);
-const[showNmea,setShowNmea]=useState(false);
-const wsRef=useRef(null);
-const simRef=useRef(null);
-
-// Simulate NMEA stream (used when no real RS3 available)
-const startSimulator=()=>{
-let tick=0;
-simRef.current=setInterval(()=>{
-tick++;
-// Slowly converge to RTK fix
-const fixQ=tick<3?1:tick<6?2:tick<10?5:4;
-const lat=44.4280+(Math.random()-0.5)*0.00002;
-const lng=-95.3755+(Math.random()-0.5)*0.00002;
-const elev=312.441+(Math.random()-0.5)*0.003;
-const sats=tick<3?8:tick<6?12:16+(tick%3);
-const hdop=tick<6?1.2:0.7+(Math.random()*0.2);
-const fixType=fixQ===4?“RTK Fix”:fixQ===5?“RTK Float”:fixQ===2?“DGPS”:“GPS”;
-const latDeg=Math.floor(lat);const latMin=(lat-latDeg)*60;
-const lngDeg=Math.abs(Math.floor(lng));const lngMin=(Math.abs(lng)-lngDeg)*60;
-const nmea=`$GNGGA,${new Date().toISOString().slice(11,19).replace(/:/g,"")}.00,`+
-`${(latDeg*100+latMin).toFixed(5)},N,`+
-`${(lngDeg*100+lngMin).toFixed(5)},W,`+
-`${fixQ},${sats},${hdop.toFixed(1)},`+
-`${(elev-30).toFixed(3)},M,30.000,M,,*6A`;
-setRawNmea(nmea);
-const parsed=parseGGA(nmea);
-if(parsed)setFixData(parsed);
-},1000);
-};
-
-const connect=()=>{
-setStage(“connecting”);
-// Try real WebSocket to Emlid RS3 hotspot IP
-try{
-const ws=new WebSocket(“ws://192.168.42.1:9001”);
-ws.onopen=()=>{setStage(“connected”);};
-ws.onmessage=e=>{
-const lines=e.data.split(”\n”);
-lines.forEach(l=>{const p=parseGGA(l.trim());if(p){setFixData(p);setRawNmea(l.trim());}});
-};
-ws.onerror=()=>{
-// Real RS3 not reachable — fall back to simulator
-ws.close();
-setStage(“connected”);
-startSimulator();
-};
-ws.onclose=()=>{if(stage===“connected”)setStage(“idle”);};
-wsRef.current=ws;
-}catch{
-// WebSocket not available in sandbox — go straight to simulator
-setStage(“connected”);
-startSimulator();
-}
-};
-
-const disconnect=()=>{
-if(wsRef.current)wsRef.current.close();
-if(simRef.current)clearInterval(simRef.current);
-wsRef.current=null;simRef.current=null;
-setStage(“idle”);setFixData(null);setRawNmea(””);
-};
-
-useEffect(()=>()=>{
-if(wsRef.current)wsRef.current.close();
-if(simRef.current)clearInterval(simRef.current);
-},[]);
-
-const addBench=()=>{if(!nb.name||!nb.elev)return;setBenches(b=>[…b,{…nb,id:Date.now()}]);setNb({name:””,elev:””});};
-const snapBench=()=>{
-if(!fixData)return;
-setBenches(b=>[…b,{name:`BM-${b.length+1}`,elev:fixData.elev.toFixed(4),id:Date.now()}]);
-};
-
-const fixColor=fixData?(fixData.fixQ===4?T.green:fixData.fixQ===5?”#F59E0B”:T.red):T.textMuted;
-const fixBg=fixData?(fixData.fixQ===4?T.greenBg:fixData.fixQ===5?”#FEF3C7”:T.redBg):T.surfaceAlt;
-
-return(
-React.createElement(“div”,{“style”:{display:“flex”,flexDirection:“column”,gap:14}},/* ── Step 1: WiFi guide ── */,stage===“idle”&&(
-<div style={{background:T.surface,borderRadius:T.radius,padding:20,boxShadow:T.shadow}}>
-<div style={{fontWeight:800,fontSize:17,color:T.text,marginBottom:4}}>Connect Emlid RS3</div>
-<div style={{fontSize:13,color:T.textSub,marginBottom:20}}>Follow these steps before tapping Connect</div>
-
-```
-      {[
-        {n:1,title:"Power on your Emlid RS3",body:'Hold the power button until the LED flashes. The unit will broadcast a WiFi hotspot.'},
-        {n:2,title:"Join the RS3 hotspot",body:'Open your device WiFi settings and connect to the network named  reach:xx:xx  (last 4 chars are unique to your unit). Password: emlidreach'},
-        {n:3,title:"Return here and connect",body:"Once connected to the RS3 hotspot, tap Connect below. The app opens a direct TCP socket to the unit at 192.168.42.1:9001 and reads the live NMEA stream."},
-      ].map(s=>(
-        <div key={s.n} style={{display:"flex",gap:12,marginBottom:16}}>
-          <div style={{width:32,height:32,borderRadius:"50%",background:T.orange,color:"white",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:800,fontSize:14,flexShrink:0}}>{s.n}</div>
-          <div>
-            <div style={{fontWeight:700,fontSize:14,color:T.text,marginBottom:3}}>{s.title}</div>
-            <div style={{fontSize:13,color:T.textSub,lineHeight:1.6}}>{s.body}</div>
-          </div>
-        </div>
-      ))}
-
-      <div style={{background:T.blueBg,borderRadius:T.radiusSm,padding:"11px 14px",marginBottom:16,fontSize:12,color:T.blue,lineHeight:1.6}}>
-        💡 <strong>Tip:</strong> The RS3 also supports NTRIP corrections over cellular. Configure your caster details below after connecting for sub-centimeter RTK Fix accuracy in the field.
-      </div>
-
-      <button onClick={()=>setStage("wifi_guide")}
-        style={{width:"100%",background:T.orange,border:"none",borderRadius:T.radiusSm,color:"white",padding:14,fontSize:15,fontWeight:700,cursor:"pointer",boxShadow:`0 4px 16px rgba(244,121,32,0.3)`,fontFamily:"inherit"}}>
-        I'm connected to the RS3 hotspot — Connect
-      </button>
-    </div>
-  )}
-
-  {/* ── Step 2: Connecting ── */}
-  {stage==="wifi_guide"&&(
-    <div style={{background:T.surface,borderRadius:T.radius,padding:24,boxShadow:T.shadow,textAlign:"center"}}>
-      <div style={{fontSize:40,marginBottom:12}}>📡</div>
-      <div style={{fontWeight:800,fontSize:16,color:T.text,marginBottom:8}}>Opening NMEA Stream</div>
-      <div style={{fontSize:13,color:T.textSub,marginBottom:24,lineHeight:1.6}}>
-        Connecting to <strong>ws://192.168.42.1:9001</strong><br/>
-        This is the RS3's built-in NMEA TCP output port
-      </div>
-      <button onClick={connect}
-        style={{width:"100%",background:T.orange,border:"none",borderRadius:T.radiusSm,color:"white",padding:14,fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
-        {stage==="connecting"?"Opening connection…":"Connect Now"}
-      </button>
-      <button onClick={()=>setStage("idle")} style={{background:"none",border:"none",color:T.textSub,marginTop:12,cursor:"pointer",fontSize:13,fontFamily:"inherit"}}>← Back</button>
-    </div>
-  ),/* ── Connected ── */,stage==="connected"&&(
-    <>
-      {/* Status bar */}
-      <div style={{background:T.surface,borderRadius:T.radius,padding:18,boxShadow:T.shadow}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
-          <div>
-            <div style={{fontWeight:800,fontSize:16,color:T.text}}>Emlid RS3</div>
-            <div style={{fontSize:12,color:T.textSub,marginTop:1}}>192.168.42.1 : 9001 · NMEA stream</div>
-          </div>
-          <div style={{display:"flex",alignItems:"center",gap:8}}>
-            {fixData&&(
-              <div style={{background:fixBg,borderRadius:20,padding:"5px 12px",display:"flex",alignItems:"center",gap:6}}>
-                <span style={{width:7,height:7,borderRadius:"50%",background:fixColor,animation:fixData.fixQ>=4?"gpsPulse 1.5s infinite":"none"}}/>
-                <span style={{fontSize:12,fontWeight:700,color:fixColor}}>{fixData.fixType}</span>
-              </div>
-            )}
-            <button onClick={disconnect} style={{background:T.redBg,border:"none",borderRadius:20,padding:"5px 12px",color:T.red,fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"inherit"}}>Disconnect</button>
-          </div>
-        </div>
-
-        {/* Satellite / signal stats */}
-        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:14}}>
-          {[
-            ["Satellites",fixData?String(fixData.sats):"—","🛰️"],
-            ["HDOP",fixData?fixData.hdop.toFixed(1):"—","📐"],
-            ["Fix Quality",fixData?String(fixData.fixQ)+" / 4":"—","📶"],
-          ].map(([l,v,ic])=>(
-            <div key={l} style={{background:T.bg,borderRadius:T.radiusSm,padding:"12px 8px",textAlign:"center"}}>
-              <div style={{fontSize:20,marginBottom:4}}>{ic}</div>
-              <div style={{fontSize:20,fontWeight:800,color:T.text}}>{v}</div>
-              <div style={{fontSize:11,color:T.textSub,marginTop:2}}>{l}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Live position */}
-        {fixData?(
-          <div style={{background:"linear-gradient(135deg,rgba(244,121,32,0.1),rgba(244,121,32,0.03))",border:"2px solid rgba(244,121,32,0.22)",borderRadius:T.radius,padding:"16px 18px"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
-              <div>
-                <div style={{fontSize:11,fontWeight:700,color:T.textSub,textTransform:"uppercase",letterSpacing:0.5,marginBottom:4}}>Live Elevation (HAE)</div>
-                <div style={{fontSize:40,fontWeight:900,color:T.orange,lineHeight:1}}>{fixData.elev.toFixed(4)}</div>
-                <div style={{fontSize:13,color:T.textSub,marginTop:6}}>{fmt(toFt(fixData.elev),3)} ft &nbsp;·&nbsp; {fixData.elev<0?"Below":"Above"} ellipsoid</div>
-              </div>
-              <div style={{textAlign:"right",fontSize:12,color:T.textSub,lineHeight:2,marginTop:4}}>
-                <div>{fixData.lat.toFixed(7)}°N</div>
-                <div>{Math.abs(fixData.lng).toFixed(7)}°W</div>
-              </div>
-            </div>
-          </div>
-        ):(
-          <div style={{background:T.bg,borderRadius:T.radiusSm,padding:16,textAlign:"center"}}>
-            <div style={{fontSize:13,color:T.textSub,animation:"gpsPulse 1.5s infinite"}}>Waiting for first NMEA sentence…</div>
-          </div>
-        )}
-
-        {/* Raw NMEA toggle */}
-        <button onClick={()=>setShowNmea(s=>!s)} style={{marginTop:12,background:"none",border:"none",color:T.textMuted,fontSize:11,cursor:"pointer",fontFamily:"inherit",textAlign:"left",padding:0}}>
-          {showNmea?"▾ Hide":"▸ Show"} raw NMEA sentence
-        </button>
-        {showNmea&&rawNmea&&(
-          <div style={{marginTop:6,background:"#1E1E1E",borderRadius:T.radiusXs,padding:"10px 12px",fontSize:10,color:"#86efac",fontFamily:"'Courier New',monospace",wordBreak:"break-all",lineHeight:1.7}}>
-            {rawNmea}
-          </div>
-        )}
-      </div>
-
-      {/* NTRIP Configuration */}
-      <div style={{background:T.surface,borderRadius:T.radius,boxShadow:T.shadow,overflow:"hidden"}}>
-        <button onClick={()=>setNtripOpen(o=>!o)} style={{width:"100%",background:"none",border:"none",padding:"15px 18px",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer",fontFamily:"inherit"}}>
-          <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <span style={{fontSize:18}}>🛰️</span>
-            <div style={{textAlign:"left"}}>
-              <div style={{fontWeight:700,fontSize:14,color:T.text}}>NTRIP Corrections</div>
-              <div style={{fontSize:11,color:ntripSaved?T.green:T.textMuted}}>{ntripSaved?"Caster configured — RTK corrections active":"Required for RTK Fix accuracy"}</div>
-            </div>
-          </div>
-          <span style={{fontSize:16,color:T.textMuted,display:"inline-block",transform:ntripOpen?"rotate(180deg)":"rotate(0deg)",transition:"transform 0.2s"}}>▾</span>
-        </button>
-        {ntripOpen&&(
-          <div style={{padding:"0 18px 18px",borderTop:`1px solid ${T.border}`}}>
-            <div style={{fontSize:12,color:T.textSub,marginBottom:14,marginTop:12,lineHeight:1.6}}>
-              Enter your NTRIP caster details to stream RTCM3 correction data to the RS3 over the internet. Your network provider (e.g. CORS, SmartNet, Trimble RTX) supplies these credentials.
-            </div>
-            {[
-              ["Caster Host","host","e.g. ntrip.state.mn.us"],
-              ["Port","port","2101"],
-              ["Mountpoint","mount","e.g. MINN_RTCM3"],
-              ["Username","user",""],
-              ["Password","pass",""],
-            ].map(([label,field,ph])=>(
-              <div key={field} style={{marginBottom:10}}>
-                <div style={{fontSize:11,fontWeight:700,color:T.textSub,marginBottom:4,textTransform:"uppercase",letterSpacing:0.4}}>{label}</div>
-                <input type={field==="pass"?"password":"text"} value={ntrip[field]}
-                  onChange={e=>setNtrip(n=>({...n,[field]:e.target.value}))} placeholder={ph}
-                  style={{width:"100%",border:`1.5px solid ${T.border}`,borderRadius:T.radiusXs,padding:"9px 12px",fontSize:13,color:T.text,outline:"none",fontFamily:"inherit",background:T.bg}}/>
-              </div>
-            ))}
-            <button onClick={()=>{setNtripSaved(true);setNtripOpen(false);}}
-              style={{width:"100%",background:T.orange,border:"none",borderRadius:T.radiusSm,color:"white",padding:12,fontSize:14,fontWeight:700,cursor:"pointer",marginTop:4,fontFamily:"inherit"}}>
-              Save & Apply NTRIP Config
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Benchmarks */}
-      <div style={{background:T.surface,borderRadius:T.radius,padding:20,boxShadow:T.shadow}}>
-        <div style={{fontWeight:800,fontSize:16,color:T.text,marginBottom:14}}>Benchmarks & Grade Points</div>
-        <div style={{display:"flex",gap:8,marginBottom:10}}>
-          <input value={nb.name} onChange={e=>setNb(b=>({...b,name:e.target.value}))} placeholder="Label  (e.g. BM-1)"
-            style={{flex:1,border:`1.5px solid ${T.border}`,borderRadius:T.radiusSm,color:T.text,padding:"11px 14px",fontSize:13,outline:"none",fontFamily:"inherit",background:T.bg}}/>
-          <input value={nb.elev} onChange={e=>setNb(b=>({...b,elev:e.target.value}))} placeholder="Elev (m)" type="number"
-            style={{width:104,border:`1.5px solid ${T.border}`,borderRadius:T.radiusSm,color:T.text,padding:"11px 12px",fontSize:13,outline:"none",fontFamily:"inherit",background:T.bg}}/>
-          <button onClick={addBench} style={{background:T.orange,border:"none",borderRadius:T.radiusSm,color:"white",padding:"0 18px",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"inherit"}}>Set</button>
-        </div>
-        <button onClick={snapBench} disabled={!fixData}
-          style={{width:"100%",background:fixData?T.bg:T.surfaceAlt,border:`1.5px dashed ${fixData?T.border:T.borderSoft}`,borderRadius:T.radiusSm,color:fixData?T.textSub:T.textMuted,padding:12,fontSize:13,fontWeight:600,cursor:fixData?"pointer":"not-allowed",marginBottom:12,fontFamily:"inherit"}}>
-          📍  Snap Benchmark from Live Position {fixData?`(${fixData.fixType})`:"(waiting for fix…)"}
-        </button>
-        {!benches.length&&<div style={{textAlign:"center",color:T.textMuted,fontSize:13,padding:16}}>No benchmarks set yet</div>}
-        {benches.map(bm=>{
-          const liveE=fixData?fixData.elev:null;
-          const delta=liveE!=null?liveE-parseFloat(bm.elev):null;
-          const cut=delta!=null&&delta>0;
-          return(
-            <div key={bm.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 16px",background:T.bg,borderRadius:T.radiusSm,marginBottom:8,border:`1.5px solid ${delta!=null?(cut?"rgba(220,38,38,0.15)":"rgba(22,163,74,0.15)"):T.border}`}}>
-              <div>
-                <div style={{fontWeight:700,fontSize:14,color:T.text}}>{bm.name}</div>
-                <div style={{fontSize:12,color:T.textSub,marginTop:2}}>Design: {parseFloat(bm.elev).toFixed(4)} m</div>
-              </div>
-              <div style={{textAlign:"right"}}>
-                {delta!=null?(
-                  <>
-                    <div style={{fontSize:24,fontWeight:900,color:cut?T.red:T.green}}>{cut?"+":""}{delta.toFixed(4)} m</div>
-                    <div style={{fontSize:11,fontWeight:700,color:cut?T.red:T.green,marginTop:2}}>{cut?"▲ Fill Required":"▼ Cut Required"}</div>
-                  </>
-                ):<div style={{fontSize:13,color:T.textMuted}}>Waiting…</div>}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </>
-  ))
-```
-
-);
+function parseGGA(line){
+  if(!line.startsWith('$GNGGA')&&!line.startsWith('$GPGGA'))return null;
+  const p=line.split(',');if(p.length<15)return null;
+  const fixQ=parseInt(p[6]);if(!fixQ)return null;
+  const latRaw=parseFloat(p[2]),latDir=p[3];
+  const lngRaw=parseFloat(p[4]),lngDir=p[5];
+  if(isNaN(latRaw)||isNaN(lngRaw))return null;
+  const lat=(Math.floor(latRaw/100)+(latRaw%100)/60)*(latDir==='S'?-1:1);
+  const lng=(Math.floor(lngRaw/100)+(lngRaw%100)/60)*(lngDir==='W'?-1:1);
+  const sats=parseInt(p[7])||0,hdop=parseFloat(p[8])||99;
+  const alt=parseFloat(p[9])||0,geoid=parseFloat(p[11])||0;
+  const fixType=fixQ===4?'RTK Fix':fixQ===5?'RTK Float':fixQ===2?'DGPS':'GPS';
+  return{lat,lng,elev:alt+geoid,sats,hdop,fixType,fixQ};
 }
 
-// ─── EXPORT SCREEN ────────────────────────────────────────────────────────────
-function ExportScreen({perimPts,features,zones}){
-const formats=[
-{name:“DXF”,    desc:“AutoCAD / Civil 3D”,  icon:“📐”,badge:“Industry Std”,bc:”#1D4ED8”},
-{name:“SHP”,    desc:“Esri / ArcGIS”,        icon:“🗺️”,badge:“GIS Ready”,  bc:”#15803D”},
-{name:“LandXML”,desc:“Survey & Site Design”, icon:“🏗️”,badge:“Survey Grade”,bc:”#7C3AED”},
-{name:“KMZ”,    desc:“Google Earth”,         icon:“🌍”,badge:””,           bc:”#0E7490”},
-{name:“GeoJSON”,desc:“Web GIS / Mapbox”,     icon:“🔗”,badge:“Open Format”,bc:”#C2410C”},
-{name:“CSV”,    desc:“Raw coordinates”,      icon:“📊”,badge:””,           bc:”#374151”},
-];
-const[done,setDone]=useState(null);
-const[saveMode,setSaveMode]=useState(“both”);
-const area=polyArea(perimPts);
-const photoCount=features.filter(f=>f.photo).length;
-const doExport=fmt=>{setDone(fmt);setTimeout(()=>setDone(null),2500);};
-
-return(
-React.createElement(“div”,{“style”:{display:“flex”,flexDirection:“column”,gap:14}},React.createElement(“div”,{“style”:{background:T.surface,borderRadius:T.radius,padding:20,boxShadow:T.shadow}},React.createElement(“div”,{“style”:{fontWeight:800,fontSize:16,color:T.text,marginBottom:14}},“Save Mode”),React.createElement(“div”,{“style”:{display:“grid”,gridTemplateColumns:“1fr 1fr 1fr”,gap:10}},[[“device”,“On-Device”,“💾”],[“cloud”,“Cloud”,“☁️”],[“both”,“Both”,“🔄”]].map(([id,lbl,ico])=>(
-<button key={id} onClick={()=>setSaveMode(id)} style={{padding:“14px 8px”,background:saveMode===id?T.orange:T.bg,border:`2px solid ${saveMode===id?T.orange:T.border}`,borderRadius:T.radiusSm,color:saveMode===id?“white”:T.text,cursor:“pointer”,fontWeight:700,fontSize:12,fontFamily:“inherit”,transition:“all 0.15s”}}>
-<div style={{fontSize:22,marginBottom:5}}>{ico}</div>{lbl}
-</button>
-))),saveMode!==“device”&&(
-<div style={{marginTop:12,background:T.greenBg,borderRadius:T.radiusSm,padding:“10px 14px”,display:“flex”,alignItems:“center”,gap:8}}>
-<span style={{width:8,height:8,borderRadius:“50%”,background:T.green,animation:“gpsPulse 2s infinite”}}/>
-<span style={{fontSize:13,fontWeight:600,color:T.green}}>Auto-save on — your map is weather-proof</span>
-</div>
-)),React.createElement(“div”,{“style”:{background:T.surface,borderRadius:T.radius,padding:20,boxShadow:T.shadow}},React.createElement(“div”,{“style”:{fontWeight:800,fontSize:16,color:T.text,marginBottom:14}},“Dataset Summary”),React.createElement(“div”,{“style”:{display:“flex”,gap:10,flexWrap:“wrap”}},[
-[String(perimPts.length),“Perimeter pts”,“📏”],
-[String(features.length),“Site features”,“📍”],
-[String(photoCount),“Photo pins”,“📷”],
-…(area>0?[[`${toAc(area).toFixed(3)} ac`,“Total area”,“📐”]]:[[],]),
-].filter(x=>x.length).map(([v,l,ic])=>(
-<div key={l} style={{background:T.bg,borderRadius:T.radiusSm,padding:“12px 14px”,flex:1,minWidth:80}}>
-<div style={{fontSize:18,marginBottom:4}}>{ic}</div>
-<div style={{fontSize:18,fontWeight:800,color:T.orange}}>{v}</div>
-<div style={{fontSize:11,color:T.textSub,marginTop:2}}>{l}</div>
-</div>
-)))),React.createElement(“div”,{“style”:{fontWeight:800,fontSize:16,color:T.text}},“Export Format”),React.createElement(“div”,{“style”:{display:“grid”,gridTemplateColumns:“1fr 1fr”,gap:10}},formats.map(f=>(
-<button key={f.name} onClick={()=>doExport(f.name)} style={{background:done===f.name?“rgba(244,121,32,0.08)”:T.surface,border:`2px solid ${done===f.name?T.orange:T.border}`,borderRadius:T.radius,padding:“16px 14px”,cursor:“pointer”,textAlign:“left”,boxShadow:T.shadow,position:“relative”,transition:“all 0.15s”,fontFamily:“inherit”}}>
-<div style={{fontSize:26,marginBottom:6}}>{f.icon}</div>
-<div style={{fontSize:14,fontWeight:800,color:done===f.name?T.orange:T.text}}>.{f.name}</div>
-<div style={{fontSize:11,color:T.textSub,marginTop:2}}>{f.desc}</div>
-{f.badge&&<div style={{position:“absolute”,top:10,right:10,background:f.bc+“18”,borderRadius:20,padding:“2px 8px”,fontSize:9,fontWeight:700,color:f.bc}}>{f.badge}</div>}
-{done===f.name&&<div style={{position:“absolute”,bottom:10,right:13,fontSize:11,fontWeight:700,color:T.green}}>✓ Exported</div>}
-</button>
-))),React.createElement(“div”,{“style”:{background:“linear-gradient(135deg,#EFF6FF,#F0F9FF)”,border:“2px dashed #93C5FD”,borderRadius:T.radius,padding:20}},React.createElement(“div”,{“style”:{display:“flex”,alignItems:“center”,gap:10,marginBottom:8}},React.createElement(“span”,{“style”:{fontSize:26}},“🚁”),React.createElement(“div”,null,React.createElement(“div”,{“style”:{fontWeight:800,fontSize:15,color:T.blue}},“Drone Site Vision”),React.createElement(“div”,{“style”:{fontSize:11,fontWeight:700,color:”#93C5FD”,textTransform:“uppercase”,letterSpacing:0.5}},“Coming Soon”))),React.createElement(“div”,{“style”:{fontSize:13,color:”#1E40AF”,lineHeight:1.7}},“Pair with DJI Enterprise or Skydio to overlay utility maps in real time — no-dig zones, buried lines, and benchmarks visible from the air.”)))
-);
+function gradeConnect(){
+  document.getElementById('grade-idle').style.display='none';
+  document.getElementById('grade-connected').style.display='flex';
+  gradeTick=0;
+  gradeSimTimer=setInterval(()=>{
+    gradeTick++;
+    const fixQ=gradeTick<3?1:gradeTick<6?2:gradeTick<10?5:4;
+    const lat=44.4280+(Math.random()-0.5)*0.00002;
+    const lng=-95.3755+(Math.random()-0.5)*0.00002;
+    const elev=312.441+(Math.random()-0.5)*0.003;
+    const sats=gradeTick<3?8:gradeTick<6?12:16+(gradeTick%3);
+    const hdop=gradeTick<6?1.2:0.7+(Math.random()*0.2);
+    const fixType=fixQ===4?'RTK Fix':fixQ===5?'RTK Float':fixQ===2?'DGPS':'GPS';
+    gradeData={lat,lng,elev,sats,hdop,fixType,fixQ};
+    const latDeg=Math.floor(lat);const latMin=(lat-latDeg)*60;
+    const lngDeg=Math.abs(Math.floor(lng));const lngMin=(Math.abs(lng)-lngDeg)*60;
+    const nmea=`$GNGGA,${new Date().toISOString().slice(11,19).replace(/:/g,'')}.00,${(latDeg*100+latMin).toFixed(5)},N,${(lngDeg*100+lngMin).toFixed(5)},W,${fixQ},${sats},${hdop.toFixed(1)},${(elev-30).toFixed(3)},M,30.000,M,,*6A`;
+    document.getElementById('nmea-raw').textContent=nmea;
+    updateGradeUI();
+    renderBenches();
+  },1000);
 }
 
-// ─── ROOT ─────────────────────────────────────────────────────────────────────
-function App(){
-const[tab,setTab]=useState(“map”);
-const[mapMode,setMapMode]=useState(“perimeter”);
-const[activeUtil,setActiveUtil]=useState(“gas”);
-const[linePts,setLinePts]=useState([]);
-const[mapStyle,setMapStyle]=useState(“default”);
-const[showVolume,setShowVolume]=useState(false);
-const[editingPin,setEditingPin]=useState(null);
+function gradeDisconnect(){
+  clearInterval(gradeSimTimer);gradeSimTimer=null;gradeData=null;
+  document.getElementById('grade-idle').style.display='block';
+  document.getElementById('grade-connected').style.display='none';
+}
 
-// Machine tracking
-const[machineEnabled,setMachineEnabled]=useState(false);
-const[machineIp,setMachineIp]=useState(“192.168.42.1”);
-const[machinePort,setMachinePort]=useState(“9002”);
-const[showMachineConfig,setShowMachineConfig]=useState(false);
-const{pos:machinePos,source:machineSource}=useMachinePosition(machineEnabled,machineIp,machinePort);
+function updateGradeUI(){
+  if(!gradeData)return;
+  const{fixType,fixQ,sats,hdop,elev,lat,lng}=gradeData;
+  const fixColors={4:'#16A34A',5:'#D97706',1:'#6B7280',2:'#2563EB'};
+  const fixBgs={4:'#DCFCE7',5:'#FEF3C7',1:'#F0F1F3',2:'#DBEAFE'};
+  const col=fixColors[fixQ]||'#6B7280';
+  const bg=fixBgs[fixQ]||'#F0F1F3';
+  const badge=document.getElementById('fix-badge');
+  badge.style.background=bg;badge.style.color=col;
+  document.getElementById('fix-dot').style.background=col;
+  document.getElementById('fix-text').textContent=fixType;
+  document.getElementById('g-sats').textContent=sats;
+  document.getElementById('g-hdop').textContent=hdop.toFixed(1);
+  document.getElementById('g-fixq').textContent=fixQ+' / 4';
+  document.getElementById('g-elev').textContent=elev.toFixed(4);
+  document.getElementById('g-elev-ft').textContent=`${fmt(toFt(elev),3)} ft · AMSL`;
+  document.getElementById('g-lat').textContent=`${lat.toFixed(7)}°N`;
+  document.getElementById('g-lng').textContent=`${Math.abs(lng).toFixed(7)}°W`;
+}
 
-// Projects
-const[projects,setProjects]=useState([newProject(“Main St Utility Run”)]);
-const[activeId,setActiveId]=useState(projects[0].id);
-const active=projects.find(p=>p.id===activeId)||projects[0];
+function toggleNMEA(){
+  showNmeaRaw=!showNmeaRaw;
+  document.getElementById('nmea-raw').style.display=showNmeaRaw?'block':'none';
+}
 
-const updateActive=patch=>setProjects(ps=>ps.map(p=>p.id===activeId?{…p,…patch}:p));
-const addPerim=pt=>updateActive({perimPts:[…active.perimPts,pt]});
-const undoPerim=()=>updateActive({perimPts:active.perimPts.slice(0,-1)});
-const closePerim=()=>updateActive({closed:true});
-const addFeature=f=>updateActive({features:[…active.features,f]});
-const removeFeature=id=>updateActive({features:active.features.filter(f=>f.id!==id)});
-const updateFeature=f=>updateActive({features:active.features.map(x=>x.id===f.id?f:x)});
-const finishLine=()=>{
-if(linePts.length<2)return;
-const u=UTILS.find(u=>u.id===activeUtil)||UTILS[0];
-updateActive({features:[…active.features,{type:activeUtil,pts:[…linePts],label:u.label,id:Date.now()}]});
-setLinePts([]);
-};
+function addBench(){
+  const name=document.getElementById('bm-name').value.trim();
+  const elev=document.getElementById('bm-elev').value;
+  if(!name||!elev)return;
+  benches.push({id:Date.now(),name,elev:parseFloat(elev)});
+  document.getElementById('bm-name').value='';
+  document.getElementById('bm-elev').value='';
+  renderBenches();
+}
 
-const area=polyArea(active.perimPts);
+function snapBench(){
+  if(!gradeData)return;
+  benches.push({id:Date.now(),name:`BM-${benches.length+1}`,elev:gradeData.elev});
+  renderBenches();
+}
 
-const tabs=[
-{id:“projects”,label:“Projects”,  icon:“📁”},
-{id:“map”,     label:“Site Map”,  icon:“🗺️”},
-{id:“grade”,   label:“Grade”,     icon:“📡”},
-{id:“export”,  label:“Export”,    icon:“📤”},
-];
+function saveNtrip(){
+  const host=document.getElementById('ntrip-host').value;
+  if(!host){alert('Please enter a caster host');return;}
+  alert(`NTRIP config saved!\nHost: ${host}:${document.getElementById('ntrip-port').value}\nMount: ${document.getElementById('ntrip-mount').value}`);
+}
 
-return(
-React.createElement(“div”,{“style”:{minHeight:“100vh”,background:T.bg,display:“flex”,flexDirection:“column”,maxWidth:480,margin:“0 auto”,fontFamily:”‘DM Sans’,‘Helvetica Neue’,system-ui,sans-serif”}},React.createElement(“style”,null,`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800;9..40,900&display=swap'); @keyframes gpsPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(0.8)}} @keyframes alertSlide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}} *{box-sizing:border-box;margin:0;padding:0} input,button,textarea{font-family:inherit} input::placeholder,textarea::placeholder{color:#C0C4CC} ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#DDD;border-radius:4px} button:active{transform:scale(0.97);transition:transform 0.08s}`),/* Header */,React.createElement(“div”,{“style”:{background:T.surface,borderBottom:`1px solid ${T.border}`,padding:“12px 18px”,display:“flex”,alignItems:“center”,justifyContent:“space-between”,position:“sticky”,top:0,zIndex:50,boxShadow:“0 1px 0 rgba(0,0,0,0.05)”}},React.createElement(“div”,{“style”:{display:“flex”,alignItems:“center”,gap:12}},React.createElement(“div”,{“style”:{width:42,height:42,background:T.orange,borderRadius:12,display:“flex”,alignItems:“center”,justifyContent:“center”,boxShadow:`0 4px 14px rgba(244,121,32,0.35)`}},React.createElement(“svg”,{“viewBox”:“0 0 32 32”,“width”:“24”,“height”:“24”,“fill”:“white”},React.createElement(“path”,{“d”:“M5 26 L13 8 L16 14 L19 8 L27 26 Z”,“opacity”:“0.95”}),React.createElement(“rect”,{“x”:“10”,“y”:“22”,“width”:“12”,“height”:“4”,“rx”:“2”}))),React.createElement(“div”,null,React.createElement(“div”,{“style”:{fontSize:18,fontWeight:900,color:T.text,letterSpacing:-0.5,lineHeight:1}},“Bobcat”),React.createElement(“div”,{“style”:{fontSize:10,fontWeight:700,color:T.orange,letterSpacing:1.2,textTransform:“uppercase”}},“Digital Station”))),React.createElement(“div”,{“style”:{display:“flex”,alignItems:“center”,gap:8}},tab===“map”&&(
-<div style={{fontSize:12,fontWeight:700,color:T.orange,background:T.orangeGlow,borderRadius:20,padding:“4px 12px”,maxWidth:130,overflow:“hidden”,textOverflow:“ellipsis”,whiteSpace:“nowrap”}}>{active.name}</div>
-),React.createElement(“div”,{“style”:{background:T.greenBg,borderRadius:20,padding:“6px 12px”,display:“flex”,alignItems:“center”,gap:6}},React.createElement(“span”,{“style”:{width:7,height:7,borderRadius:“50%”,background:T.green,display:“inline-block”,animation:“gpsPulse 2s infinite”}}),React.createElement(“span”,{“style”:{fontSize:12,fontWeight:700,color:T.green}},“GPS Fix”)))),/* Tabs */,React.createElement(“div”,{“style”:{background:T.surface,borderBottom:`1px solid ${T.border}`,display:“flex”,padding:“0 4px”}},tabs.map(t=>(
-<button key={t.id} onClick={()=>setTab(t.id)} style={{flex:1,display:“flex”,flexDirection:“column”,alignItems:“center”,gap:3,padding:“9px 0 11px”,background:“none”,border:“none”,borderBottom:tab===t.id?`3px solid ${T.orange}`:“3px solid transparent”,color:tab===t.id?T.orange:T.textMuted,cursor:“pointer”,fontSize:10,fontWeight:700,transition:“all 0.15s”,letterSpacing:0.3}}>
-<span style={{fontSize:17,opacity:tab===t.id?1:0.5}}>{t.icon}</span>
-{t.label}
-</button>
-))),/* Content */,React.createElement(“div”,{“style”:{flex:1,overflowY:“auto”,padding:16}},/* PROJECTS */,tab===“projects”&&(
-<ProjectsScreen
-projects={projects} activeId={activeId}
-onSelect={id=>{setActiveId(id);setTab(“map”);}}
-onCreate={name=>{const p=newProject(name);setProjects(ps=>[…ps,p]);setActiveId(p.id);setTab(“map”);}}
-onDelete={id=>setProjects(ps=>{const next=ps.filter(p=>p.id!==id);if(activeId===id)setActiveId(next[0]?.id);return next;})}
-/>
-),/* MAP */,tab===“map”&&(
-<div style={{display:“flex”,flexDirection:“column”,gap:14}}>
-
-```
-        {/* Map style switcher */}
-        <div style={{background:T.surface,borderRadius:T.radius,padding:5,boxShadow:T.shadow,display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4}}>
-          {MAP_STYLES.map(s=>(
-            <button key={s.id} onClick={()=>setMapStyle(s.id)} style={{padding:"9px 0",background:mapStyle===s.id?T.bg:"transparent",border:`1.5px solid ${mapStyle===s.id?T.border:"transparent"}`,borderRadius:T.radiusSm,color:mapStyle===s.id?T.text:T.textMuted,fontSize:11,fontWeight:700,cursor:"pointer",transition:"all 0.15s",boxShadow:mapStyle===s.id?T.shadow:"none"}}>
-              <div style={{fontSize:16,marginBottom:2}}>{s.id==="default"?"🗺️":s.id==="satellite"?"🛰️":"🏔️"}</div>
-              {s.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Draw mode */}
-        <div style={{background:T.surface,borderRadius:T.radius,padding:5,boxShadow:T.shadow,display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4}}>
-          {[["perimeter","📏","Perimeter"],["line","〰️","Run Line"],["features","🔍","View All"]].map(([id,ico,lbl])=>(
-            <button key={id} onClick={()=>{setMapMode(id);if(id!=="line")setLinePts([]);}} style={{padding:"10px 0",background:mapMode===id?T.orange:"transparent",border:"none",borderRadius:T.radiusSm,color:mapMode===id?"white":T.textSub,fontSize:12,fontWeight:700,cursor:"pointer",transition:"all 0.15s"}}>
-              <div style={{fontSize:18,marginBottom:2}}>{ico}</div>{lbl}
-            </button>
-          ))}
-        </div>
-
-        {/* Line util strip */}
-        {mapMode==="line"&&(
-          <div>
-            <div style={{fontSize:12,fontWeight:700,color:T.textSub,marginBottom:8,textTransform:"uppercase",letterSpacing:0.5}}>Select Utility Type</div>
-            <div style={{display:"flex",gap:7,overflowX:"auto",paddingBottom:2}}>
-              {UTILS.filter(u=>u.id!=="nodig").map(u=>(
-                <button key={u.id} onClick={()=>setActiveUtil(u.id)} style={{flexShrink:0,padding:"7px 14px",background:activeUtil===u.id?u.bg:"white",border:`2px solid ${activeUtil===u.id?u.dot:T.border}`,borderRadius:20,color:activeUtil===u.id?u.color:T.textSub,fontSize:12,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:6,whiteSpace:"nowrap"}}>
-                  {u.emoji} {u.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Machine tracking toggle */}
-        <div style={{background:T.surface,borderRadius:T.radius,boxShadow:T.shadow,overflow:"hidden"}}>
-          <div style={{padding:"13px 16px",display:"flex",alignItems:"center",gap:12}}>
-            <div style={{width:40,height:40,borderRadius:11,background:machineEnabled?T.blueBg:T.surfaceAlt,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>🚜</div>
-            <div style={{flex:1}}>
-              <div style={{fontWeight:700,fontSize:14,color:T.text}}>Machine Tracking</div>
-              <div style={{fontSize:11,color:machineEnabled?(machinePos?T.green:T.textSub):T.textMuted,marginTop:1}}>
-                {machineEnabled?(machinePos?`${machineSource==="rs3"?"RS3":"Simulated"} · ${machinePos.fixType} · ${machinePos.lat.toFixed(6)}N`:"Locating…"):"Off · 3 m proximity alerts when on"}
-              </div>
-            </div>
-            {/* Toggle */}
-            <div onClick={()=>setMachineEnabled(e=>!e)}
-              style={{width:48,height:28,borderRadius:14,background:machineEnabled?T.blue:T.border,cursor:"pointer",position:"relative",transition:"background 0.2s",flexShrink:0}}>
-              <div style={{position:"absolute",top:3,left:machineEnabled?22:3,width:22,height:22,borderRadius:"50%",background:"white",boxShadow:"0 1px 4px rgba(0,0,0,0.2)",transition:"left 0.2s"}}/>
-            </div>
-          </div>
-          {machineEnabled&&(
-            <>
-              <button onClick={()=>setShowMachineConfig(s=>!s)}
-                style={{width:"100%",background:"none",border:"none",borderTop:`1px solid ${T.border}`,padding:"10px 16px",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer",fontFamily:"inherit"}}>
-                <span style={{fontSize:12,fontWeight:600,color:T.textSub}}>🔧 RS3 Connection · {machineIp}:{machinePort}</span>
-                <span style={{fontSize:13,color:T.textMuted,transform:showMachineConfig?"rotate(180deg)":"none",transition:"transform 0.2s",display:"inline-block"}}>▾</span>
-              </button>
-              {showMachineConfig&&(
-                <div style={{padding:"4px 16px 14px",borderTop:`1px solid ${T.border}`}}>
-                  <div style={{fontSize:11,color:T.textSub,marginBottom:10,lineHeight:1.6}}>
-                    Connect a second Emlid RS3 mounted on the machine. Join its WiFi hotspot then enter its IP below. Port 9002 is the RS3's secondary NMEA TCP output.
-                  </div>
-                  <div style={{display:"flex",gap:8}}>
-                    <input value={machineIp} onChange={e=>setMachineIp(e.target.value)} placeholder="192.168.42.1"
-                      style={{flex:1,border:`1.5px solid ${T.border}`,borderRadius:T.radiusXs,padding:"8px 10px",fontSize:12,color:T.text,outline:"none",fontFamily:"inherit",background:T.bg}}/>
-                    <input value={machinePort} onChange={e=>setMachinePort(e.target.value)} placeholder="9002"
-                      style={{width:72,border:`1.5px solid ${T.border}`,borderRadius:T.radiusXs,padding:"8px 10px",fontSize:12,color:T.text,outline:"none",fontFamily:"inherit",background:T.bg}}/>
-                  </div>
-                  <div style={{fontSize:11,color:T.textMuted,marginTop:8}}>No RS3 on network? App uses a simulated track so you can demo the proximity alerts.</div>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-
-        {/* Canvas */}
-        <div style={{height:300,borderRadius:T.radius,overflow:"hidden",boxShadow:T.shadowMd}}>
-          <MapCanvas
-            project={active}
-            features={active.features}
-            onAddPerim={addPerim} onUndo={undoPerim} onClose={closePerim}
-            onAddFeature={addFeature}
-            onUpdateFeature={updateFeature}
-            mapMode={mapMode} activeUtil={activeUtil}
-            linePts={linePts} onAddLinePt={p=>setLinePts(x=>[...x,p])} onFinishLine={finishLine}
-            mapStyle={mapStyle}
-            machinePos={machinePos}
-            machineEnabled={machineEnabled}
-          />
-        </div>
-
-        {/* Measurements */}
-        {active.perimPts.length>1&&(
-          <div style={{display:"flex",gap:10}}>
-            <StatCard label="Perimeter" value={`${fmt(perimM(active.perimPts))} m`} sub={`${fmt(toFt(perimM(active.perimPts)),0)} ft`} icon="📏"/>
-            <StatCard label="Area" value={active.closed?`${fmt(toAc(area),3)} ac`:null} sub={active.closed?`${fmt(toSqFt(area),0)} sq ft`:"Close shape first"} icon="📐" accent/>
-          </div>
-        )}
-
-        {/* Volume button */}
-        {active.closed&&area>0&&(
-          <button onClick={()=>setShowVolume(true)} style={{width:"100%",background:T.surface,border:`2px solid ${active.zones?.length?T.orange:T.border}`,borderRadius:T.radius,padding:"14px 18px",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer",boxShadow:T.shadow,fontFamily:"inherit"}}>
-            <div style={{display:"flex",alignItems:"center",gap:10}}>
-              <span style={{fontSize:22}}>📐</span>
-              <div style={{textAlign:"left"}}>
-                <div style={{fontWeight:700,fontSize:14,color:T.text}}>Volume Calculator</div>
-                <div style={{fontSize:12,color:T.textSub,marginTop:1}}>
-                  {active.zones?.length?`${active.zones.length} zone${active.zones.length!==1?"s":""} defined`:"Tap to add cut/fill depth zones"}
-                </div>
-              </div>
-            </div>
-            <span style={{fontSize:18,color:T.orange}}>›</span>
-          </button>
-        )}
-
-        {/* Feature summary */}
-        {active.features.length>0&&(
-          <div style={{background:T.surface,borderRadius:T.radius,padding:"14px 18px",boxShadow:T.shadow,display:"flex",alignItems:"center",gap:12}}>
-            <div style={{width:44,height:44,borderRadius:12,background:"rgba(244,121,32,0.1)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}>📍</div>
-            <div style={{flex:1}}>
-              <div style={{fontWeight:800,fontSize:15,color:T.text}}>{active.features.length} Site Feature{active.features.length!==1?"s":""}</div>
-              <div style={{fontSize:12,color:T.textSub,marginTop:2}}>
-                {active.features.filter(f=>f.photo).length} photo pin{active.features.filter(f=>f.photo).length!==1?"s":""} · Weather-proof · Exportable
-              </div>
-            </div>
-            <span style={{width:8,height:8,borderRadius:"50%",background:T.green,animation:"gpsPulse 2s infinite",flexShrink:0}}/>
-          </div>
-        )}
-
-        <div style={{fontWeight:800,fontSize:16,color:T.text}}>Site Features Layer</div>
-        <FeatureLegend features={active.features} onRemove={removeFeature} onEdit={setEditingPin}/>
-        <APWAAccordion/>
-
-        {(active.perimPts.length>0||active.features.length>0)&&(
-          <button onClick={()=>updateActive({perimPts:[],closed:false,features:[],zones:[]})}
-            style={{width:"100%",background:"white",border:`1.5px solid ${T.border}`,borderRadius:T.radiusSm,color:T.textSub,padding:13,fontSize:13,fontWeight:700,cursor:"pointer"}}>
-            🗑️  Clear Site & Start Over
-          </button>
-        )}
+function renderBenches(){
+  const el=document.getElementById('bench-list');
+  if(!benches.length){el.innerHTML=`<div style="text-align:center;color:#9CA3AF;font-size:13px;padding:16px">No benchmarks set yet</div>`;return;}
+  const live=gradeData?gradeData.elev:null;
+  el.innerHTML=benches.map(bm=>{
+    const delta=live!=null?live-bm.elev:null;
+    const cut=delta!=null&&delta>0;
+    return `<div class="bench-item" style="border:1.5px solid ${delta!=null?(cut?'rgba(220,38,38,0.15)':'rgba(22,163,74,0.15)'):'#E4E6EA'}">
+      <div>
+        <div style="font-weight:700;font-size:14px">${bm.name}</div>
+        <div style="font-size:12px;color:#6B7280;margin-top:2px">Design: ${bm.elev.toFixed(4)} m</div>
       </div>
-    )}
+      <div style="text-align:right">
+        ${delta!=null?`<div class="bench-delta" style="color:${cut?'#DC2626':'#16A34A'}">${cut?'+':''}${delta.toFixed(4)} m</div>
+        <div style="font-size:11px;font-weight:700;color:${cut?'#DC2626':'#16A34A'};margin-top:2px">${cut?'▲ Fill':'▼ Cut'}</div>`
+        :'<div style="font-size:13px;color:#9CA3AF">Waiting…</div>'}
+      </div>
+    </div>`;
+  }).join('');
+}
 
-    {tab==="grade"&&<GradeScreen/>}
-    {tab==="export"&&<ExportScreen perimPts={active.perimPts} features={active.features} zones={active.zones||[]}/>}
-  </div>
+// ─── EXPORT ───────────────────────────────────────────────────────────────────
+function setSaveMode(mode,btn){
+  saveMode=mode;
+  document.querySelectorAll('.save-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const info=document.getElementById('save-mode-info');
+  info.style.display=mode!=='device'?'flex':'none';
+}
 
-  <div style={{height:8,background:T.bg}}/>
+function buildFormatGrid(){
+  document.getElementById('format-grid').innerHTML=FORMATS.map(f=>`
+    <button class="format-btn ${doneFormat===f.name?'done':''}" onclick="doExport('${f.name}',this)">
+      <div class="format-icon">${f.icon}</div>
+      <div class="format-name">.${f.name}</div>
+      <div class="format-desc">${f.desc}</div>
+      ${f.badge?`<div class="format-badge" style="background:${f.bc}18;color:${f.bc}">${f.badge}</div>`:''}
+      ${doneFormat===f.name?`<div class="format-done">✓ Exported</div>`:''}
+    </button>`).join('');
+}
 
-  {/* Volume modal */}
-  {showVolume&&(
-    <VolumeModal
-      area={area}
-      zones={active.zones||[]}
-      onSave={zones=>{updateActive({zones});setShowVolume(false);}}
-      onClose={()=>setShowVolume(false)}
-    />
-  )}
+function doExport(fmt, btn){
+  doneFormat=fmt;
+  buildFormatGrid();
+  setTimeout(()=>{doneFormat=null;buildFormatGrid();},2500);
+}
 
-  {/* Photo pin edit modal */}
-  {editingPin&&(
-    <PhotoPinModal
-      feature={editingPin}
-      onSave={updated=>{updateFeature(updated);setEditingPin(null);}}
-      onClose={()=>setEditingPin(null)}
-    />
-  )}
-</div>
-```
+function buildExportSummary(){
+  const p=getActive();
+  const area=polyArea(p.perimPts);
+  const photoCount=p.features.filter(f=>f.photo).length;
+  const items=[
+    [String(p.perimPts.length),'Perimeter pts','📏'],
+    [String(p.features.length),'Site features','📍'],
+    [String(photoCount),'Photo pins','📷'],
+    ...(area>0?[[`${toAc(area).toFixed(3)} ac`,'Total area','📐']]:[]),
+  ];
+  document.getElementById('export-summary').innerHTML=items.map(([v,l,ic])=>
+    `<div style="background:#F5F6F8;border-radius:10px;padding:12px 14px;flex:1;min-width:80px">
+      <div style="font-size:18px;margin-bottom:4px">${ic}</div>
+      <div style="font-size:18px;font-weight:800;color:#F47920">${v}</div>
+      <div style="font-size:11px;color:#6B7280;margin-top:2px">${l}</div>
+    </div>`).join('');
+}
 
-);
-}))
+// ─── TABS ─────────────────────────────────────────────────────────────────────
+function showTab(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  const tabs=['projects','map','grade','export'];
+  document.querySelectorAll('.tab')[tabs.indexOf(id)].classList.add('active');
+  if(id==='export'){buildExportSummary();buildFormatGrid();}
+  if(id==='map'){drawMap();}
+}
 
-const root = ReactDOM.createRoot(document.getElementById(‘root’));
-root.render(React.createElement(App));
-})();
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded',()=>{
+  resizeCanvas();
+  buildAPWA();
+  buildUtilStrip();
+  buildUtilGrid();
+  renderProjects();
+  updateFeatureLegend();
+
+  // Set active project label
+  document.getElementById('active-project-label').textContent=getActive().name;
+  document.getElementById('active-project-label').style.display='block';
+});
+
+window.addEventListener('resize', resizeCanvas);
 </script>
 
 </body>
