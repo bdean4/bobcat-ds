@@ -10,364 +10,305 @@
 <meta name="apple-mobile-web-app-title" content="Bobcat DS"/>
 <title>Bobcat Digital Station</title>
 <link rel="preconnect" href="[https://fonts.googleapis.com"/]https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-:root{
-  --orange:#F47920;
-  --orange-light:#FF9240;
-  --orange-glow:rgba(244,121,32,0.15);
-  --orange-border:rgba(244,121,32,0.3);
-  --bg:#F2F4F7;
-  --surface:#FFFFFF;
-  --surface2:#F8F9FB;
-  --border:#E5E7EB;
-  --border2:#EEF0F3;
-  --text:#0F172A;
-  --text2:#475569;
-  --text3:#94A3B8;
-  --green:#15803D;
-  --green-bg:#DCFCE7;
-  --red:#DC2626;
-  --red-bg:#FEE2E2;
-  --blue:#2563EB;
-  --blue-bg:#DBEAFE;
-  --shadow-sm:0 1px 2px rgba(0,0,0,0.06),0 1px 3px rgba(0,0,0,0.04);
-  --shadow:0 2px 8px rgba(0,0,0,0.08),0 1px 3px rgba(0,0,0,0.05);
-  --shadow-lg:0 8px 24px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.06);
-  --radius:14px;
-  --radius-sm:10px;
-  --radius-xs:7px;
-  --font:'Plus Jakarta Sans',system-ui,sans-serif;
-}
+/* ── RESET & BASE ─────────────────────────────────────────── */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;width:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--text)}
+html,body{height:100%;width:100%;overflow:hidden;background:#F5F6F8;
+  font-family:'DM Sans',system-ui,sans-serif;color:#111827}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:#ddd;border-radius:3px}
+
+/* ── LAYOUT ───────────────────────────────────────────────── */
 #app{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden}
-
-/* Header */
-#header{
-background:var(–surface);
-padding:0 16px;
-height:56px;
-display:flex;align-items:center;justify-content:space-between;
-border-bottom:1px solid var(–border);
-flex-shrink:0;
-z-index:100;
-}
-.logo{display:flex;align-items:center;gap:10px}
-.logo-mark{
-width:38px;height:38px;background:var(–orange);border-radius:10px;
-display:flex;align-items:center;justify-content:center;
-box-shadow:0 3px 10px rgba(244,121,32,0.35);
-}
-.logo-title{font-size:17px;font-weight:900;color:var(–text);letter-spacing:-0.4px;line-height:1}
-.logo-sub{font-size:9px;font-weight:700;color:var(–orange);letter-spacing:1.5px;text-transform:uppercase}
-.gps-badge{
-display:flex;align-items:center;gap:6px;
-background:var(–green-bg);border-radius:20px;padding:5px 11px;
-}
-.gps-badge span{font-size:12px;font-weight:700;color:var(–green)}
-.pulse{width:7px;height:7px;border-radius:50%;background:var(–green);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.75)}}
-
-/* Tab bar */
-#tabbar{
-background:var(–surface);
-border-bottom:1px solid var(–border);
-display:flex;
-flex-shrink:0;
-padding:0;
-}
-.tab{
-flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
-padding:8px 0 10px;background:none;border:none;
-border-bottom:2.5px solid transparent;
-color:var(–text3);cursor:pointer;font-size:10px;font-weight:700;
-font-family:var(–font);letter-spacing:0.2px;transition:color .15s;
-}
-.tab.active{color:var(–orange);border-bottom-color:var(–orange)}
-.tab-icon{font-size:16px;opacity:.5}
-.tab.active .tab-icon{opacity:1}
-
-/* Content */
+#header{background:#fff;border-bottom:1px solid #E4E6EA;padding:0 16px;
+height:54px;display:flex;align-items:center;justify-content:space-between;
+flex-shrink:0;position:sticky;top:0;z-index:200}
+#tabbar{background:#fff;border-bottom:1px solid #E4E6EA;display:flex;
+padding:0 4px;flex-shrink:0}
 #content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
-.screen{display:none;flex-direction:column;gap:12px;padding:14px}
+.screen{display:none;flex-direction:column;gap:12px;padding:14px 14px 28px}
 .screen.active{display:flex}
 
-/* Cards */
-.card{background:var(–surface);border-radius:var(–radius);box-shadow:var(–shadow-sm);overflow:hidden}
-.card-pad{padding:16px}
-.card-title{font-size:15px;font-weight:800;color:var(–text);margin-bottom:12px}
+/* ── HEADER ───────────────────────────────────────────────── */
+.logo{display:flex;align-items:center;gap:11px}
+.logo-icon{width:40px;height:40px;background:#F47920;border-radius:11px;
+display:flex;align-items:center;justify-content:center;
+box-shadow:0 3px 10px rgba(244,121,32,0.35);flex-shrink:0}
+.logo-name{font-size:17px;font-weight:900;color:#111827;letter-spacing:-.4px;line-height:1}
+.logo-sub{font-size:9px;font-weight:700;color:#F47920;letter-spacing:1.5px;text-transform:uppercase}
+.gps-pill{display:flex;align-items:center;gap:6px;background:#DCFCE7;
+border-radius:20px;padding:5px 11px}
+.gps-pill span{font-size:12px;font-weight:700;color:#16A34A}
+.dot{width:7px;height:7px;border-radius:50%;animation:blink 2s infinite;flex-shrink:0}
+.dot-green{background:#16A34A}
+.dot-orange{background:#F47920}
+.dot-red{background:#DC2626;animation-duration:0.8s}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.7)}}
 
-/* Buttons */
-.btn{
-display:inline-flex;align-items:center;justify-content:center;gap:7px;
-border:none;border-radius:var(–radius-sm);padding:12px 18px;
-font-size:14px;font-weight:700;cursor:pointer;font-family:var(–font);
-transition:all .15s;white-space:nowrap;
-}
+/* ── TABS ─────────────────────────────────────────────────── */
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
+padding:8px 0 10px;background:none;border:none;
+border-bottom:2.5px solid transparent;color:#9CA3AF;cursor:pointer;
+font-size:10px;font-weight:700;font-family:inherit;letter-spacing:.2px;transition:color .15s}
+.tab.on{color:#F47920;border-bottom-color:#F47920}
+.tab-ico{font-size:16px;opacity:.5}
+.tab.on .tab-ico{opacity:1}
+
+/* ── CARDS ────────────────────────────────────────────────── */
+.card{background:#fff;border-radius:14px;
+box-shadow:0 1px 3px rgba(0,0,0,0.07),0 1px 2px rgba(0,0,0,0.04);
+overflow:hidden}
+.cp{padding:16px}
+.ctitle{font-size:15px;font-weight:800;color:#111827;margin-bottom:13px}
+
+/* ── BUTTONS ──────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;
+border:none;border-radius:10px;padding:12px 18px;font-size:14px;
+font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
 .btn:active{transform:scale(.97)}
-.btn-primary{background:var(–orange);color:#fff;box-shadow:0 3px 12px rgba(244,121,32,0.3)}
-.btn-primary:hover{background:var(–orange-light)}
-.btn-ghost{background:var(–surface2);color:var(–text2);border:1.5px solid var(–border)}
-.btn-danger{background:var(–red-bg);color:var(–red);border:none}
-.btn-success{background:var(–green-bg);color:var(–green);border:none}
-.btn-block{width:100%;display:flex}
-.btn-sm{padding:7px 13px;font-size:12px;border-radius:var(–radius-xs)}
+.btn-o{background:#F47920;color:#fff;box-shadow:0 3px 12px rgba(244,121,32,0.3)}
+.btn-o:hover{background:#FF9240}
+.btn-g{background:#F0F1F3;color:#374151;border:1.5px solid #E4E6EA}
+.btn-red{background:#FEE2E2;color:#DC2626;border:none}
+.btn-grn{background:#DCFCE7;color:#15803D;border:none}
+.btn-w{width:100%;display:flex}
+.btn-s{padding:7px 13px;font-size:12px;border-radius:8px}
 
-/* Inputs */
-.input{
-border:1.5px solid var(–border);border-radius:var(–radius-xs);
-padding:10px 13px;font-size:13px;color:var(–text);
-outline:none;font-family:var(–font);background:var(–surface2);width:100%;
-transition:border-color .15s;
-}
-.input:focus{border-color:var(–orange);background:var(–surface)}
-.input::placeholder{color:var(–text3)}
-textarea.input{resize:none}
-.input-label{font-size:11px;font-weight:700;color:var(–text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+/* ── INPUTS ───────────────────────────────────────────────── */
+input,textarea{border:1.5px solid #E4E6EA;border-radius:9px;padding:10px 13px;
+font-size:13px;color:#111827;outline:none;font-family:inherit;background:#F8F9FB;
+width:100%;transition:border-color .15s}
+input:focus,textarea:focus{border-color:#F47920;background:#fff}
+input::placeholder,textarea::placeholder{color:#C0C4CC}
+textarea{resize:none}
+.ilabel{font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase;
+letter-spacing:.5px;margin-bottom:5px}
 
-/* Pill selector */
-.pill-selector{display:flex;background:var(–surface2);border-radius:var(–radius-sm);padding:4px;gap:3px}
-.pill-opt{
-flex:1;padding:8px 0;background:transparent;border:none;
-border-radius:8px;font-size:12px;font-weight:700;color:var(–text3);
-cursor:pointer;font-family:var(–font);transition:all .15s;text-align:center;
-}
-.pill-opt .pico{display:block;font-size:16px;margin-bottom:1px}
-.pill-opt.active{background:var(–orange);color:#fff;box-shadow:0 2px 8px rgba(244,121,32,0.3)}
+/* ── SEGMENT CONTROL ──────────────────────────────────────── */
+.seg{background:#fff;border-radius:14px;padding:4px;
+box-shadow:0 1px 3px rgba(0,0,0,0.07);display:grid;gap:3px}
+.seg3{grid-template-columns:1fr 1fr 1fr}
+.seg2{grid-template-columns:1fr 1fr}
+.seg-b{padding:9px 0;background:transparent;border:none;border-radius:10px;
+color:#6B7280;font-size:12px;font-weight:700;cursor:pointer;
+font-family:inherit;transition:all .15s;text-align:center}
+.seg-b .si{font-size:17px;display:block;margin-bottom:1px}
+.seg-b.on{background:#F47920;color:#fff;box-shadow:0 2px 8px rgba(244,121,32,0.3)}
 
-/* Stat row */
+/* ── STATS ────────────────────────────────────────────────── */
 .stats-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stat-card{
-background:var(–surface);border-radius:var(–radius);
-padding:14px 16px;box-shadow:var(–shadow-sm);
-border:1.5px solid var(–border2);
-}
-.stat-card.accent{border-color:var(–orange-border);background:linear-gradient(135deg,rgba(244,121,32,0.04),var(–surface))}
-.stat-label{font-size:10px;font-weight:700;color:var(–text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
-.stat-value{font-size:22px;font-weight:900;color:var(–text);line-height:1}
-.stat-card.accent .stat-value{color:var(–orange)}
-.stat-sub{font-size:11px;color:var(–text3);margin-top:3px}
+.stat{background:#fff;border-radius:14px;padding:14px 16px;
+box-shadow:0 1px 3px rgba(0,0,0,0.07);border:1.5px solid #ECEEF2}
+.stat.ac{border-color:rgba(244,121,32,0.3);
+background:linear-gradient(135deg,rgba(244,121,32,.05),#fff)}
+.slabel{font-size:10px;font-weight:700;color:#9CA3AF;
+text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+.sval{font-size:21px;font-weight:900;color:#111827;line-height:1}
+.stat.ac .sval{color:#F47920}
+.ssub{font-size:11px;color:#6B7280;margin-top:3px}
 
-/* Badge */
+/* ── BADGES ───────────────────────────────────────────────── */
 .badge{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700}
-.badge-green{background:var(–green-bg);color:var(–green)}
-.badge-orange{background:var(–orange-glow);color:var(–orange);border:1px solid var(–orange-border)}
-.badge-blue{background:var(–blue-bg);color:var(–blue)}
-.badge-red{background:var(–red-bg);color:var(–red)}
-.badge-gray{background:var(–surface2);color:var(–text3);border:1px solid var(–border)}
+.badge-grn{background:#DCFCE7;color:#15803D}
+.badge-org{background:rgba(244,121,32,.12);color:#F47920;border:1px solid rgba(244,121,32,.3)}
+.badge-blu{background:#DBEAFE;color:#2563EB}
+.badge-red{background:#FEE2E2;color:#DC2626}
+.badge-gray{background:#F0F1F3;color:#6B7280}
 
-/* Toggle */
-.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.toggle{
-width:46px;height:26px;border-radius:13px;
-background:var(–border);cursor:pointer;position:relative;
-transition:background .2s;flex-shrink:0;border:none;appearance:none;
-}
-.toggle.on{background:var(–blue)}
-.toggle::after{
-content:’’;position:absolute;top:3px;left:3px;
+/* ── TOGGLE ───────────────────────────────────────────────── */
+.tog-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tog{width:46px;height:26px;border-radius:13px;background:#E4E6EA;
+cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;border:none}
+.tog.on{background:#2563EB}
+.tog::after{content:’’;position:absolute;top:3px;left:3px;
 width:20px;height:20px;border-radius:50%;background:#fff;
-box-shadow:0 1px 4px rgba(0,0,0,0.2);transition:left .2s;
-}
-.toggle.on::after{left:23px}
+box-shadow:0 1px 4px rgba(0,0,0,0.2);transition:left .2s}
+.tog.on::after{left:23px}
 
-/* Info boxes */
-.info-box{border-radius:var(–radius-xs);padding:10px 13px;font-size:12px;line-height:1.6}
-.info-blue{background:var(–blue-bg);color:#1E40AF}
-.info-green{background:var(–green-bg);color:var(–green);display:flex;align-items:center;gap:7px}
-.info-orange{background:var(–orange-glow);color:#9A4A00;border:1px solid var(–orange-border)}
+/* ── INFO BOXES ───────────────────────────────────────────── */
+.ibox{border-radius:9px;padding:10px 13px;font-size:12px;line-height:1.6}
+.ibox-b{background:#DBEAFE;color:#1E40AF}
+.ibox-g{background:#DCFCE7;color:#15803D;display:flex;align-items:center;gap:7px}
+.ibox-o{background:rgba(244,121,32,.08);color:#9A4A00;border:1px solid rgba(244,121,32,.25)}
 
-/* Section header */
-.section-header{font-size:13px;font-weight:800;color:var(–text);letter-spacing:-.1px;padding:0 2px}
+/* ── MAP ──────────────────────────────────────────────────── */
+#map-wrap{position:relative;width:100%;border-radius:14px;overflow:hidden;
+box-shadow:0 4px 16px rgba(0,0,0,0.1);height:360px}
+#lmap{width:100%;height:100%}
 
-/* Map container */
-#map-wrap{position:relative;width:100%;height:360px;border-radius:var(–radius);overflow:hidden;box-shadow:var(–shadow)}
-#leaflet-map{width:100%;height:100%}
+/* Map overlays */
+.map-tl{position:absolute;top:10px;left:10px;z-index:500;display:flex;flex-direction:column;gap:5px}
+.map-tr{position:absolute;top:10px;right:10px;z-index:500}
+.map-bl{position:absolute;bottom:10px;left:10px;z-index:500}
+.map-br{position:absolute;bottom:10px;right:10px;z-index:500;display:flex;gap:7px}
+.mchip{background:rgba(255,255,255,.96);backdrop-filter:blur(6px);
+border-radius:20px;padding:5px 12px;font-size:11px;font-weight:600;
+display:flex;align-items:center;gap:6px;
+box-shadow:0 2px 8px rgba(0,0,0,0.1);white-space:nowrap}
+.mbtn{background:rgba(255,255,255,.96);backdrop-filter:blur(6px);
+border:none;border-radius:20px;padding:7px 14px;font-size:12px;
+font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.12);
+font-family:inherit;display:flex;align-items:center;gap:5px}
+.mbtn-o{background:#F47920;color:#fff;box-shadow:0 3px 12px rgba(244,121,32,.4)}
+.mbtn-g{background:#15803D;color:#fff}
+.mbtn:active{transform:scale(.97)}
 
-/* Map toolbar */
-.map-toolbar{
-position:absolute;top:12px;left:12px;right:12px;
-display:flex;justify-content:space-between;align-items:flex-start;
-pointer-events:none;z-index:500;gap:8px;
-}
-.map-toolbar-left,.map-toolbar-right{display:flex;flex-direction:column;gap:6px;pointer-events:all}
-.map-chip{
-background:rgba(255,255,255,0.96);border-radius:20px;padding:5px 12px;
-font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;
-box-shadow:var(–shadow);backdrop-filter:blur(8px);white-space:nowrap;
-}
-.map-actions{
-position:absolute;bottom:12px;right:12px;
-display:flex;gap:7px;z-index:500;
-}
-.map-hint{
-position:absolute;bottom:12px;left:12px;
-background:rgba(255,255,255,0.92);border-radius:20px;
-padding:5px 12px;font-size:10px;font-weight:600;color:var(–text2);
-box-shadow:var(–shadow);backdrop-filter:blur(8px);z-index:500;
-}
-.map-btn{
-background:rgba(255,255,255,0.96);border:none;border-radius:20px;
-padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;
-box-shadow:var(–shadow);backdrop-filter:blur(8px);font-family:var(–font);
-display:flex;align-items:center;gap:5px;
-}
-.map-btn.primary{background:var(–orange);color:#fff;box-shadow:0 3px 12px rgba(244,121,32,0.4)}
-.map-btn.success{background:#15803D;color:#fff}
-.map-btn:active{transform:scale(.97)}
-
-/* Proximity alert */
-#prox-alert{
-display:none;
-background:var(–red);border-radius:var(–radius);
-padding:12px 16px;box-shadow:0 4px 20px rgba(220,38,38,0.4);
-animation:slideDown .2s ease-out;
-}
-#prox-alert.show{display:block}
-@keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+/* ── PROXIMITY ALERT ──────────────────────────────────────── */
+#prox{display:none;background:#DC2626;border-radius:14px;padding:13px 16px;
+box-shadow:0 4px 20px rgba(220,38,38,.4);animation:sld .22s ease-out}
+#prox.show{display:block}
+@keyframes sld{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 .prox-inner{display:flex;align-items:center;gap:12px}
-.prox-icon-wrap{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.prox-info{flex:1}
-.prox-title{font-weight:800;font-size:13px;color:#fff}
+.prox-ico{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.2);
+display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.prox-info{flex:1}.prox-title{font-weight:800;font-size:13px;color:#fff}
 .prox-sub{font-size:11px;color:rgba(255,255,255,.8);margin-top:1px}
 .prox-dist{text-align:right;flex-shrink:0}
-.prox-dist-num{font-size:26px;font-weight:900;color:#fff;line-height:1}
-.prox-dist-unit{font-size:9px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.5px}
+.prox-num{font-size:26px;font-weight:900;color:#fff;line-height:1}
+.prox-unit{font-size:9px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.5px}
 
-/* Feature legend */
-.feat-group{background:var(–surface);border-radius:var(–radius);overflow:hidden;box-shadow:var(–shadow-sm)}
-.feat-group-hd{display:flex;align-items:center;gap:9px;padding:12px 14px}
-.feat-row{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-top:1px solid var(–border2)}
-.feat-info{flex:1;min-width:0}
-.feat-coord{font-size:11px;color:var(–text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.feat-note{font-size:10px;color:var(–text3);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rm-btn{background:var(–surface2);border:none;border-radius:7px;width:27px;height:27px;cursor:pointer;font-size:14px;color:var(–text3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+/* ── FEATURE LEGEND ───────────────────────────────────────── */
+.fgroup{background:#fff;border-radius:14px;overflow:hidden;
+box-shadow:0 1px 3px rgba(0,0,0,0.07);margin-bottom:8px}
+.fhead{display:flex;align-items:center;gap:9px;padding:12px 14px}
+.frow{display:flex;justify-content:space-between;align-items:center;
+padding:9px 14px;border-top:1px solid #F0F1F3}
+.fcoord{font-size:11px;color:#9CA3AF;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fnote{font-size:10px;color:#9CA3AF;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rmbtn{background:#F0F1F3;border:none;border-radius:7px;width:27px;height:27px;
+cursor:pointer;font-size:14px;color:#9CA3AF;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 
-/* Accordion */
-.accord{background:var(–surface);border-radius:var(–radius);box-shadow:var(–shadow-sm);overflow:hidden}
-.accord-hd{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;cursor:pointer;font-weight:700;font-size:14px;border:none;background:none;width:100%;font-family:var(–font);text-align:left;color:var(–text)}
-.accord-hd .chevron{font-size:14px;color:var(–text3);transition:transform .2s}
-.accord-hd.open .chevron{transform:rotate(180deg)}
-.accord-body{display:none;padding:4px 16px 16px;border-top:1px solid var(–border2)}
-.accord-body.open{display:block}
+/* ── ACCORDION ────────────────────────────────────────────── */
+.acc{background:#fff;border-radius:14px;overflow:hidden;
+box-shadow:0 1px 3px rgba(0,0,0,0.07)}
+.acc-hd{display:flex;justify-content:space-between;align-items:center;
+padding:13px 16px;cursor:pointer;font-weight:700;font-size:14px;
+border:none;background:none;width:100%;font-family:inherit;
+text-align:left;color:#111827}
+.acc-hd .chev{font-size:14px;color:#9CA3AF;transition:transform .2s}
+.acc-hd.open .chev{transform:rotate(180deg)}
+.acc-body{display:none;padding:4px 16px 16px;border-top:1px solid #F0F1F3}
+.acc-body.open{display:block}
 .apwa-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding-top:10px}
-.apwa-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(–radius-xs)}
+.apwa-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px}
 
-/* Grade screen */
-.step-row{display:flex;gap:12px;margin-bottom:16px}
-.step-num{width:30px;height:30px;border-radius:50%;background:var(–orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0}
-.step-body .step-title{font-weight:700;font-size:13px;margin-bottom:3px}
-.step-body .step-desc{font-size:12px;color:var(–text2);line-height:1.6}
-.rtk-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
-.rtk-stat{background:var(–surface2);border-radius:var(–radius-xs);padding:11px 8px;text-align:center}
-.rtk-stat-val{font-size:19px;font-weight:800;color:var(–text)}
-.rtk-stat-lbl{font-size:10px;color:var(–text3);margin-top:2px}
-.elev-card{background:linear-gradient(135deg,rgba(244,121,32,.08),rgba(244,121,32,.02));border:1.5px solid var(–orange-border);border-radius:var(–radius);padding:16px}
-.elev-num{font-size:36px;font-weight:900;color:var(–orange);line-height:1}
-.bench-item{display:flex;justify-content:space-between;align-items:center;padding:13px 14px;background:var(–surface2);border-radius:var(–radius-xs);margin-bottom:7px;border:1.5px solid var(–border2)}
-.bench-delta{font-size:21px;font-weight:900;line-height:1}
+/* ── GRADE ────────────────────────────────────────────────── */
+.step-row{display:flex;gap:11px;margin-bottom:15px}
+.step-n{width:30px;height:30px;border-radius:50%;background:#F47920;color:#fff;
+display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0}
+.step-title{font-weight:700;font-size:13px;margin-bottom:3px}
+.step-desc{font-size:12px;color:#6B7280;line-height:1.6}
+.rtk3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:13px}
+.rbox{background:#F8F9FB;border-radius:9px;padding:11px 8px;text-align:center}
+.rval{font-size:19px;font-weight:800;color:#111827}
+.rlbl{font-size:10px;color:#9CA3AF;margin-top:2px}
+.elevcard{background:linear-gradient(135deg,rgba(244,121,32,.09),rgba(244,121,32,.02));
+border:1.5px solid rgba(244,121,32,.25);border-radius:14px;padding:16px}
+.elevnum{font-size:36px;font-weight:900;color:#F47920;line-height:1}
+.bitem{display:flex;justify-content:space-between;align-items:center;
+padding:13px 14px;background:#F8F9FB;border-radius:9px;margin-bottom:7px;
+border:1.5px solid #ECEEF2}
+.bdelta{font-size:21px;font-weight:900;line-height:1}
 
-/* Export */
-.format-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.format-card{
-background:var(–surface);border:1.5px solid var(–border);border-radius:var(–radius);
-padding:14px;cursor:pointer;font-family:var(–font);text-align:left;
-box-shadow:var(–shadow-sm);position:relative;transition:all .15s;
-}
-.format-card:active{transform:scale(.97)}
-.format-card.done{background:var(–orange-glow);border-color:var(–orange)}
-.f-icon{font-size:24px;margin-bottom:5px}
-.f-name{font-size:13px;font-weight:800;color:var(–text)}
-.format-card.done .f-name{color:var(–orange)}
-.f-desc{font-size:10px;color:var(–text3);margin-top:2px}
-.f-badge{position:absolute;top:9px;right:9px;border-radius:20px;padding:2px 7px;font-size:9px;font-weight:700}
-.f-done{position:absolute;bottom:9px;right:11px;font-size:10px;font-weight:700;color:var(–green)}
-.save-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-.save-opt{
-padding:12px 6px;background:var(–surface2);border:1.5px solid var(–border);
-border-radius:var(–radius-xs);cursor:pointer;font-weight:700;font-size:11px;
-font-family:var(–font);text-align:center;transition:all .15s;
-}
-.save-opt .sico{font-size:20px;display:block;margin-bottom:4px}
-.save-opt.active{background:var(–orange);border-color:var(–orange);color:#fff}
+/* ── EXPORT ───────────────────────────────────────────────── */
+.fmtgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.fcard{background:#fff;border:1.5px solid #E4E6EA;border-radius:14px;padding:14px;
+cursor:pointer;font-family:inherit;text-align:left;
+box-shadow:0 1px 3px rgba(0,0,0,0.07);position:relative;transition:all .15s}
+.fcard:active{transform:scale(.97)}
+.fcard.done{background:rgba(244,121,32,.08);border-color:#F47920}
+.fico{font-size:24px;margin-bottom:5px}
+.fname{font-size:13px;font-weight:800;color:#111827}
+.fcard.done .fname{color:#F47920}
+.fdesc{font-size:10px;color:#9CA3AF;margin-top:2px}
+.fbadge{position:absolute;top:9px;right:9px;border-radius:20px;padding:2px 7px;font-size:9px;font-weight:700}
+.fdone{position:absolute;bottom:9px;right:11px;font-size:10px;font-weight:700;color:#15803D}
+.saverow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.sopt{padding:12px 6px;background:#F8F9FB;border:1.5px solid #E4E6EA;
+border-radius:9px;cursor:pointer;font-weight:700;font-size:11px;
+font-family:inherit;text-align:center;transition:all .15s}
+.sopt .sico{font-size:20px;display:block;margin-bottom:4px}
+.sopt.on{background:#F47920;border-color:#F47920;color:#fff}
+.sumrow{display:flex;gap:9px;flex-wrap:wrap}
+.sumitem{background:#F8F9FB;border-radius:9px;padding:11px 13px;flex:1;min-width:80px}
+.sumico{font-size:17px;margin-bottom:3px}
+.sumval{font-size:17px;font-weight:900;color:#F47920}
+.sumlbl{font-size:10px;color:#9CA3AF;margin-top:2px}
 
-/* Projects */
-.proj-card{
-background:var(–surface);border-radius:var(–radius);
-box-shadow:var(–shadow-sm);border:1.5px solid var(–border);
-overflow:hidden;transition:border-color .15s;margin-bottom:10px;
-}
-.proj-card.active-p{border-color:var(–orange)}
-.proj-body{padding:15px 16px}
-.proj-tags{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 13px}
-.proj-tag{display:flex;align-items:center;gap:4px;background:var(–surface2);border-radius:20px;padding:4px 9px;font-size:10px;font-weight:600;color:var(–text3)}
-.proj-actions{display:flex;gap:7px}
+/* ── PROJECTS ─────────────────────────────────────────────── */
+.pcard{background:#fff;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,0.07);
+border:1.5px solid #E4E6EA;overflow:hidden;transition:border-color .15s;margin-bottom:10px}
+.pcard.ap{border-color:#F47920}
+.pbody{padding:15px 16px}
+.ptags{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0 12px}
+.ptag{display:flex;align-items:center;gap:4px;background:#F8F9FB;
+border-radius:20px;padding:4px 9px;font-size:10px;font-weight:600;color:#9CA3AF}
+.pacts{display:flex;gap:7px}
 
-/* Volume modal */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:999;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
-.modal-bg.open{display:flex}
-.modal-sheet{background:var(–surface);border-radius:20px 20px 0 0;padding:22px 18px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;box-shadow:var(–shadow-lg)}
-.modal-handle{width:36px;height:4px;background:var(–border);border-radius:2px;margin:0 auto 18px}
+/* ── VOLUME MODAL ─────────────────────────────────────────── */
+.moverlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;
+display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
+.moverlay.open{display:flex}
+.msheet{background:#fff;border-radius:20px 20px 0 0;padding:20px 16px;
+width:100%;max-width:100%;max-height:88vh;overflow-y:auto;
+box-shadow:0 -8px 32px rgba(0,0,0,.12)}
+.mhandle{width:36px;height:4px;background:#E4E6EA;border-radius:2px;margin:0 auto 16px}
+.zcard{background:#F8F9FB;border-radius:9px;padding:13px;margin-bottom:9px;border:1.5px solid #ECEEF2}
+.zrow{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:9px}
+.ztype{display:flex;gap:6px}
+.ztbtn{flex:1;padding:8px 0;border:1.5px solid #E4E6EA;border-radius:8px;
+background:#fff;cursor:pointer;font-weight:700;font-size:12px;font-family:inherit}
+.ztbtn.cut{background:#FEE2E2;border-color:#DC2626;color:#DC2626}
+.ztbtn.fill{background:#DCFCE7;border-color:#15803D;color:#15803D}
+.voltotal{background:rgba(244,121,32,.08);border:1.5px solid rgba(244,121,32,.3);
+border-radius:9px;padding:13px 16px;display:flex;justify-content:space-between;
+align-items:center;margin-bottom:13px}
 
-/* Zone cards */
-.zone-card{background:var(–surface2);border-radius:var(–radius-xs);padding:13px;margin-bottom:9px;border:1.5px solid var(–border2)}
-.zone-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
-.zone-type-pair{display:flex;gap:6px}
-.ztype-btn{flex:1;padding:8px 0;border:1.5px solid var(–border);border-radius:var(–radius-xs);background:var(–surface);cursor:pointer;font-weight:700;font-size:12px;font-family:var(–font)}
-.ztype-btn.cut{background:var(–red-bg);border-color:var(–red);color:var(–red)}
-.ztype-btn.fill{background:var(–green-bg);border-color:var(–green);color:var(–green)}
-.vol-total{background:var(–orange-glow);border:1.5px solid var(–orange-border);border-radius:var(–radius-xs);padding:13px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}
+/* ── UTIL PICKER ──────────────────────────────────────────── */
+.ugrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.uopt{padding:13px;border-radius:9px;border:1.5px solid transparent;
+cursor:pointer;font-family:inherit;font-weight:700;font-size:13px;
+display:flex;align-items:center;gap:10px;transition:all .15s;background:#F8F9FB}
+.uopt:active{transform:scale(.97)}
 
-/* Util picker modal */
-.util-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
-.util-opt{
-padding:13px;border-radius:var(–radius-xs);border:1.5px solid transparent;
-cursor:pointer;font-family:var(–font);font-weight:700;font-size:13px;
-display:flex;align-items:center;gap:10px;transition:all .15s;background:var(–surface2);
-}
-.util-opt:active{transform:scale(.97)}
+/* ── UTIL STRIP ───────────────────────────────────────────── */
+.ustrip{display:flex;gap:7px;overflow-x:auto;padding-bottom:3px}
+.ustrip::-webkit-scrollbar{display:none}
+.uchip{flex-shrink:0;display:flex;align-items:center;gap:5px;
+padding:6px 12px;border-radius:20px;border:1.5px solid #E4E6EA;
+background:#fff;font-size:11px;font-weight:700;color:#6B7280;
+cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .15s}
 
-/* NMEA */
-.nmea-box{background:#0F172A;border-radius:var(–radius-xs);padding:10px 12px;font-size:10px;color:#86efac;font-family:‘Courier New’,monospace;word-break:break-all;line-height:1.8;margin-top:7px}
+/* ── NMEA ─────────────────────────────────────────────────── */
+.nmea{background:#0F172A;border-radius:8px;padding:9px 11px;font-size:9px;
+color:#86efac;font-family:‘Courier New’,monospace;word-break:break-all;
+line-height:1.8;margin-top:6px}
 
-/* Drone card */
-.drone-card{background:linear-gradient(135deg,#EFF6FF,#F0F9FF);border:1.5px dashed #93C5FD;border-radius:var(–radius);padding:18px}
+/* ── DRONE TEASER ─────────────────────────────────────────── */
+.drone{background:linear-gradient(135deg,#EFF6FF,#F0F9FF);
+border:1.5px dashed #93C5FD;border-radius:14px;padding:18px}
 
-/* Empty state */
-.empty-state{background:var(–surface);border-radius:var(–radius);padding:32px 24px;text-align:center;box-shadow:var(–shadow-sm)}
-.empty-icon{font-size:36px;margin-bottom:10px}
-.empty-title{font-size:14px;font-weight:800;color:var(–text);margin-bottom:5px}
-.empty-sub{font-size:12px;color:var(–text3);line-height:1.6}
+/* ── EMPTY STATE ──────────────────────────────────────────── */
+.empty{background:#fff;border-radius:14px;padding:30px 20px;text-align:center;
+box-shadow:0 1px 3px rgba(0,0,0,0.07)}
+.empty-ico{font-size:34px;margin-bottom:10px}
+.empty-title{font-size:14px;font-weight:800;color:#111827;margin-bottom:5px}
+.empty-sub{font-size:12px;color:#9CA3AF;line-height:1.6}
 
-/* Leaflet overrides */
-.leaflet-control-zoom{border:none!important;box-shadow:var(–shadow)!important}
-.leaflet-control-zoom a{background:rgba(255,255,255,.96)!important;color:var(–text)!important;font-weight:700!important;backdrop-filter:blur(8px)}
-.leaflet-control-attribution{font-size:9px!important}
+/* ── SECTION HEADER ───────────────────────────────────────── */
+.sh{font-size:13px;font-weight:800;color:#111827;padding:0 2px}
 
-/* Util line strip */
-.util-strip{display:flex;gap:7px;overflow-x:auto;padding-bottom:3px}
-.util-strip::-webkit-scrollbar{display:none}
-.util-chip{
-flex-shrink:0;display:flex;align-items:center;gap:5px;
-padding:6px 13px;border-radius:20px;border:1.5px solid var(–border);
-background:var(–surface);font-size:11px;font-weight:700;color:var(–text3);
-cursor:pointer;font-family:var(–font);white-space:nowrap;transition:all .15s;
-}
-.util-chip.active{border-color:var(–dot-color,#3B82F6);background:var(–bg-color,#DBEAFE);color:var(–col-color,#1D4ED8)}
-
-/* Scrollbar for content */
-#content::-webkit-scrollbar{width:3px}
-#content::-webkit-scrollbar-thumb{background:var(–border);border-radius:3px}
-
-/* Summary widget */
-.summary-wrap{display:flex;gap:9px;flex-wrap:wrap}
-.summary-item{background:var(–surface2);border-radius:var(–radius-xs);padding:11px 13px;flex:1;min-width:78px}
-.summary-icon{font-size:17px;margin-bottom:3px}
-.summary-val{font-size:17px;font-weight:900;color:var(–orange)}
-.summary-lbl{font-size:10px;color:var(–text3);margin-top:2px}
+/* ── LEAFLET OVERRIDES ────────────────────────────────────── */
+.leaflet-control-zoom{border:none!important;box-shadow:0 2px 8px rgba(0,0,0,.12)!important}
+.leaflet-control-zoom a{background:rgba(255,255,255,.96)!important;
+color:#111827!important;font-weight:700!important;backdrop-filter:blur(6px)}
+.leaflet-control-attribution{font-size:8px!important;background:rgba(255,255,255,.7)!important}
+.leaflet-popup-content-wrapper{border-radius:12px!important;
+box-shadow:0 4px 16px rgba(0,0,0,.12)!important;border:none!important}
+.leaflet-popup-content{font-family:‘DM Sans’,system-ui,sans-serif!important;margin:12px 14px!important}
+.leaflet-popup-tip-container{display:none}
 </style>
 
 </head>
@@ -378,331 +319,335 @@ cursor:pointer;font-family:var(–font);white-space:nowrap;transition:all .15s;
 
 <div id="header">
   <div class="logo">
-    <div class="logo-mark">
+    <div class="logo-icon">
       <svg viewBox="0 0 32 32" width="22" height="22" fill="white">
         <path d="M5 26L13 8l3 6 3-6 8 18z" opacity=".95"/>
         <rect x="10" y="22" width="12" height="4" rx="2"/>
       </svg>
     </div>
     <div>
-      <div class="logo-title">Bobcat</div>
+      <div class="logo-name">Bobcat</div>
       <div class="logo-sub">Digital Station</div>
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:8px">
-    <span id="active-proj-chip" class="badge badge-orange" style="display:none;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
-    <div class="gps-badge"><span class="pulse"></span><span>GPS Fix</span></div>
+    <span id="proj-chip" class="badge badge-org" style="display:none;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+    <div class="gps-pill"><span class="dot dot-green"></span><span>GPS Fix</span></div>
   </div>
 </div>
 
 <!-- TABS -->
 
 <div id="tabbar">
-  <button class="tab active" onclick="showTab('projects')"><span class="tab-icon">📁</span>Projects</button>
-  <button class="tab" onclick="showTab('map')"><span class="tab-icon">🗺️</span>Site Map</button>
-  <button class="tab" onclick="showTab('grade')"><span class="tab-icon">📡</span>Grade</button>
-  <button class="tab" onclick="showTab('export')"><span class="tab-icon">📤</span>Export</button>
+  <button class="tab on" onclick="showTab('projects')"><span class="tab-ico">📁</span>Projects</button>
+  <button class="tab" onclick="showTab('map')"><span class="tab-ico">🗺️</span>Site Map</button>
+  <button class="tab" onclick="showTab('grade')"><span class="tab-ico">📡</span>Grade</button>
+  <button class="tab" onclick="showTab('export')"><span class="tab-ico">📤</span>Export</button>
 </div>
 
 <!-- CONTENT -->
 
 <div id="content">
 
-  <!-- ══ PROJECTS ══ -->
+<!-- ════ PROJECTS ════ -->
 
-  <div id="screen-projects" class="screen active">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <div style="font-size:18px;font-weight:900">Job Site Projects</div>
-      <button class="btn btn-primary btn-sm" onclick="toggleNewProj()">＋ New Site</button>
-    </div>
-    <div id="new-proj-form" style="display:none">
-      <div class="card card-pad">
-        <div class="card-title" style="margin-bottom:10px">New Job Site</div>
-        <div style="display:flex;gap:8px">
-          <input class="input" id="new-proj-name" placeholder="e.g. Main St Utility Run" onkeydown="if(event.key==='Enter')createProject()"/>
-          <button class="btn btn-primary" style="padding:0 18px" onclick="createProject()">Create</button>
-        </div>
+<div id="screen-projects" class="screen active">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <div style="font-size:18px;font-weight:900">Job Site Projects</div>
+    <button class="btn btn-o btn-s" onclick="toggleNewProj()">＋ New Site</button>
+  </div>
+  <div id="new-proj-form" style="display:none">
+    <div class="card cp">
+      <div class="ctitle" style="margin-bottom:10px">New Job Site</div>
+      <div style="display:flex;gap:8px">
+        <input id="new-proj-name" placeholder="e.g. Main St Utility Run" onkeydown="if(event.key==='Enter')createProject()"/>
+        <button class="btn btn-o" style="padding:0 18px" onclick="createProject()">Create</button>
       </div>
     </div>
-    <div id="proj-list"></div>
+  </div>
+  <div id="proj-list"></div>
+</div>
+
+<!-- ════ MAP ════ -->
+
+<div id="screen-map" class="screen">
+
+  <!-- Proximity alert -->
+
+  <div id="prox">
+    <div class="prox-inner">
+      <div class="prox-ico" id="prox-ico">⚡</div>
+      <div class="prox-info">
+        <div class="prox-title" id="prox-title">Gas Line Nearby</div>
+        <div class="prox-sub">Proceed with extreme caution</div>
+      </div>
+      <div class="prox-dist">
+        <div class="prox-num" id="prox-num">2.1</div>
+        <div class="prox-unit">METRES</div>
+      </div>
+    </div>
   </div>
 
-  <!-- ══ MAP ══ -->
+  <!-- Map tile style -->
 
-  <div id="screen-map" class="screen">
-
-```
-<!-- Proximity alert -->
-<div id="prox-alert">
-  <div class="prox-inner">
-    <div class="prox-icon-wrap" id="prox-icon">⚡</div>
-    <div class="prox-info">
-      <div class="prox-title" id="prox-title">Gas Line Nearby</div>
-      <div class="prox-sub">Proceed with extreme caution</div>
-    </div>
-    <div class="prox-dist">
-      <div class="prox-dist-num" id="prox-dist-num">2.1</div>
-      <div class="prox-dist-unit">METRES</div>
-    </div>
+  <div class="seg seg3">
+    <button class="seg-b on" onclick="setTileStyle('street',this)"><span class="si">🗺️</span>Street</button>
+    <button class="seg-b" onclick="setTileStyle('satellite',this)"><span class="si">🛰️</span>Satellite</button>
+    <button class="seg-b" onclick="setTileStyle('topo',this)"><span class="si">🏔️</span>Topo</button>
   </div>
-</div>
 
-<!-- Mode selector -->
-<div class="pill-selector">
-  <button class="pill-opt active" id="mode-perim" onclick="setMode('perimeter',this)"><span class="pico">📏</span>Perimeter</button>
-  <button class="pill-opt" id="mode-line" onclick="setMode('line',this)"><span class="pico">〰️</span>Run Line</button>
-  <button class="pill-opt" id="mode-view" onclick="setMode('view',this)"><span class="pico">🔍</span>View All</button>
-</div>
+  <!-- Draw mode -->
 
-<!-- Line utility strip -->
-<div id="line-strip" style="display:none">
-  <div class="input-label" style="margin-bottom:7px">Select Utility Type</div>
-  <div class="util-strip" id="util-strip-wrap"></div>
-</div>
+  <div class="seg seg3">
+    <button class="seg-b on" id="mode-perim" onclick="setMode('perimeter',this)"><span class="si">📏</span>Perimeter</button>
+    <button class="seg-b" id="mode-line" onclick="setMode('line',this)"><span class="si">〰️</span>Run Line</button>
+    <button class="seg-b" id="mode-view" onclick="setMode('view',this)"><span class="si">🔍</span>View All</button>
+  </div>
 
-<!-- Map -->
-<div id="map-wrap">
-  <div id="leaflet-map"></div>
-  <div class="map-toolbar">
-    <div class="map-toolbar-left">
-      <div id="machine-map-chip" class="map-chip" style="display:none;background:rgba(37,99,235,.92);color:#fff">
+  <!-- Line utility strip -->
+
+  <div id="line-strip" style="display:none">
+    <div class="ilabel" style="margin-bottom:7px">Select Utility Type</div>
+    <div class="ustrip" id="ustrip-wrap"></div>
+  </div>
+
+  <!-- THE MAP -->
+
+  <div id="map-wrap">
+    <div id="lmap"></div>
+    <!-- overlays -->
+    <div class="map-tl">
+      <div id="machine-chip" style="display:none" class="mchip" style="background:rgba(37,99,235,.92);color:#fff">
         🚜 <span id="machine-chip-txt">Machine</span>
-        <span style="width:6px;height:6px;border-radius:50%;background:#fff;animation:pulse 1.5s infinite"></span>
+        <span class="dot dot-orange" style="background:#fff"></span>
       </div>
     </div>
-    <div class="map-toolbar-right">
-      <div class="map-chip"><span class="pulse" style="background:var(--green)"></span><span style="color:var(--green);font-weight:600">GPS Active</span></div>
+    <div class="map-tr">
+      <div class="mchip"><span class="dot dot-green"></span><span style="color:#15803D;font-weight:600">GPS Active</span></div>
+    </div>
+    <div class="map-br" id="map-actions"></div>
+    <div class="map-bl">
+      <div class="mchip" style="font-size:10px;color:#6B7280">Hold = Utility &nbsp;·&nbsp; Tap = Draw &nbsp;·&nbsp; Tap pin = Edit</div>
     </div>
   </div>
-  <div class="map-actions" id="map-actions"></div>
-  <div class="map-hint">Hold = Utility &nbsp;·&nbsp; Tap = Draw &nbsp;·&nbsp; Tap pin = Edit</div>
-</div>
 
-<!-- Measurements -->
-<div id="measurements" style="display:none">
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-label">📏 Perimeter</div>
-      <div class="stat-value" id="stat-perim">—</div>
-      <div class="stat-sub" id="stat-perim-sub"></div>
-    </div>
-    <div class="stat-card accent">
-      <div class="stat-label">📐 Area</div>
-      <div class="stat-value" id="stat-area">—</div>
-      <div class="stat-sub" id="stat-area-sub">Close shape first</div>
+  <!-- Measurements -->
+
+  <div id="measurements" style="display:none">
+    <div class="stats-row">
+      <div class="stat">
+        <div class="slabel">📏 Perimeter</div>
+        <div class="sval" id="stat-perim">—</div>
+        <div class="ssub" id="stat-perim-sub"></div>
+      </div>
+      <div class="stat ac">
+        <div class="slabel">📐 Area</div>
+        <div class="sval" id="stat-area">—</div>
+        <div class="ssub" id="stat-area-sub">Close shape first</div>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- Volume -->
-<div id="vol-btn-wrap" style="display:none">
-  <button class="card card-pad btn-block" style="text-align:left;cursor:pointer;border:1.5px solid var(--border)" onclick="openVolModal()">
-    <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+  <!-- Volume button -->
+
+  <div id="vol-btn-wrap" style="display:none">
+    <button class="card cp btn-w" style="text-align:left;cursor:pointer;border:1.5px solid #E4E6EA;display:flex;justify-content:space-between;align-items:center" onclick="openVolModal()">
       <div style="display:flex;align-items:center;gap:10px">
         <span style="font-size:20px">📐</span>
         <div>
           <div style="font-size:14px;font-weight:700">Volume Calculator</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:1px" id="vol-btn-sub">Tap to add cut/fill depth zones</div>
+          <div style="font-size:11px;color:#9CA3AF;margin-top:1px" id="vol-btn-sub">Tap to add cut/fill depth zones</div>
         </div>
       </div>
-      <span style="font-size:18px;color:var(--orange)">›</span>
+      <span style="font-size:18px;color:#F47920">›</span>
+    </button>
+  </div>
+
+  <!-- Machine tracking -->
+
+  <div class="card">
+    <div class="cp" style="padding-bottom:12px">
+      <div class="tog-row">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:38px;height:38px;border-radius:10px;background:#DBEAFE;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0">🚜</div>
+          <div>
+            <div style="font-weight:700;font-size:14px">Machine Tracking</div>
+            <div style="font-size:11px;color:#9CA3AF;margin-top:1px" id="machine-status-txt">Off · 3 m proximity alerts when on</div>
+          </div>
+        </div>
+        <button class="tog" id="machine-tog" onclick="toggleMachine()"></button>
+      </div>
     </div>
-  </button>
+  </div>
+
+  <!-- Feature count -->
+
+  <div id="feat-summary" style="display:none" class="card cp">
+    <div style="display:flex;align-items:center;gap:11px">
+      <div style="width:42px;height:42px;border-radius:11px;background:rgba(244,121,32,.1);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📍</div>
+      <div style="flex:1">
+        <div style="font-weight:800;font-size:14px" id="feat-count-txt">0 Features</div>
+        <div style="font-size:11px;color:#9CA3AF;margin-top:2px">Weather-proof · Exportable · Crew-shareable</div>
+      </div>
+      <span class="dot dot-green"></span>
+    </div>
+  </div>
+
+  <div class="sh">Site Features Layer</div>
+  <div id="feat-legend"></div>
+
+  <div class="acc">
+    <button class="acc-hd" onclick="toggleAcc(this)">APWA Color Reference <span class="chev">▾</span></button>
+    <div class="acc-body"><div class="apwa-grid" id="apwa-grid"></div></div>
+  </div>
+
+<button class="btn btn-g btn-w" onclick="clearSite()" id="clear-btn" style="display:none">🗑️  Clear Site & Start Over</button>
+
 </div>
 
-<!-- Machine tracking -->
-<div class="card" style="overflow:hidden">
-  <div class="card-pad" style="padding-bottom:12px">
-    <div class="toggle-row">
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:38px;height:38px;border-radius:10px;background:var(--blue-bg);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0">🚜</div>
+<!-- ════ GRADE ════ -->
+
+<div id="screen-grade" class="screen">
+  <div id="grade-idle">
+    <div class="card cp">
+      <div class="ctitle">Connect Emlid RS3</div>
+      <div style="font-size:13px;color:#6B7280;margin-bottom:18px">Follow these steps before connecting</div>
+      <div class="step-row"><div class="step-n">1</div><div><div class="step-title">Power on your Emlid RS3</div><div class="step-desc">Hold the power button until the LED flashes. The RS3 will broadcast its WiFi hotspot.</div></div></div>
+      <div class="step-row"><div class="step-n">2</div><div><div class="step-title">Join the RS3 hotspot</div><div class="step-desc">Go to WiFi settings and connect to <strong>reach:xx:xx</strong>. Password: <strong>emlidreach</strong></div></div></div>
+      <div class="step-row" style="margin-bottom:16px"><div class="step-n">3</div><div><div class="step-title">Return here and connect</div><div class="step-desc">The app opens a direct NMEA TCP stream to the unit at 192.168.42.1:9001.</div></div></div>
+      <div class="ibox ibox-b" style="margin-bottom:14px">💡 <strong>Tip:</strong> Configure your NTRIP caster after connecting for sub-cm RTK Fix accuracy.</div>
+      <button class="btn btn-o btn-w" onclick="gradeConnect()">I'm connected to the RS3 hotspot — Connect</button>
+    </div>
+  </div>
+  <div id="grade-live" style="display:none;flex-direction:column;gap:12px">
+    <div class="card cp">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:13px">
         <div>
-          <div style="font-weight:700;font-size:14px">Machine Tracking</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:1px" id="machine-status-txt">Off · 3 m proximity alerts when on</div>
+          <div style="font-weight:800;font-size:15px">Emlid RS3</div>
+          <div style="font-size:11px;color:#9CA3AF;margin-top:1px">192.168.42.1 : 9001 · NMEA stream</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:7px">
+          <div class="badge" id="fix-badge"><span class="dot" id="fix-dot"></span><span id="fix-txt">RTK Fix</span></div>
+          <button class="btn btn-red btn-s" onclick="gradeDisconnect()">Disconnect</button>
         </div>
       </div>
-      <button class="toggle" id="machine-toggle" onclick="toggleMachine()"></button>
+      <div class="rtk3">
+        <div class="rbox"><div style="font-size:17px;margin-bottom:3px">🛰️</div><div class="rval" id="g-sats">—</div><div class="rlbl">Satellites</div></div>
+        <div class="rbox"><div style="font-size:17px;margin-bottom:3px">📐</div><div class="rval" id="g-hdop">—</div><div class="rlbl">HDOP</div></div>
+        <div class="rbox"><div style="font-size:17px;margin-bottom:3px">📶</div><div class="rval" id="g-fixq">—</div><div class="rlbl">Fix Quality</div></div>
+      </div>
+      <div class="elevcard">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Live Elevation (HAE)</div>
+            <div class="elevnum" id="g-elev">—</div>
+            <div style="font-size:12px;color:#9CA3AF;margin-top:5px" id="g-elev-ft"></div>
+          </div>
+          <div style="text-align:right;font-size:11px;color:#9CA3AF;line-height:2">
+            <div id="g-lat">—</div><div id="g-lng">—</div>
+          </div>
+        </div>
+      </div>
+      <button style="margin-top:10px;background:none;border:none;color:#9CA3AF;font-size:11px;cursor:pointer;font-family:inherit" onclick="toggleNmea()">▸ Show raw NMEA</button>
+      <div class="nmea" id="nmea-box" style="display:none"></div>
     </div>
-  </div>
-</div>
-
-<!-- Feature count -->
-<div id="feat-summary" style="display:none" class="card card-pad">
-  <div style="display:flex;align-items:center;gap:11px">
-    <div style="width:42px;height:42px;border-radius:11px;background:var(--orange-glow);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📍</div>
-    <div style="flex:1">
-      <div style="font-weight:800;font-size:14px" id="feat-count-txt">0 Site Features</div>
-      <div style="font-size:11px;color:var(--text3);margin-top:2px">Weather-proof · Exportable · Crew-shareable</div>
-    </div>
-    <span class="pulse"></span>
-  </div>
-</div>
-
-<div class="section-header">Site Features Layer</div>
-<div id="feat-legend"></div>
-
-<div class="accord">
-  <button class="accord-hd" onclick="toggleAccord(this)">
-    APWA Color Reference <span class="chevron">▾</span>
-  </button>
-  <div class="accord-body"><div class="apwa-grid" id="apwa-grid"></div></div>
-</div>
-
-<button class="btn btn-ghost btn-block" onclick="clearSite()" id="clear-btn" style="display:none">🗑️ &nbsp;Clear Site & Start Over</button>
-```
-
-  </div>
-
-  <!-- ══ GRADE ══ -->
-
-  <div id="screen-grade" class="screen">
-    <div id="grade-idle-view">
-      <div class="card card-pad">
-        <div class="card-title">Connect Emlid RS3</div>
-        <div style="font-size:13px;color:var(--text2);margin-bottom:18px">Follow these steps before connecting</div>
-        <div class="step-row"><div class="step-num">1</div><div class="step-body"><div class="step-title">Power on your Emlid RS3</div><div class="step-desc">Hold the power button until the LED flashes. The RS3 will broadcast its WiFi hotspot.</div></div></div>
-        <div class="step-row"><div class="step-num">2</div><div class="step-body"><div class="step-title">Join the RS3 hotspot</div><div class="step-desc">Open your device WiFi settings. Connect to <strong>reach:xx:xx</strong>. Password: <strong>emlidreach</strong></div></div></div>
-        <div class="step-row" style="margin-bottom:16px"><div class="step-num">3</div><div class="step-body"><div class="step-title">Return here and connect</div><div class="step-desc">The app opens a direct NMEA TCP stream to the unit at 192.168.42.1:9001.</div></div></div>
-        <div class="info-box info-blue" style="margin-bottom:14px">💡 <strong>Tip:</strong> Configure your NTRIP caster after connecting for sub-cm RTK Fix accuracy.</div>
-        <button class="btn btn-primary btn-block" onclick="gradeConnect()">I'm connected to the RS3 hotspot — Connect</button>
+    <div class="acc">
+      <button class="acc-hd" onclick="toggleAcc(this)">🛰️ &nbsp;NTRIP Corrections <span class="chev">▾</span></button>
+      <div class="acc-body">
+        <div style="display:flex;flex-direction:column;gap:9px;padding-top:10px">
+          <div><div class="ilabel">Caster Host</div><input id="ntrip-host" placeholder="e.g. ntrip.state.mn.us"/></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div><div class="ilabel">Port</div><input id="ntrip-port" value="2101"/></div>
+            <div><div class="ilabel">Mountpoint</div><input id="ntrip-mount" placeholder="MINN_RTCM3"/></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div><div class="ilabel">Username</div><input id="ntrip-user"/></div>
+            <div><div class="ilabel">Password</div><input type="password" id="ntrip-pass"/></div>
+          </div>
+          <button class="btn btn-o btn-w" onclick="saveNtrip()">Save & Apply NTRIP Config</button>
+        </div>
       </div>
     </div>
+    <div class="card cp">
+      <div class="ctitle">Benchmarks & Grade Points</div>
+      <div style="display:flex;gap:7px;margin-bottom:9px">
+        <input id="bm-name" placeholder="Label (e.g. BM-1)" style="flex:1"/>
+        <input id="bm-elev" type="number" placeholder="Elev (m)" style="width:96px"/>
+        <button class="btn btn-o" style="padding:0 15px" onclick="addBench()">Set</button>
+      </div>
+      <button class="btn btn-g btn-w" style="margin-bottom:11px" onclick="snapBench()">📍 &nbsp;Snap from Live Position</button>
+      <div id="bench-list"></div>
+    </div>
+  </div>
+</div>
 
-```
-<div id="grade-live-view" style="display:none">
-  <!-- Status card -->
-  <div class="card card-pad">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+<!-- ════ EXPORT ════ -->
+
+<div id="screen-export" class="screen">
+  <div class="card cp">
+    <div class="ctitle">Save Mode</div>
+    <div class="saverow">
+      <button class="sopt" onclick="setSaveMode('device',this)"><span class="sico">💾</span>On-Device</button>
+      <button class="sopt" onclick="setSaveMode('cloud',this)"><span class="sico">☁️</span>Cloud</button>
+      <button class="sopt on" onclick="setSaveMode('both',this)"><span class="sico">🔄</span>Both</button>
+    </div>
+    <div class="ibox ibox-g" style="margin-top:11px" id="save-mode-info">
+      <span class="dot dot-green"></span> Auto-save active — your map is weather-proof
+    </div>
+  </div>
+  <div class="card cp">
+    <div class="ctitle">Dataset Summary</div>
+    <div class="sumrow" id="export-summary"></div>
+  </div>
+  <div class="sh">Export Format</div>
+  <div class="fmtgrid" id="format-grid"></div>
+  <div class="drone">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <span style="font-size:24px">🚁</span>
       <div>
-        <div style="font-weight:800;font-size:15px">Emlid RS3</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:1px">192.168.42.1 : 9001 · NMEA stream</div>
-      </div>
-      <div style="display:flex;gap:7px;align-items:center">
-        <div class="badge" id="fix-badge"><span class="pulse" id="fix-dot"></span><span id="fix-txt">RTK Fix</span></div>
-        <button class="btn btn-danger btn-sm" onclick="gradeDisconnect()">Disconnect</button>
+        <div style="font-size:15px;font-weight:800;color:#2563EB">Drone Site Vision</div>
+        <div style="font-size:9px;font-weight:700;color:#93C5FD;text-transform:uppercase;letter-spacing:.5px">Coming Soon</div>
       </div>
     </div>
-    <div class="rtk-stats">
-      <div class="rtk-stat"><div style="font-size:17px;margin-bottom:3px">🛰️</div><div class="rtk-stat-val" id="g-sats">—</div><div class="rtk-stat-lbl">Satellites</div></div>
-      <div class="rtk-stat"><div style="font-size:17px;margin-bottom:3px">📐</div><div class="rtk-stat-val" id="g-hdop">—</div><div class="rtk-stat-lbl">HDOP</div></div>
-      <div class="rtk-stat"><div style="font-size:17px;margin-bottom:3px">📶</div><div class="rtk-stat-val" id="g-fixq">—</div><div class="rtk-stat-lbl">Fix Quality</div></div>
-    </div>
-    <div class="elev-card">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div>
-          <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Live Elevation (HAE)</div>
-          <div class="elev-num" id="g-elev">—</div>
-          <div style="font-size:12px;color:var(--text3);margin-top:5px" id="g-elev-ft"></div>
-        </div>
-        <div style="text-align:right;font-size:11px;color:var(--text3);line-height:2">
-          <div id="g-lat">—</div><div id="g-lng">—</div>
-        </div>
-      </div>
-    </div>
-    <button style="margin-top:10px;background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer;font-family:var(--font)" onclick="toggleNMEA()">▸ Show raw NMEA</button>
-    <div class="nmea-box" id="nmea-box" style="display:none"></div>
-  </div>
-  <!-- NTRIP -->
-  <div class="accord">
-    <button class="accord-hd" onclick="toggleAccord(this)">🛰️ &nbsp;NTRIP Corrections <span class="chevron">▾</span></button>
-    <div class="accord-body">
-      <div style="display:flex;flex-direction:column;gap:9px;padding-top:10px">
-        <div><div class="input-label">Caster Host</div><input class="input" id="ntrip-host" placeholder="e.g. ntrip.state.mn.us"/></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div><div class="input-label">Port</div><input class="input" id="ntrip-port" value="2101"/></div>
-          <div><div class="input-label">Mountpoint</div><input class="input" id="ntrip-mount" placeholder="e.g. MINN_RTCM3"/></div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div><div class="input-label">Username</div><input class="input" id="ntrip-user"/></div>
-          <div><div class="input-label">Password</div><input class="input" type="password" id="ntrip-pass"/></div>
-        </div>
-        <button class="btn btn-primary btn-block" onclick="saveNtrip()">Save & Apply NTRIP Config</button>
-      </div>
-    </div>
-  </div>
-  <!-- Benchmarks -->
-  <div class="card card-pad">
-    <div class="card-title">Benchmarks & Grade Points</div>
-    <div style="display:flex;gap:7px;margin-bottom:9px">
-      <input class="input" id="bm-name" placeholder="Label (e.g. BM-1)" style="flex:1"/>
-      <input class="input" id="bm-elev" type="number" placeholder="Elev (m)" style="width:96px"/>
-      <button class="btn btn-primary" style="padding:0 15px" onclick="addBench()">Set</button>
-    </div>
-    <button class="btn btn-ghost btn-block" style="margin-bottom:11px" onclick="snapBench()">📍 &nbsp;Snap from Live Position</button>
-    <div id="bench-list"></div>
+    <div style="font-size:12px;color:#1E40AF;line-height:1.7">Pair with DJI Enterprise or Skydio to overlay utility maps, no-dig zones, and benchmarks in real time from the air.</div>
   </div>
 </div>
-```
-
-  </div>
-
-  <!-- ══ EXPORT ══ -->
-
-  <div id="screen-export" class="screen">
-    <div class="card card-pad">
-      <div class="card-title">Save Mode</div>
-      <div class="save-row">
-        <button class="save-opt" onclick="setSaveMode('device',this)"><span class="sico">💾</span>On-Device</button>
-        <button class="save-opt" onclick="setSaveMode('cloud',this)"><span class="sico">☁️</span>Cloud</button>
-        <button class="save-opt active" onclick="setSaveMode('both',this)"><span class="sico">🔄</span>Both</button>
-      </div>
-      <div class="info-box info-green" style="margin-top:11px" id="save-mode-info">
-        <span class="pulse"></span> Auto-save active — your map is weather-proof
-      </div>
-    </div>
-    <div class="card card-pad">
-      <div class="card-title">Dataset Summary</div>
-      <div class="summary-wrap" id="export-summary"></div>
-    </div>
-    <div class="section-header">Export Format</div>
-    <div class="format-grid" id="format-grid"></div>
-    <div class="drone-card">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-        <span style="font-size:24px">🚁</span>
-        <div>
-          <div style="font-size:15px;font-weight:800;color:var(--blue)">Drone Site Vision</div>
-          <div style="font-size:9px;font-weight:700;color:#93C5FD;text-transform:uppercase;letter-spacing:.5px">Coming Soon</div>
-        </div>
-      </div>
-      <div style="font-size:12px;color:#1E40AF;line-height:1.7">Pair with DJI Enterprise or Skydio to overlay utility maps, no-dig zones, and benchmarks in real time from the air.</div>
-    </div>
-  </div>
 
 </div><!-- end content -->
 </div><!-- end app -->
 
 <!-- UTILITY PICKER MODAL -->
 
-<div class="modal-bg" id="util-modal" onclick="closeUtilModal()">
-  <div class="modal-sheet" onclick="event.stopPropagation()">
-    <div class="modal-handle"></div>
+<div class="moverlay" id="util-modal" onclick="closeUtilModal()">
+  <div class="msheet" onclick="event.stopPropagation()">
+    <div class="mhandle"></div>
     <div style="font-size:16px;font-weight:800;margin-bottom:4px">Place Utility Marker</div>
-    <div style="font-size:12px;color:var(--text3)">Select the utility type to drop a pin</div>
-    <div class="util-grid" id="util-grid"></div>
+    <div style="font-size:12px;color:#9CA3AF">Tap the utility type to drop a pin</div>
+    <div class="ugrid" id="ugrid"></div>
   </div>
 </div>
 
 <!-- VOLUME MODAL -->
 
-<div class="modal-bg" id="vol-modal" onclick="closeVolModal()">
-  <div class="modal-sheet" onclick="event.stopPropagation()">
-    <div class="modal-handle"></div>
+<div class="moverlay" id="vol-modal" onclick="closeVolModal()">
+  <div class="msheet" onclick="event.stopPropagation()">
+    <div class="mhandle"></div>
     <div style="font-size:17px;font-weight:800;margin-bottom:3px">Volume Calculator</div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:18px" id="vol-area-lbl"></div>
+    <div style="font-size:12px;color:#9CA3AF;margin-bottom:18px" id="vol-area-lbl"></div>
     <div id="zone-list"></div>
-    <button class="btn btn-ghost btn-block" style="margin-bottom:13px" onclick="addZone()">＋ Add Zone</button>
-    <div class="vol-total" id="vol-total" style="display:none">
-      <div style="font-size:12px;font-weight:600;color:var(--text3)">Total Est. Volume</div>
-      <div style="font-size:24px;font-weight:900;color:var(--orange)" id="vol-total-num">—</div>
+    <button class="btn btn-g btn-w" style="margin-bottom:13px" onclick="addZone()">＋ Add Zone</button>
+    <div class="voltotal" id="vol-total" style="display:none">
+      <div style="font-size:12px;font-weight:600;color:#9CA3AF">Total Est. Volume</div>
+      <div style="font-size:24px;font-weight:900;color:#F47920" id="vol-total-num">—</div>
     </div>
-    <button class="btn btn-primary btn-block" onclick="saveVol()">Save Volume Data</button>
+    <button class="btn btn-o btn-w" onclick="saveVol()">Save Volume Data</button>
   </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════════
-// DATA
-// ═══════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════════════════════════ */
 const UTILS=[
   {id:'gas',     label:'Gas / Oil',   color:'#CA8A04',bg:'#FEF9C3',emoji:'⚡',dot:'#FACC15'},
   {id:'electric',label:'Electric',    color:'#DC2626',bg:'#FEE2E2',emoji:'🔌',dot:'#EF4444'},
@@ -713,7 +658,6 @@ const UTILS=[
   {id:'manhole', label:'Manhole',     color:'#7C3AED',bg:'#EDE9FE',emoji:'🔘',dot:'#A855F7'},
   {id:'nodig',   label:'No-Dig Zone', color:'#B91C1C',bg:'#FEE2E2',emoji:'⛔',dot:'#EF4444'},
 ];
-
 const FORMATS=[
   {name:'DXF',    desc:'AutoCAD / Civil 3D',  icon:'📐',badge:'Industry Std',bc:'#1D4ED8'},
   {name:'SHP',    desc:'Esri / ArcGIS',        icon:'🗺️',badge:'GIS Ready',  bc:'#15803D'},
@@ -723,33 +667,28 @@ const FORMATS=[
   {name:'CSV',    desc:'Raw coordinates',      icon:'📊',badge:'',           bc:'#374151'},
 ];
 
-const DEFAULT_LAT=44.428, DEFAULT_LNG=-95.376;
+const DLAT=44.428,DLNG=-95.376;
 
 let projects=[{id:1,name:'Main St Utility Run',created:new Date().toLocaleDateString(),perimPts:[],closed:false,features:[],zones:[]}];
-let activeId=1;
-let mapMode='perimeter';
-let activeUtil='gas';
-let linePts=[];
-let machineEnabled=false, machinePos=null, machineAngle=0, machineTmr=null;
-let gradeData=null, gradeTmr=null, gradeTick=0;
-let benches=[], showNmea=false;
-let zones=[], doneFormat=null, saveMode='both';
+let activeId=1,mapMode='perimeter',activeUtil='gas',linePts=[];
+let machineEnabled=false,machinePos=null,machineAngle=0,machineTmr=null;
+let gradeData=null,gradeTmr=null,gradeTick=0,benches=[],showNmeaFlag=false;
+let zones=[],doneFormat=null,saveMode='both';
+let pendingLatLng=null,longPressTmr=null;
 
-// Leaflet map state
-let leafMap=null, perimLayer=null, featureMarkers=[], linePolylines=[];
-let machineMarker=null, drawLayer=null;
-let pendingLatLng=null; // for util picker
-let longPressTimer=null;
+// Leaflet state
+let lmap=null,drawLayer=null,machineMarker=null;
+let streetTiles=null,satTiles=null,topoTiles=null,currentTileStyle='street';
 
 function getActive(){return projects.find(p=>p.id===activeId)||projects[0];}
 
-// ═══════════════════════════════════════════════════════════════════
-// GEO MATH
-// ═══════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
+   GEO MATH
+═══════════════════════════════════════════════════════════════ */
 function haversine(a,b){
   const R=6371000,r=x=>x*Math.PI/180;
-  const dLat=r(b.lat-a.lat),dLng=r(b.lng-a.lng);
-  const x=Math.sin(dLat/2)**2+Math.cos(r(a.lat))*Math.cos(r(b.lat))*Math.sin(dLng/2)**2;
+  const dL=r(b.lat-a.lat),dl=r(b.lng-a.lng);
+  const x=Math.sin(dL/2)**2+Math.cos(r(a.lat))*Math.cos(r(b.lat))*Math.sin(dl/2)**2;
   return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
 }
 function polyArea(pts){
@@ -762,142 +701,134 @@ function polyArea(pts){
   let a=0;for(let i=0;i<xy.length;i++){const j=(i+1)%xy.length;a+=xy[i].x*xy[j].y-xy[j].x*xy[i].y;}
   return Math.abs(a/2);
 }
-function perimM(pts){
-  if(pts.length<2)return 0;
-  let d=0;for(let i=0;i<pts.length;i++)d+=haversine(pts[i],pts[(i+1)%pts.length]);
-  return d;
-}
+function perimM(pts){if(pts.length<2)return 0;let d=0;for(let i=0;i<pts.length;i++)d+=haversine(pts[i],pts[(i+1)%pts.length]);return d;}
 const toAc=m=>m/4046.86,toSqFt=m=>m*10.7639,toFt=m=>m*3.28084;
 function fmt(n,d=1){return Number(n).toLocaleString(undefined,{maximumFractionDigits:d,minimumFractionDigits:d});}
 
-// ═══════════════════════════════════════════════════════════════════
-// LEAFLET MAP INIT
-// ═══════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
+   LEAFLET MAP
+═══════════════════════════════════════════════════════════════ */
 function initMap(){
-  if(leafMap) return;
+  if(lmap) return;
 
-  leafMap = L.map('leaflet-map',{
-    center:[DEFAULT_LAT, DEFAULT_LNG],
-    zoom:17,
-    zoomControl:true,
-    attributionControl:true,
-  });
+  lmap=L.map('lmap',{center:[DLAT,DLNG],zoom:17,zoomControl:true,attributionControl:true});
 
-  // OpenStreetMap tiles — free, no API key
-  L.tileLayer('[https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png]https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    attribution:'© <a href="[https://openstreetmap.org">OpenStreetMap</a]https://openstreetmap.org">OpenStreetMap</a>',
-    maxZoom:22,
-  }).addTo(leafMap);
+  // Tile layers
+  streetTiles=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'© <a href="[https://openstreetmap.org">OpenStreetMap</a]https://openstreetmap.org">OpenStreetMap</a>',maxZoom:22
+  }).addTo(lmap);
 
-  // Satellite layer option
-  window.satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{
+  satTiles=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{
     attribution:'© Esri World Imagery',maxZoom:20
   });
 
-  // Draw layer group
-  drawLayer = L.layerGroup().addTo(leafMap);
-
-  // Map click handler
-  leafMap.on('click', onMapClick);
-  leafMap.on('contextmenu', e=>{ e.originalEvent.preventDefault(); openUtilAtLatLng(e.latlng); });
-
-  // Long-press for mobile
-  leafMap.on('mousedown touchstart', e=>{
-    const latlng = e.latlng || (e.touches&&leafMap.mouseEventToLatLng(e.touches[0]));
-    if(!latlng) return;
-    longPressTimer = setTimeout(()=>{ longPressTimer=null; openUtilAtLatLng(latlng); }, 500);
+  topoTiles=L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',{
+    attribution:'© OpenTopoMap',maxZoom:17
   });
-  leafMap.on('mouseup touchend mousemove touchmove', ()=>{ if(longPressTimer){clearTimeout(longPressTimer);longPressTimer=null;} });
 
-  redrawMap();
+  drawLayer=L.layerGroup().addTo(lmap);
+
+  // Click to place perimeter / line points
+  lmap.on('click',onMapClick);
+
+  // Long-press for utility picker (right-click on desktop)
+  lmap.on('contextmenu',e=>{e.originalEvent.preventDefault();openUtilAt(e.latlng);});
+
+  // Touch long-press
+  lmap.on('mousedown',e=>{
+    longPressTmr=setTimeout(()=>{longPressTmr=null;openUtilAt(e.latlng);},500);
+  });
+  lmap.on('mouseup mousemove',()=>{if(longPressTmr){clearTimeout(longPressTmr);longPressTmr=null;}});
+
+  redraw();
+}
+
+function setTileStyle(style,btn){
+  currentTileStyle=style;
+  document.querySelectorAll('#screen-map .seg3:first-of-type .seg-b').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  if(!lmap) return;
+  [streetTiles,satTiles,topoTiles].forEach(t=>{if(t&&lmap.hasLayer(t))lmap.removeLayer(t);});
+  if(style==='street') streetTiles.addTo(lmap);
+  else if(style==='satellite') satTiles.addTo(lmap);
+  else topoTiles.addTo(lmap);
 }
 
 function onMapClick(e){
+  const p=getActive();
   if(mapMode==='perimeter'){
-    const p=getActive();
     if(p.closed) return;
-    // Snap close check
     if(p.perimPts.length>2){
-      const first=p.perimPts[0];
-      const d=haversine({lat:e.latlng.lat,lng:e.latlng.lng},first);
-      if(d<3){closePerim();return;}
+      const d=haversine({lat:e.latlng.lat,lng:e.latlng.lng},p.perimPts[0]);
+      if(d<4){closePerim();return;}
     }
     p.perimPts.push({lat:e.latlng.lat,lng:e.latlng.lng});
-    redrawMap();updateMeasurements();updateMapActions();
+    redraw();updateMeasurements();updateMapActions();
     document.getElementById('clear-btn').style.display='block';
   } else if(mapMode==='line'){
     linePts.push({lat:e.latlng.lat,lng:e.latlng.lng});
-    redrawMap();updateMapActions();
+    redraw();updateMapActions();
   }
 }
 
-function openUtilAtLatLng(latlng){
+function openUtilAt(latlng){
   pendingLatLng={lat:latlng.lat,lng:latlng.lng};
   document.getElementById('util-modal').classList.add('open');
 }
 
-// Map style switching
-function setMapStyle(style){
-  if(!leafMap) return;
-  if(style==='satellite'){
-    window.satelliteLayer.addTo(leafMap);
-  } else {
-    if(leafMap.hasLayer(window.satelliteLayer)) leafMap.removeLayer(window.satelliteLayer);
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// MAP DRAW
-// ═══════════════════════════════════════════════════════════════════
-
-// Custom divIcon for pins
-function makeIcon(emoji, bg, dot, alert){
-  const ring=alert?'border:2.5px solid #DC2626;box-shadow:0 0 0 4px rgba(220,38,38,0.2)':'border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.25)';
+/* ═══════════════════════════════════════════════════════════════
+   MAP REDRAW
+═══════════════════════════════════════════════════════════════ */
+function makePin(emoji,bg,dot,alerting){
+  const border=alerting
+    ?'border:2.5px solid #DC2626;box-shadow:0 0 0 4px rgba(220,38,38,.2),0 2px 8px rgba(0,0,0,.25)'
+    :'border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.25)';
   return L.divIcon({
     className:'',
-    html:`<div style="width:34px;height:34px;border-radius:50%;background:${bg};${ring};display:flex;align-items:center;justify-content:center;font-size:17px">${emoji}</div>`,
-    iconSize:[34,34],iconAnchor:[17,17],
+    html:`<div style="width:34px;height:34px;border-radius:50%;background:${bg};${border};display:flex;align-items:center;justify-content:center;font-size:17px">${emoji}</div>`,
+    iconSize:[34,34],iconAnchor:[17,17]
   });
 }
 
-function makeMachineIcon(alert){
-  const bg=alert?'#DC2626':'#2563EB';
+function makeNodeIcon(label,first){
+  const s=first?26:20;
+  return L.divIcon({
+    className:'',
+    html:`<div style="width:${s}px;height:${s}px;border-radius:50%;background:#F47920;border:2.5px solid #fff;box-shadow:0 2px 8px rgba(244,121,32,.4);display:flex;align-items:center;justify-content:center;color:#fff;font-size:${first?11:9}px;font-weight:800">${label}</div>`,
+    iconSize:[s,s],iconAnchor:[s/2,s/2]
+  });
+}
+
+function makeMachineIcon(alerting){
+  const bg=alerting?'#DC2626':'#2563EB';
   return L.divIcon({
     className:'',
     html:`<div style="position:relative">
-      <div style="width:36px;height:36px;border-radius:50%;background:${bg};border:3px solid #fff;box-shadow:0 2px 12px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;font-size:16px">🚜</div>
-      <div style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);background:${bg};color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;white-space:nowrap;font-family:var(--font)">Machine</div>
+      <div style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);background:${bg};color:#fff;font-size:9px;font-weight:800;padding:2px 8px;border-radius:8px;white-space:nowrap;font-family:'DM Sans',system-ui">Machine</div>
+      <div style="width:36px;height:36px;border-radius:50%;background:${bg};border:3px solid #fff;box-shadow:0 2px 12px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:17px">🚜</div>
     </div>`,
-    iconSize:[36,58],iconAnchor:[18,47],
+    iconSize:[36,58],iconAnchor:[18,47]
   });
 }
 
-function redrawMap(){
-  if(!leafMap||!drawLayer) return;
+function redraw(){
+  if(!lmap||!drawLayer) return;
   drawLayer.clearLayers();
-  featureMarkers=[];linePolylines=[];
 
   const p=getActive();
-  const {perimPts,closed,features}=p;
+  const{perimPts,closed,features}=p;
 
-  // Perimeter polygon/polyline
+  // Perimeter
   if(perimPts.length>1){
-    const latlngs=perimPts.map(pt=>[pt.lat,pt.lng]);
+    const ll=perimPts.map(pt=>[pt.lat,pt.lng]);
     if(closed&&perimPts.length>2){
-      L.polygon(latlngs,{
-        color:'#F47920',weight:2.5,fillColor:'#F47920',fillOpacity:.1,dashArray:null
-      }).addTo(drawLayer);
+      L.polygon(ll,{color:'#F47920',weight:2.5,fillColor:'#F47920',fillOpacity:.1}).addTo(drawLayer);
     } else {
-      L.polyline(latlngs,{color:'#F47920',weight:2.5,dashArray:'8,5'}).addTo(drawLayer);
+      L.polyline(ll,{color:'#F47920',weight:2.5,dashArray:'8,5'}).addTo(drawLayer);
     }
     // Nodes
     perimPts.forEach((pt,i)=>{
-      const ic=L.divIcon({
-        className:'',
-        html:`<div style="width:${i===0?26:20}px;height:${i===0?26:20}px;border-radius:50%;background:#F47920;border:2.5px solid #fff;box-shadow:0 2px 8px rgba(244,121,32,0.4);display:flex;align-items:center;justify-content:center;color:#fff;font-size:${i===0?11:9}px;font-weight:800">${i===0?'A':i+1}</div>`,
-        iconSize:[i===0?26:20,i===0?26:20],iconAnchor:[i===0?13:10,i===0?13:10],
-      });
-      const m=L.marker([pt.lat,pt.lng],{icon:ic,draggable:false}).addTo(drawLayer);
+      L.marker([pt.lat,pt.lng],{icon:makeNodeIcon(i===0?'A':String(i+1),i===0)}).addTo(drawLayer);
     });
   }
 
@@ -906,100 +837,86 @@ function redrawMap(){
     const u=UTILS.find(u=>u.id===activeUtil)||UTILS[0];
     L.polyline(linePts.map(p=>[p.lat,p.lng]),{color:u.dot,weight:4,dashArray:'10,5'}).addTo(drawLayer);
     linePts.forEach(pt=>{
-      const ic=L.divIcon({className:'',html:`<div style="width:10px;height:10px;border-radius:50%;background:${u.dot};border:2px solid #fff"></div>`,iconSize:[10,10],iconAnchor:[5,5]});
-      L.marker([pt.lat,pt.lng],{icon:ic}).addTo(drawLayer);
+      L.divIcon&&L.marker([pt.lat,pt.lng],{icon:L.divIcon({
+        className:'',
+        html:`<div style="width:10px;height:10px;border-radius:50%;background:${u.dot};border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2)"></div>`,
+        iconSize:[10,10],iconAnchor:[5,5]
+      })}).addTo(drawLayer);
     });
   }
 
-  // Feature lines
+  // Saved feature lines
   features.filter(f=>f.pts&&f.pts.length>1).forEach(f=>{
     const u=UTILS.find(u=>u.id===f.type)||UTILS[0];
     const pl=L.polyline(f.pts.map(p=>[p.lat,p.lng]),{color:u.dot,weight:4,dashArray:'12,5'}).addTo(drawLayer);
-    pl.bindTooltip(u.label,{permanent:false,direction:'top'});
-    linePolylines.push(pl);
+    pl.bindTooltip(`<span style="font-family:'DM Sans',system-ui;font-size:12px;font-weight:700;color:${u.color}">${u.emoji} ${u.label}</span>`,{permanent:false,direction:'top'});
   });
 
   // Feature point pins
   features.filter(f=>f.lat!=null).forEach(f=>{
     const u=UTILS.find(u=>u.id===f.type)||UTILS[0];
-    const alert=machineEnabled&&machinePos&&haversine(machinePos,{lat:f.lat,lng:f.lng})<=3;
-    const m=L.marker([f.lat,f.lng],{icon:makeIcon(u.emoji,u.bg,u.dot,alert)}).addTo(drawLayer);
-    m.bindPopup(`<div style="font-family:var(--font);min-width:140px">
-      <div style="font-weight:700;font-size:13px;margin-bottom:4px">${u.emoji} ${u.label}</div>
-      ${f.note?`<div style="font-size:11px;color:#6B7280;margin-bottom:4px">📝 ${f.note}</div>`:''}
+    const alerting=machineEnabled&&machinePos&&haversine(machinePos,{lat:f.lat,lng:f.lng})<=3;
+    const m=L.marker([f.lat,f.lng],{icon:makePin(u.emoji,u.bg,u.dot,alerting)}).addTo(drawLayer);
+    m.bindPopup(`<div style="font-family:'DM Sans',system-ui;min-width:150px">
+      <div style="font-weight:800;font-size:14px;margin-bottom:5px">${u.emoji} ${u.label}</div>
+      ${f.note?`<div style="font-size:12px;color:#6B7280;margin-bottom:4px">📝 ${f.note}</div>`:''}
       <div style="font-size:10px;color:#9CA3AF">${f.lat.toFixed(6)}, ${f.lng.toFixed(6)}</div>
-    </div>`,{maxWidth:200});
-    m.on('click',()=>m.openPopup());
-    featureMarkers.push({id:f.id,marker:m});
+    </div>`);
   });
 
-  // Machine dot
+  // Machine
   if(machineEnabled&&machinePos){
-    const alert=nearestAlert()!=null;
+    const alerting=nearestAlert()!=null;
     if(machineMarker) machineMarker.remove();
-    machineMarker=L.marker([machinePos.lat,machinePos.lng],{icon:makeMachineIcon(alert),zIndexOffset:1000}).addTo(drawLayer);
+    machineMarker=L.marker([machinePos.lat,machinePos.lng],{icon:makeMachineIcon(alerting),zIndexOffset:1000}).addTo(drawLayer);
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// MAP CONTROLS
-// ═══════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
+   MAP CONTROLS
+═══════════════════════════════════════════════════════════════ */
 function setMode(mode,btn){
   mapMode=mode;
-  document.querySelectorAll('.pill-opt').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+  document.querySelectorAll('#screen-map .seg3:nth-of-type(2) .seg-b').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
   document.getElementById('line-strip').style.display=mode==='line'?'block':'none';
-  if(mode!=='line'){linePts=[];}
-  redrawMap();updateMapActions();
+  if(mode!=='line') linePts=[];
+  redraw();updateMapActions();
 }
 
 function updateMapActions(){
-  const {perimPts,closed}=getActive();
+  const{perimPts,closed}=getActive();
   const el=document.getElementById('map-actions');
-  let html='';
-  if(perimPts.length>0&&!closed&&mapMode==='perimeter'){
-    html+=`<button class="map-btn" onclick="undoPerim()">↩ Undo</button>`;
-  }
-  if(perimPts.length>2&&!closed&&mapMode==='perimeter'){
-    html+=`<button class="map-btn primary" onclick="closePerim()">Close ✓</button>`;
-  }
-  if(mapMode==='line'&&linePts.length>1){
-    html+=`<button class="map-btn success" onclick="finishLine()">Save Line ✓</button>`;
-  }
-  el.innerHTML=html;
+  let h='';
+  if(perimPts.length>0&&!closed&&mapMode==='perimeter')
+    h+=`<button class="mbtn" onclick="undoPerim()">↩ Undo</button>`;
+  if(perimPts.length>2&&!closed&&mapMode==='perimeter')
+    h+=`<button class="mbtn mbtn-o" onclick="closePerim()">Close ✓</button>`;
+  if(mapMode==='line'&&linePts.length>1)
+    h+=`<button class="mbtn mbtn-g" onclick="finishLine()">Save Line ✓</button>`;
+  el.innerHTML=h;
 }
 
-function undoPerim(){
-  getActive().perimPts.pop();
-  redrawMap();updateMeasurements();updateMapActions();
-}
-
-function closePerim(){
-  getActive().closed=true;
-  redrawMap();updateMeasurements();updateMapActions();updateVolBtn();
-}
-
+function undoPerim(){getActive().perimPts.pop();redraw();updateMeasurements();updateMapActions();}
+function closePerim(){getActive().closed=true;redraw();updateMeasurements();updateMapActions();updateVolBtn();}
 function finishLine(){
   if(linePts.length<2)return;
   const u=UTILS.find(u=>u.id===activeUtil)||UTILS[0];
   getActive().features.push({type:activeUtil,pts:[...linePts],label:u.label,id:Date.now()});
-  linePts=[];
-  redrawMap();updateMapActions();updateFeatLegend();updateFeatSummary();
+  linePts=[];redraw();updateMapActions();updateFeatLegend();updateFeatSummary();
 }
-
 function clearSite(){
-  const p=getActive();
-  p.perimPts=[];p.closed=false;p.features=[];p.zones=[];linePts=[];
-  redrawMap();updateMeasurements();updateVolBtn();updateFeatLegend();updateFeatSummary();updateMapActions();
+  const p=getActive();p.perimPts=[];p.closed=false;p.features=[];p.zones=[];linePts=[];
+  redraw();updateMeasurements();updateVolBtn();updateFeatLegend();updateFeatSummary();updateMapActions();
   document.getElementById('clear-btn').style.display='none';
-  document.getElementById('prox-alert').classList.remove('show');
+  document.getElementById('prox').classList.remove('show');
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// MEASUREMENTS
-// ═══════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
+   MEASUREMENTS
+═══════════════════════════════════════════════════════════════ */
 function updateMeasurements(){
-  const {perimPts,closed}=getActive();
+  const{perimPts,closed}=getActive();
   const el=document.getElementById('measurements');
   if(perimPts.length>1){
     el.style.display='block';
@@ -1014,81 +931,74 @@ function updateMeasurements(){
       document.getElementById('stat-area').textContent='—';
       document.getElementById('stat-area-sub').textContent='Close shape first';
     }
-  } else {
-    el.style.display='none';
-  }
+  } else el.style.display='none';
 }
 
 function updateVolBtn(){
-  const {perimPts,closed,zones}=getActive();
+  const{perimPts,closed,zones}=getActive();
   const el=document.getElementById('vol-btn-wrap');
   const area=polyArea(perimPts);
   if(closed&&area>0){
     el.style.display='block';
     const z=zones&&zones.length;
-    document.getElementById('vol-btn-sub').textContent=
-      z?`${z} zone${z!==1?'s':''} defined`:'Tap to add cut/fill depth zones';
-  } else {
-    el.style.display='none';
-  }
+    document.getElementById('vol-btn-sub').textContent=z?`${z} zone${z!==1?'s':''} defined`:'Tap to add cut/fill depth zones';
+  } else el.style.display='none';
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// UTILITY PICKER
-// ═══════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
+   UTILITY PICKER
+═══════════════════════════════════════════════════════════════ */
 function placeUtil(u){
   if(!pendingLatLng) return;
   getActive().features.push({type:u.id,lat:pendingLatLng.lat,lng:pendingLatLng.lng,label:u.label,id:Date.now()});
   pendingLatLng=null;
   closeUtilModal();
-  redrawMap();updateFeatLegend();updateFeatSummary();
+  redraw();updateFeatLegend();updateFeatSummary();
   document.getElementById('clear-btn').style.display='block';
 }
 function closeUtilModal(){document.getElementById('util-modal').classList.remove('open');}
 
-function buildUtilGrid(){
-  document.getElementById('util-grid').innerHTML=UTILS.map(u=>
-    `<button class="util-opt" style="background:${u.bg};border-color:${u.dot}" onclick="placeUtil({id:'${u.id}',label:'${u.label}',emoji:'${u.emoji}'})">
-      <span style="font-size:22px">${u.emoji}</span>
-      <span style="color:${u.color}">${u.label}</span>
+function buildUgrid(){
+  document.getElementById('ugrid').innerHTML=UTILS.map(u=>
+    `<button class="uopt" style="background:${u.bg};border-color:${u.dot}" onclick="placeUtil({id:'${u.id}',label:'${u.label}',emoji:'${u.emoji}'})">
+      <span style="font-size:22px">${u.emoji}</span><span style="color:${u.color}">${u.label}</span>
     </button>`).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// FEATURE LEGEND
-// ═══════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
+   FEATURE LEGEND
+═══════════════════════════════════════════════════════════════ */
 function updateFeatLegend(){
   const features=getActive().features;
   const el=document.getElementById('feat-legend');
   if(!features.length){
-    el.innerHTML=`<div class="empty-state"><div class="empty-icon">🏗️</div><div class="empty-title">No features placed yet</div><div class="empty-sub">Hold anywhere on the map to open the utility picker and drop a marker or trace a line</div></div>`;
+    el.innerHTML=`<div class="empty"><div class="empty-ico">🏗️</div><div class="empty-title">No features placed yet</div><div class="empty-sub">Hold anywhere on the map to open the utility picker and drop a marker or trace a line</div></div>`;
     return;
   }
   const grouped={};
   features.forEach(f=>{if(!grouped[f.type])grouped[f.type]=[];grouped[f.type].push(f);});
   el.innerHTML=Object.entries(grouped).map(([type,items])=>{
     const u=UTILS.find(x=>x.id===type)||UTILS[0];
-    return `<div class="feat-group" style="border-top:3px solid ${u.dot};margin-bottom:9px">
-      <div class="feat-group-hd" style="background:${u.bg}">
+    return `<div class="fgroup" style="border-top:3px solid ${u.dot}">
+      <div class="fhead" style="background:${u.bg}">
         <span style="width:9px;height:9px;border-radius:50%;background:${u.dot};flex-shrink:0;display:inline-block"></span>
         <span style="font-size:13px;font-weight:700;color:${u.color}">${u.emoji} ${u.label}</span>
         <span style="margin-left:auto;background:#fff;border-radius:20px;padding:1px 9px;font-size:11px;font-weight:700;color:${u.color}">${items.length}</span>
       </div>
-      ${items.map(f=>`
-        <div class="feat-row">
-          <div class="feat-info">
-            <div class="feat-coord">${f.pts?`Line · ${f.pts.length} nodes`:`${f.lat.toFixed(5)},  ${f.lng.toFixed(5)}`}</div>
-            ${f.note?`<div class="feat-note">📝 ${f.note}</div>`:''}
-          </div>
-          <button class="rm-btn" onclick="removeFeature(${f.id})">×</button>
-        </div>`).join('')}
+      ${items.map(f=>`<div class="frow">
+        <div style="flex:1;min-width:0">
+          <div class="fcoord">${f.pts?`Line · ${f.pts.length} nodes`:`${f.lat.toFixed(5)},  ${f.lng.toFixed(5)}`}</div>
+          ${f.note?`<div class="fnote">📝 ${f.note}</div>`:''}
+        </div>
+        <button class="rmbtn" onclick="removeFeature(${f.id})">×</button>
+      </div>`).join('')}
     </div>`;
   }).join('');
 }
 
 function removeFeature(id){
   const p=getActive();p.features=p.features.filter(f=>f.id!==id);
-  redrawMap();updateFeatLegend();updateFeatSummary();
+  redraw();updateFeatLegend();updateFeatSummary();
 }
 
 function updateFeatSummary(){
@@ -1098,25 +1008,17 @@ function updateFeatSummary(){
   document.getElementById('feat-count-txt').textContent=`${f.length} Site Feature${f.length!==1?'s':''}`;
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// UTILITY STRIP (line mode)
-// ═══════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
+   UTIL STRIP + APWA
+═══════════════════════════════════════════════════════════════ */
 function buildUtilStrip(){
-  document.getElementById('util-strip-wrap').innerHTML=UTILS.filter(u=>u.id!=='nodig').map(u=>
-    `<button class="util-chip${activeUtil===u.id?' active':''}"
-      style="${activeUtil===u.id?`--dot-color:${u.dot};--bg-color:${u.bg};--col-color:${u.color}`:''}"
-      onclick="setActiveUtil('${u.id}')">
-      ${u.emoji} ${u.label}
-    </button>`).join('');
+  document.getElementById('ustrip-wrap').innerHTML=UTILS.filter(u=>u.id!=='nodig').map(u=>
+    `<button class="uchip${activeUtil===u.id?' on':''}" onclick="setActiveUtil('${u.id}')"
+      style="${activeUtil===u.id?`border-color:${u.dot};background:${u.bg};color:${u.color}`:''}"
+    >${u.emoji} ${u.label}</button>`).join('');
 }
+function setActiveUtil(id){activeUtil=id;buildUtilStrip();}
 
-function setActiveUtil(id){
-  activeUtil=id;buildUtilStrip();
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// APWA
-// ═══════════════════════════════════════════════════════════════════
 function buildAPWA(){
   document.getElementById('apwa-grid').innerHTML=UTILS.map(u=>
     `<div class="apwa-item" style="background:${u.bg}">
@@ -1125,21 +1027,24 @@ function buildAPWA(){
     </div>`).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// MACHINE TRACKING
-// ═══════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
+   MACHINE TRACKING
+═══════════════════════════════════════════════════════════════ */
 function toggleMachine(){
   machineEnabled=!machineEnabled;
-  const t=document.getElementById('machine-toggle');
-  const chip=document.getElementById('machine-map-chip');
+  const t=document.getElementById('machine-tog');
   t.classList.toggle('on',machineEnabled);
-  if(machineEnabled){chip.style.display='flex';startMachineSim();}
-  else {
-    chip.style.display='none';stopMachineSim();machinePos=null;
+  const chip=document.getElementById('machine-chip');
+  if(machineEnabled){
+    chip.style.display='flex';
+    startMachineSim();
+  } else {
+    chip.style.display='none';
+    stopMachineSim();machinePos=null;
     if(machineMarker){machineMarker.remove();machineMarker=null;}
     document.getElementById('machine-status-txt').textContent='Off · 3 m proximity alerts when on';
-    document.getElementById('prox-alert').classList.remove('show');
-    redrawMap();
+    document.getElementById('prox').classList.remove('show');
+    redraw();
   }
 }
 
@@ -1147,14 +1052,10 @@ function startMachineSim(){
   stopMachineSim();machineAngle=0;
   machineTmr=setInterval(()=>{
     machineAngle+=0.04;
-    machinePos={
-      lat:DEFAULT_LAT+Math.sin(machineAngle)*0.00025,
-      lng:DEFAULT_LNG+Math.cos(machineAngle)*0.00025,
-    };
+    machinePos={lat:DLAT+Math.sin(machineAngle)*0.00025,lng:DLNG+Math.cos(machineAngle)*0.00025};
     document.getElementById('machine-status-txt').textContent=`Simulated · RTK Fix · ${machinePos.lat.toFixed(6)}N`;
-    document.getElementById('machine-chip-txt').textContent=`Machine · RTK Fix`;
-    updateProxAlert();
-    redrawMap();
+    document.getElementById('machine-chip-txt').textContent='Machine · RTK Fix';
+    updateProxAlert();redraw();
   },800);
 }
 function stopMachineSim(){if(machineTmr){clearInterval(machineTmr);machineTmr=null;}}
@@ -1172,146 +1073,123 @@ function nearestAlert(){
 
 function updateProxAlert(){
   const a=nearestAlert();
-  const el=document.getElementById('prox-alert');
+  const el=document.getElementById('prox');
   if(a&&machineEnabled){
     const u=UTILS.find(u=>u.id===a.feature.type)||UTILS[0];
-    document.getElementById('prox-icon').textContent=u.emoji;
+    document.getElementById('prox-ico').textContent=u.emoji;
     document.getElementById('prox-title').textContent=`⚠️ ${a.feature.label} Nearby`;
-    document.getElementById('prox-dist-num').textContent=a.dist.toFixed(1);
+    document.getElementById('prox-num').textContent=a.dist.toFixed(1);
     el.classList.add('show');
-  } else {
-    el.classList.remove('show');
-  }
+  } else el.classList.remove('show');
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// PROJECTS
-// ═══════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
+   PROJECTS
+═══════════════════════════════════════════════════════════════ */
 function toggleNewProj(){
   const el=document.getElementById('new-proj-form');
   el.style.display=el.style.display==='none'?'block':'none';
   if(el.style.display==='block')document.getElementById('new-proj-name').focus();
 }
-
 function createProject(){
   const name=document.getElementById('new-proj-name').value.trim();if(!name)return;
   const p={id:Date.now(),name,created:new Date().toLocaleDateString(),perimPts:[],closed:false,features:[],zones:[]};
-  projects.push(p);
-  selectProject(p.id);
+  projects.push(p);selectProject(p.id);
   document.getElementById('new-proj-name').value='';
   document.getElementById('new-proj-form').style.display='none';
-  renderProjList();
-  showTab('map');
+  renderProjs();showTab('map');
 }
-
 function selectProject(id){
   activeId=id;linePts=[];
   const p=getActive();
-  document.getElementById('active-proj-chip').textContent=p.name;
-  document.getElementById('active-proj-chip').style.display='inline-flex';
-  updateMeasurements();updateVolBtn();updateFeatLegend();updateFeatSummary();
-  updateMapActions();
+  document.getElementById('proj-chip').textContent=p.name;
+  document.getElementById('proj-chip').style.display='inline-flex';
+  updateMeasurements();updateVolBtn();updateFeatLegend();updateFeatSummary();updateMapActions();
   document.getElementById('clear-btn').style.display=(p.perimPts.length||p.features.length)?'block':'none';
-  renderProjList();
-  redrawMap();
-  // Re-center map on features if any
-  if(p.perimPts.length>0&&leafMap){
+  renderProjs();redraw();
+  if(p.perimPts.length>0&&lmap){
     const lats=p.perimPts.map(pt=>pt.lat),lngs=p.perimPts.map(pt=>pt.lng);
-    leafMap.setView([(Math.min(...lats)+Math.max(...lats))/2,(Math.min(...lngs)+Math.max(...lngs))/2],17);
+    lmap.setView([(Math.min(...lats)+Math.max(...lats))/2,(Math.min(...lngs)+Math.max(...lngs))/2],17);
   }
 }
-
 function deleteProject(id){
   if(projects.length===1)return;
   projects=projects.filter(p=>p.id!==id);
   if(activeId===id)selectProject(projects[0].id);
-  renderProjList();
+  renderProjs();
 }
-
-function renderProjList(){
+function renderProjs(){
   const el=document.getElementById('proj-list');
-  if(!projects.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">🏗️</div><div class="empty-title">No projects yet</div></div>`;return;}
+  if(!projects.length){el.innerHTML=`<div class="empty"><div class="empty-ico">🏗️</div><div class="empty-title">No projects yet</div></div>`;return;}
   el.innerHTML=projects.map(p=>{
-    const isA=p.id===activeId;
-    const hasP=p.perimPts.length>2,fc=p.features.length,vz=p.zones&&p.zones.length;
-    return `<div class="proj-card ${isA?'active-p':''}">
-      <div class="proj-body">
+    const isA=p.id===activeId,hasP=p.perimPts.length>2,fc=p.features.length,vz=p.zones&&p.zones.length;
+    return `<div class="pcard${isA?' ap':''}">
+      <div class="pbody">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
-          <div>
-            <div style="font-weight:800;font-size:15px">${p.name}</div>
-            <div style="font-size:11px;color:var(--text3);margin-top:2px">Created ${p.created}</div>
-          </div>
-          ${isA?`<span class="badge badge-orange">Active</span>`:''}
+          <div><div style="font-weight:800;font-size:15px">${p.name}</div>
+            <div style="font-size:11px;color:#9CA3AF;margin-top:2px">Created ${p.created}</div></div>
+          ${isA?`<span class="badge badge-org">Active</span>`:''}
         </div>
-        <div class="proj-tags">
-          <span class="proj-tag" style="color:${hasP?'var(--green)':'var(--text3)'}">📏 ${hasP?'Perimeter mapped':'No perimeter'}</span>
-          <span class="proj-tag" style="color:${fc>0?'var(--blue)':'var(--text3)'}">📍 ${fc} feature${fc!==1?'s':''}</span>
-          <span class="proj-tag" style="color:${vz?'var(--orange)':'var(--text3)'}">📐 ${vz?vz+' vol zone'+(vz!==1?'s':''):'No volume data'}</span>
+        <div class="ptags">
+          <span class="ptag" style="color:${hasP?'#15803D':'#9CA3AF'}">📏 ${hasP?'Perimeter mapped':'No perimeter'}</span>
+          <span class="ptag" style="color:${fc>0?'#2563EB':'#9CA3AF'}">📍 ${fc} feature${fc!==1?'s':''}</span>
+          <span class="ptag" style="color:${vz?'#F47920':'#9CA3AF'}">📐 ${vz?vz+' vol zone'+(vz!==1?'s':''):'No volume data'}</span>
         </div>
-        <div class="proj-actions">
-          <button class="btn ${isA?'btn-primary':'btn-ghost'}" style="flex:1;font-size:13px" onclick="selectProject(${p.id});showTab('map')">${isA?'Currently Editing':'Open Site'}</button>
-          ${projects.length>1?`<button class="btn btn-danger" style="font-size:13px" onclick="deleteProject(${p.id})">Delete</button>`:''}
+        <div class="pacts">
+          <button class="btn ${isA?'btn-o':'btn-g'}" style="flex:1;font-size:13px" onclick="selectProject(${p.id});showTab('map')">${isA?'Currently Editing':'Open Site'}</button>
+          ${projects.length>1?`<button class="btn btn-red" style="font-size:13px" onclick="deleteProject(${p.id})">Delete</button>`:''}
         </div>
       </div>
     </div>`;
   }).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// VOLUME
-// ═══════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
+   VOLUME
+═══════════════════════════════════════════════════════════════ */
 function openVolModal(){
   zones=[...(getActive().zones||[])];
   if(!zones.length)zones=[{id:Date.now(),label:'Zone A',depth:'',type:'cut'}];
   const area=polyArea(getActive().perimPts);
   document.getElementById('vol-area-lbl').textContent=`Site area: ${fmt(toAc(area),3)} ac (${fmt(toSqFt(area),0)} sq ft)`;
-  renderZones();
-  document.getElementById('vol-modal').classList.add('open');
+  renderZones();document.getElementById('vol-modal').classList.add('open');
 }
 function closeVolModal(){document.getElementById('vol-modal').classList.remove('open');}
-
 function addZone(){zones.push({id:Date.now(),label:`Zone ${String.fromCharCode(65+zones.length)}`,depth:'',type:'cut'});renderZones();}
-
 function renderZones(){
   const area=polyArea(getActive().perimPts);
   document.getElementById('zone-list').innerHTML=zones.map((z,i)=>{
     const vol=z.depth?(area/zones.length)*parseFloat(z.depth):0;
-    return `<div class="zone-card">
+    return `<div class="zcard">
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <input value="${z.label}" onchange="zones[${i}].label=this.value" style="font-weight:700;font-size:14px;border:none;background:transparent;width:120px;font-family:var(--font);color:var(--text)"/>
-        ${zones.length>1?`<button onclick="zones.splice(${i},1);renderZones()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px">×</button>`:''}
+        <input value="${z.label}" onchange="zones[${i}].label=this.value" style="font-weight:700;font-size:14px;border:none;background:transparent;width:120px;font-family:inherit;color:#111827"/>
+        ${zones.length>1?`<button onclick="zones.splice(${i},1);renderZones()" style="background:none;border:none;color:#9CA3AF;cursor:pointer;font-size:16px">×</button>`:''}
       </div>
-      <div class="zone-row">
-        <div>
-          <div class="input-label">Avg Depth (m)</div>
-          <input type="number" class="input" value="${z.depth}" placeholder="0.00" onchange="zones[${i}].depth=this.value;renderZones()"/>
-        </div>
-        <div>
-          <div class="input-label">Type</div>
-          <div class="zone-type-pair">
-            <button class="ztype-btn ${z.type==='cut'?'cut':''}" onclick="zones[${i}].type='cut';renderZones()">▼ Cut</button>
-            <button class="ztype-btn ${z.type==='fill'?'fill':''}" onclick="zones[${i}].type='fill';renderZones()">▲ Fill</button>
+      <div class="zrow">
+        <div><div class="ilabel">Avg Depth (m)</div><input type="number" value="${z.depth}" placeholder="0.00" onchange="zones[${i}].depth=this.value;renderZones()"/></div>
+        <div><div class="ilabel">Type</div>
+          <div class="ztype">
+            <button class="ztbtn${z.type==='cut'?' cut':''}" onclick="zones[${i}].type='cut';renderZones()">▼ Cut</button>
+            <button class="ztbtn${z.type==='fill'?' fill':''}" onclick="zones[${i}].type='fill';renderZones()">▲ Fill</button>
           </div>
         </div>
       </div>
-      ${vol?`<div style="margin-top:9px;font-size:11px;color:var(--text3)">Zone volume: <strong style="color:${z.type==='cut'?'var(--red)':'var(--green)'}">${fmt(vol,1)} m³</strong></div>`:''}
+      ${vol?`<div style="margin-top:9px;font-size:11px;color:#6B7280">Zone volume: <strong style="color:${z.type==='cut'?'#DC2626':'#15803D'}">${fmt(vol,1)} m³</strong></div>`:''}
     </div>`;
   }).join('');
-
   const total=zones.reduce((s,z)=>s+(z.depth?(area/zones.length)*parseFloat(z.depth):0),0);
   const tv=document.getElementById('vol-total');
   tv.style.display=total>0?'flex':'none';
   document.getElementById('vol-total-num').textContent=`${fmt(total,1)} m³`;
 }
-
 function saveVol(){getActive().zones=[...zones];closeVolModal();updateVolBtn();}
 
-// ═══════════════════════════════════════════════════════════════════
-// GRADE
-// ═══════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
+   GRADE
+═══════════════════════════════════════════════════════════════ */
 function gradeConnect(){
-  document.getElementById('grade-idle-view').style.display='none';
-  document.getElementById('grade-live-view').style.display='block';
+  document.getElementById('grade-idle').style.display='none';
+  document.getElementById('grade-live').style.display='flex';
   gradeTick=0;
   gradeTmr=setInterval(()=>{
     gradeTick++;
@@ -1322,28 +1200,25 @@ function gradeConnect(){
     const hdop=gradeTick<6?1.2:.7+(Math.random()*.2);
     const fixType=fixQ===4?'RTK Fix':fixQ===5?'RTK Float':fixQ===2?'DGPS':'GPS';
     gradeData={lat,lng,elev,sats,hdop,fixType,fixQ};
-    const latDeg=Math.floor(lat),latMin=(lat-latDeg)*60;
-    const lngDeg=Math.abs(Math.floor(lng)),lngMin=(Math.abs(lng)-lngDeg)*60;
-    const nmea=`$GNGGA,${new Date().toISOString().slice(11,19).replace(/:/g,'')}.00,${(latDeg*100+latMin).toFixed(5)},N,${(lngDeg*100+lngMin).toFixed(5)},W,${fixQ},${sats},${hdop.toFixed(1)},${(elev-30).toFixed(3)},M,30.000,M,,*6A`;
+    const ld=Math.floor(lat),lm=(lat-ld)*60;
+    const ldd=Math.abs(Math.floor(lng)),ldm=(Math.abs(lng)-ldd)*60;
+    const nmea=`$GNGGA,${new Date().toISOString().slice(11,19).replace(/:/g,'')}.00,${(ld*100+lm).toFixed(5)},N,${(ldd*100+ldm).toFixed(5)},W,${fixQ},${sats},${hdop.toFixed(1)},${(elev-30).toFixed(3)},M,30.000,M,,*6A`;
     document.getElementById('nmea-box').textContent=nmea;
     updateGradeUI();renderBenches();
   },1000);
 }
-
 function gradeDisconnect(){
   clearInterval(gradeTmr);gradeTmr=null;gradeData=null;
-  document.getElementById('grade-idle-view').style.display='block';
-  document.getElementById('grade-live-view').style.display='none';
+  document.getElementById('grade-idle').style.display='block';
+  document.getElementById('grade-live').style.display='none';
 }
-
 function updateGradeUI(){
-  if(!gradeData) return;
+  if(!gradeData)return;
   const{fixType,fixQ,sats,hdop,elev,lat,lng}=gradeData;
-  const cols={4:'var(--green)',5:'#D97706',2:'var(--blue)',1:'var(--text3)'};
-  const bgs={4:'var(--green-bg)',5:'#FEF3C7',2:'var(--blue-bg)',1:'var(--surface2)'};
-  const col=cols[fixQ]||'var(--text3)',bg=bgs[fixQ]||'var(--surface2)';
-  const badge=document.getElementById('fix-badge');
-  badge.style.background=bg;badge.style.color=col;
+  const cols={4:'#15803D',5:'#D97706',2:'#2563EB',1:'#6B7280'};
+  const bgs={4:'#DCFCE7',5:'#FEF3C7',2:'#DBEAFE',1:'#F0F1F3'};
+  const col=cols[fixQ]||'#6B7280',bg=bgs[fixQ]||'#F0F1F3';
+  const b=document.getElementById('fix-badge');b.style.background=bg;b.style.color=col;
   document.getElementById('fix-dot').style.background=col;
   document.getElementById('fix-txt').textContent=fixType;
   document.getElementById('g-sats').textContent=sats;
@@ -1354,127 +1229,98 @@ function updateGradeUI(){
   document.getElementById('g-lat').textContent=`${lat.toFixed(7)}°N`;
   document.getElementById('g-lng').textContent=`${Math.abs(lng).toFixed(7)}°W`;
 }
-
-function toggleNMEA(){showNmea=!showNmea;document.getElementById('nmea-box').style.display=showNmea?'block':'none';}
-
+function toggleNmea(){showNmeaFlag=!showNmeaFlag;document.getElementById('nmea-box').style.display=showNmeaFlag?'block':'none';}
 function addBench(){
   const name=document.getElementById('bm-name').value.trim();
   const elev=document.getElementById('bm-elev').value;
-  if(!name||!elev) return;
+  if(!name||!elev)return;
   benches.push({id:Date.now(),name,elev:parseFloat(elev)});
-  document.getElementById('bm-name').value='';
-  document.getElementById('bm-elev').value='';
+  document.getElementById('bm-name').value='';document.getElementById('bm-elev').value='';
   renderBenches();
 }
-
-function snapBench(){
-  if(!gradeData) return;
-  benches.push({id:Date.now(),name:`BM-${benches.length+1}`,elev:gradeData.elev});
-  renderBenches();
-}
-
-function saveNtrip(){
-  const host=document.getElementById('ntrip-host').value;
-  if(!host){alert('Please enter a caster host');return;}
-  alert(`NTRIP config saved!\nHost: ${host}:${document.getElementById('ntrip-port').value}\nMount: ${document.getElementById('ntrip-mount').value}`);
-}
-
+function snapBench(){if(!gradeData)return;benches.push({id:Date.now(),name:`BM-${benches.length+1}`,elev:gradeData.elev});renderBenches();}
+function saveNtrip(){const h=document.getElementById('ntrip-host').value;if(!h){alert('Enter a caster host');return;}alert(`NTRIP saved!\nHost: ${h}:${document.getElementById('ntrip-port').value}`);}
 function renderBenches(){
   const el=document.getElementById('bench-list');
-  if(!benches.length){el.innerHTML=`<div style="text-align:center;color:var(--text3);font-size:12px;padding:14px">No benchmarks set yet</div>`;return;}
+  if(!benches.length){el.innerHTML=`<div style="text-align:center;color:#9CA3AF;font-size:12px;padding:14px">No benchmarks set yet</div>`;return;}
   const live=gradeData?gradeData.elev:null;
   el.innerHTML=benches.map(bm=>{
     const delta=live!=null?live-bm.elev:null,cut=delta!=null&&delta>0;
-    return `<div class="bench-item" style="border-color:${delta!=null?(cut?'rgba(220,38,38,.2)':'rgba(21,128,61,.2)'):'var(--border2)'}">
-      <div>
-        <div style="font-weight:700;font-size:14px">${bm.name}</div>
-        <div style="font-size:11px;color:var(--text3);margin-top:1px">Design: ${bm.elev.toFixed(4)} m</div>
-      </div>
+    return `<div class="bitem" style="border-color:${delta!=null?(cut?'rgba(220,38,38,.2)':'rgba(21,128,61,.2)'):'#ECEEF2'}">
+      <div><div style="font-weight:700;font-size:14px">${bm.name}</div>
+        <div style="font-size:11px;color:#9CA3AF;margin-top:1px">Design: ${bm.elev.toFixed(4)} m</div></div>
       <div style="text-align:right">
-        ${delta!=null?`<div class="bench-delta" style="color:${cut?'var(--red)':'var(--green)'}">${cut?'+':''}${delta.toFixed(4)} m</div><div style="font-size:10px;font-weight:700;color:${cut?'var(--red)':'var(--green)'};margin-top:1px">${cut?'▲ Fill':'▼ Cut'}</div>`:'<div style="font-size:12px;color:var(--text3)">Waiting…</div>'}
+        ${delta!=null?`<div class="bdelta" style="color:${cut?'#DC2626':'#15803D'}">${cut?'+':''}${delta.toFixed(4)} m</div>
+        <div style="font-size:10px;font-weight:700;color:${cut?'#DC2626':'#15803D'};margin-top:1px">${cut?'▲ Fill':'▼ Cut'}</div>`
+        :'<div style="font-size:12px;color:#9CA3AF">Waiting…</div>'}
       </div>
     </div>`;
   }).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// EXPORT
-// ═══════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
+   EXPORT
+═══════════════════════════════════════════════════════════════ */
 function setSaveMode(mode,btn){
   saveMode=mode;
-  document.querySelectorAll('.save-opt').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+  document.querySelectorAll('.sopt').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
   document.getElementById('save-mode-info').style.display=mode!=='device'?'flex':'none';
 }
-
 function buildFormatGrid(){
   document.getElementById('format-grid').innerHTML=FORMATS.map(f=>
-    `<button class="format-card ${doneFormat===f.name?'done':''}" onclick="doExport('${f.name}')">
-      <div class="f-icon">${f.icon}</div>
-      <div class="f-name">.${f.name}</div>
-      <div class="f-desc">${f.desc}</div>
-      ${f.badge?`<div class="f-badge" style="background:${f.bc}1A;color:${f.bc}">${f.badge}</div>`:''}
-      ${doneFormat===f.name?`<div class="f-done">✓ Exported</div>`:''}
+    `<button class="fcard${doneFormat===f.name?' done':''}" onclick="doExport('${f.name}')">
+      <div class="fico">${f.icon}</div>
+      <div class="fname">.${f.name}</div>
+      <div class="fdesc">${f.desc}</div>
+      ${f.badge?`<div class="fbadge" style="background:${f.bc}1A;color:${f.bc}">${f.badge}</div>`:''}
+      ${doneFormat===f.name?`<div class="fdone">✓ Exported</div>`:''}
     </button>`).join('');
 }
-
 function doExport(fmt){doneFormat=fmt;buildFormatGrid();setTimeout(()=>{doneFormat=null;buildFormatGrid();},2500);}
-
 function buildExportSummary(){
   const p=getActive(),area=polyArea(p.perimPts);
-  const items=[[String(p.perimPts.length),'Perimeter pts','📏'],[String(p.features.length),'Site features','📍'],
-    ...(area>0?[[`${toAc(area).toFixed(3)} ac`,'Total area','📐']]:[[]])].filter(x=>x.length);
+  const items=[[String(p.perimPts.length),'Perimeter pts','📏'],[String(p.features.length),'Features','📍'],
+    ...(area>0?[[`${toAc(area).toFixed(3)} ac`,'Total area','📐']]:[])].filter(x=>x.length);
   document.getElementById('export-summary').innerHTML=items.map(([v,l,ic])=>
-    `<div class="summary-item"><div class="summary-icon">${ic}</div><div class="summary-val">${v}</div><div class="summary-lbl">${l}</div></div>`).join('');
+    `<div class="sumitem"><div class="sumico">${ic}</div><div class="sumval">${v}</div><div class="sumlbl">${l}</div></div>`).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// ACCORDION
-// ═══════════════════════════════════════════════════════════════════
-function toggleAccord(btn){
+/* ═══════════════════════════════════════════════════════════════
+   ACCORDION
+═══════════════════════════════════════════════════════════════ */
+function toggleAcc(btn){
   const body=btn.nextElementSibling;
   const open=body.classList.toggle('open');
   btn.classList.toggle('open',open);
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// TABS
-// ═══════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
+   TABS
+═══════════════════════════════════════════════════════════════ */
 function showTab(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   document.getElementById('screen-'+id).classList.add('active');
   const tabs=['projects','map','grade','export'];
-  document.querySelectorAll('.tab')[tabs.indexOf(id)].classList.add('active');
+  document.querySelectorAll('.tab')[tabs.indexOf(id)].classList.add('on');
   if(id==='map'){
-    // Init map after screen is visible so Leaflet can measure dimensions
     setTimeout(()=>{
       initMap();
-      if(leafMap) leafMap.invalidateSize();
-    },50);
+      if(lmap) lmap.invalidateSize();
+    },60);
   }
   if(id==='export'){buildExportSummary();buildFormatGrid();}
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// MAP STYLE SWITCHER (attached to pill selector in map screen)
-// ═══════════════════════════════════════════════════════════════════
-// Override pill-selector row 1 to be map style
-document.addEventListener('DOMContentLoaded',()=>{
-  // Build static elements
-  buildAPWA();
-  buildUtilGrid();
-  buildUtilStrip();
-  renderProjList();
-  updateFeatLegend();
-
-  // Set active project label
-  const p=getActive();
-  document.getElementById('active-proj-chip').textContent=p.name;
-  document.getElementById('active-proj-chip').style.display='inline-flex';
+/* ═══════════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded',()=>{
+  buildAPWA();buildUgrid();buildUtilStrip();renderProjs();updateFeatLegend();
+  document.getElementById('proj-chip').textContent=getActive().name;
+  document.getElementById('proj-chip').style.display='inline-flex';
 });
-
-window.addEventListener('resize',()=>{if(leafMap)leafMap.invalidateSize();});
+window.addEventListener('resize',()=>{if(lmap)lmap.invalidateSize();});
 </script>
 
 </body>
