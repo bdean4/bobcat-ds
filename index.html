@@ -9,565 +9,743 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-title" content="Bobcat DS"/>
 <title>Bobcat Digital Station</title>
+<link rel="preconnect" href="[https://fonts.googleapis.com"/]https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
+:root{
+  --orange:#F47920;
+  --orange-light:#FF9240;
+  --orange-glow:rgba(244,121,32,0.15);
+  --orange-border:rgba(244,121,32,0.3);
+  --bg:#F2F4F7;
+  --surface:#FFFFFF;
+  --surface2:#F8F9FB;
+  --border:#E5E7EB;
+  --border2:#EEF0F3;
+  --text:#0F172A;
+  --text2:#475569;
+  --text3:#94A3B8;
+  --green:#15803D;
+  --green-bg:#DCFCE7;
+  --red:#DC2626;
+  --red-bg:#FEE2E2;
+  --blue:#2563EB;
+  --blue-bg:#DBEAFE;
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.06),0 1px 3px rgba(0,0,0,0.04);
+  --shadow:0 2px 8px rgba(0,0,0,0.08),0 1px 3px rgba(0,0,0,0.05);
+  --shadow-lg:0 8px 24px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.06);
+  --radius:14px;
+  --radius-sm:10px;
+  --radius-xs:7px;
+  --font:'Plus Jakarta Sans',system-ui,sans-serif;
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:#F5F6F8;color:#111827;overflow-x:hidden}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#ddd;border-radius:4px}
+html,body{height:100%;width:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--text)}
+#app{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden}
 
-/* Layout */
-#app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
-#header{background:#fff;border-bottom:1px solid #E4E6EA;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 1px 0 rgba(0,0,0,0.05)}
-#tabbar{background:#fff;border-bottom:1px solid #E4E6EA;display:flex;padding:0 4px}
-.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 11px;background:none;border:none;border-bottom:3px solid transparent;color:#9CA3AF;cursor:pointer;font-size:10px;font-weight:700;letter-spacing:0.3px;font-family:inherit;transition:all 0.15s}
-.tab.active{color:#F47920;border-bottom-color:#F47920}
-.tab-icon{font-size:17px;opacity:0.5}
+/* Header */
+#header{
+background:var(–surface);
+padding:0 16px;
+height:56px;
+display:flex;align-items:center;justify-content:space-between;
+border-bottom:1px solid var(–border);
+flex-shrink:0;
+z-index:100;
+}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{
+width:38px;height:38px;background:var(–orange);border-radius:10px;
+display:flex;align-items:center;justify-content:center;
+box-shadow:0 3px 10px rgba(244,121,32,0.35);
+}
+.logo-title{font-size:17px;font-weight:900;color:var(–text);letter-spacing:-0.4px;line-height:1}
+.logo-sub{font-size:9px;font-weight:700;color:var(–orange);letter-spacing:1.5px;text-transform:uppercase}
+.gps-badge{
+display:flex;align-items:center;gap:6px;
+background:var(–green-bg);border-radius:20px;padding:5px 11px;
+}
+.gps-badge span{font-size:12px;font-weight:700;color:var(–green)}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(–green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.75)}}
+
+/* Tab bar */
+#tabbar{
+background:var(–surface);
+border-bottom:1px solid var(–border);
+display:flex;
+flex-shrink:0;
+padding:0;
+}
+.tab{
+flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
+padding:8px 0 10px;background:none;border:none;
+border-bottom:2.5px solid transparent;
+color:var(–text3);cursor:pointer;font-size:10px;font-weight:700;
+font-family:var(–font);letter-spacing:0.2px;transition:color .15s;
+}
+.tab.active{color:var(–orange);border-bottom-color:var(–orange)}
+.tab-icon{font-size:16px;opacity:.5}
 .tab.active .tab-icon{opacity:1}
-#content{flex:1;overflow-y:auto;padding:16px;padding-bottom:32px}
-.screen{display:none}
-.screen.active{display:flex;flex-direction:column;gap:14px}
+
+/* Content */
+#content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.screen{display:none;flex-direction:column;gap:12px;padding:14px}
+.screen.active{display:flex}
 
 /* Cards */
-.card{background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,0.08);padding:18px}
-.card-title{font-weight:800;font-size:16px;color:#111827;margin-bottom:14px}
+.card{background:var(–surface);border-radius:var(–radius);box-shadow:var(–shadow-sm);overflow:hidden}
+.card-pad{padding:16px}
+.card-title{font-size:15px;font-weight:800;color:var(–text);margin-bottom:12px}
 
 /* Buttons */
-.btn{border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:8px}
-.btn:active{transform:scale(0.97)}
-.btn-orange{background:#F47920;color:#fff;box-shadow:0 4px 14px rgba(244,121,32,0.3)}
-.btn-ghost{background:#F0F1F3;color:#374151;border:1.5px solid #E4E6EA}
-.btn-green{background:#16A34A;color:#fff}
-.btn-red{background:#DC2626;color:#fff}
-.btn-full{width:100%}
-.btn-sm{padding:7px 14px;font-size:12px;border-radius:8px}
+.btn{
+display:inline-flex;align-items:center;justify-content:center;gap:7px;
+border:none;border-radius:var(–radius-sm);padding:12px 18px;
+font-size:14px;font-weight:700;cursor:pointer;font-family:var(–font);
+transition:all .15s;white-space:nowrap;
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(–orange);color:#fff;box-shadow:0 3px 12px rgba(244,121,32,0.3)}
+.btn-primary:hover{background:var(–orange-light)}
+.btn-ghost{background:var(–surface2);color:var(–text2);border:1.5px solid var(–border)}
+.btn-danger{background:var(–red-bg);color:var(–red);border:none}
+.btn-success{background:var(–green-bg);color:var(–green);border:none}
+.btn-block{width:100%;display:flex}
+.btn-sm{padding:7px 13px;font-size:12px;border-radius:var(–radius-xs)}
 
 /* Inputs */
-input,textarea{border:1.5px solid #E4E6EA;border-radius:10px;padding:11px 14px;font-size:13px;color:#111827;outline:none;font-family:inherit;background:#F5F6F8;width:100%}
-input:focus,textarea:focus{border-color:#F47920}
-textarea{resize:none}
+.input{
+border:1.5px solid var(–border);border-radius:var(–radius-xs);
+padding:10px 13px;font-size:13px;color:var(–text);
+outline:none;font-family:var(–font);background:var(–surface2);width:100%;
+transition:border-color .15s;
+}
+.input:focus{border-color:var(–orange);background:var(–surface)}
+.input::placeholder{color:var(–text3)}
+textarea.input{resize:none}
+.input-label{font-size:11px;font-weight:700;color:var(–text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
 
-/* Segmented control */
-.seg{background:#fff;border-radius:16px;padding:5px;box-shadow:0 1px 3px rgba(0,0,0,0.08);display:grid;gap:4px}
-.seg-3{grid-template-columns:1fr 1fr 1fr}
-.seg-2{grid-template-columns:1fr 1fr}
-.seg-btn{padding:10px 0;background:transparent;border:none;border-radius:10px;color:#6B7280;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.15s;text-align:center}
-.seg-btn.active{background:#F47920;color:#fff}
-.seg-btn .seg-icon{font-size:18px;display:block;margin-bottom:2px}
+/* Pill selector */
+.pill-selector{display:flex;background:var(–surface2);border-radius:var(–radius-sm);padding:4px;gap:3px}
+.pill-opt{
+flex:1;padding:8px 0;background:transparent;border:none;
+border-radius:8px;font-size:12px;font-weight:700;color:var(–text3);
+cursor:pointer;font-family:var(–font);transition:all .15s;text-align:center;
+}
+.pill-opt .pico{display:block;font-size:16px;margin-bottom:1px}
+.pill-opt.active{background:var(–orange);color:#fff;box-shadow:0 2px 8px rgba(244,121,32,0.3)}
 
-/* Stat cards */
-.stats-row{display:flex;gap:10px}
-.stat-card{flex:1;background:#fff;border-radius:16px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,0.08);border:1.5px solid #ECEEF2}
-.stat-card.accent{border-color:rgba(244,121,32,0.3)}
-.stat-label{font-size:11px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;display:flex;align-items:center;gap:5px}
-.stat-value{font-size:24px;font-weight:800;color:#111827;line-height:1}
-.stat-card.accent .stat-value{color:#F47920}
-.stat-sub{font-size:12px;color:#6B7280;margin-top:4px}
+/* Stat row */
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat-card{
+background:var(–surface);border-radius:var(–radius);
+padding:14px 16px;box-shadow:var(–shadow-sm);
+border:1.5px solid var(–border2);
+}
+.stat-card.accent{border-color:var(–orange-border);background:linear-gradient(135deg,rgba(244,121,32,0.04),var(–surface))}
+.stat-label{font-size:10px;font-weight:700;color:var(–text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+.stat-value{font-size:22px;font-weight:900;color:var(–text);line-height:1}
+.stat-card.accent .stat-value{color:var(–orange)}
+.stat-sub{font-size:11px;color:var(–text3);margin-top:3px}
 
 /* Badge */
-.badge{display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700}
-.badge-green{background:#DCFCE7;color:#16A34A}
-.badge-orange{background:rgba(244,121,32,0.12);color:#F47920;border:1px solid #F47920}
-.badge-blue{background:#DBEAFE;color:#2563EB}
-.badge-red{background:#FEE2E2;color:#DC2626}
-.badge-gray{background:#F0F1F3;color:#6B7280}
+.badge{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700}
+.badge-green{background:var(–green-bg);color:var(–green)}
+.badge-orange{background:var(–orange-glow);color:var(–orange);border:1px solid var(–orange-border)}
+.badge-blue{background:var(–blue-bg);color:var(–blue)}
+.badge-red{background:var(–red-bg);color:var(–red)}
+.badge-gray{background:var(–surface2);color:var(–text3);border:1px solid var(–border)}
 
 /* Toggle */
-.toggle-wrap{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.toggle{width:48px;height:28px;border-radius:14px;background:#E4E6EA;cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0;border:none}
-.toggle.on{background:#2563EB}
-.toggle-thumb{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.2);transition:left 0.2s}
-.toggle.on .toggle-thumb{left:23px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.toggle{
+width:46px;height:26px;border-radius:13px;
+background:var(–border);cursor:pointer;position:relative;
+transition:background .2s;flex-shrink:0;border:none;appearance:none;
+}
+.toggle.on{background:var(–blue)}
+.toggle::after{
+content:’’;position:absolute;top:3px;left:3px;
+width:20px;height:20px;border-radius:50%;background:#fff;
+box-shadow:0 1px 4px rgba(0,0,0,0.2);transition:left .2s;
+}
+.toggle.on::after{left:23px}
 
-/* Map canvas */
-#map-canvas{width:100%;height:300px;border-radius:16px;display:block;cursor:crosshair;box-shadow:0 4px 16px rgba(0,0,0,0.1)}
-.map-wrap{position:relative;border-radius:16px;overflow:hidden}
-.map-overlay-tr{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
-.map-overlay-tl{position:absolute;top:12px;left:12px;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
-.map-overlay-bl{position:absolute;bottom:12px;left:12px}
-.map-overlay-br{position:absolute;bottom:12px;right:12px;display:flex;gap:8px}
-.map-pill{background:rgba(255,255,255,0.95);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;box-shadow:0 1px 4px rgba(0,0,0,0.1)}
+/* Info boxes */
+.info-box{border-radius:var(–radius-xs);padding:10px 13px;font-size:12px;line-height:1.6}
+.info-blue{background:var(–blue-bg);color:#1E40AF}
+.info-green{background:var(–green-bg);color:var(–green);display:flex;align-items:center;gap:7px}
+.info-orange{background:var(–orange-glow);color:#9A4A00;border:1px solid var(–orange-border)}
 
-/* Utility picker modal */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
-.modal-bg.open{display:flex}
-.modal{background:#fff;border-radius:24px 24px 0 0;padding:24px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto}
-.modal-handle{width:40px;height:4px;border-radius:2px;background:#E4E6EA;margin:0 auto 20px}
-.util-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.util-btn{padding:14px;border-radius:12px;border:2px solid transparent;cursor:pointer;font-family:inherit;font-weight:700;font-size:13px;display:flex;align-items:center;gap:10px;transition:all 0.15s;background:#F5F6F8}
-.util-btn:active{transform:scale(0.97)}
+/* Section header */
+.section-header{font-size:13px;font-weight:800;color:var(–text);letter-spacing:-.1px;padding:0 2px}
 
-/* Feature legend */
-.feature-group{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
-.feature-group-header{display:flex;align-items:center;gap:10px;padding:13px 16px}
-.feature-item{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-top:1px solid #E4E6EA}
-.feature-item-info{flex:1;min-width:0}
-.feature-item-label{font-size:12px;color:#6B7280;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.feature-item-note{font-size:11px;color:#9CA3AF;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.remove-btn{background:#F0F1F3;border:none;border-radius:8px;width:28px;height:28px;cursor:pointer;font-size:15px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+/* Map container */
+#map-wrap{position:relative;width:100%;height:360px;border-radius:var(–radius);overflow:hidden;box-shadow:var(–shadow)}
+#leaflet-map{width:100%;height:100%}
 
-/* APWA accordion */
-.accordion{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
-.accordion-header{display:flex;justify-content:space-between;align-items:center;padding:15px 18px;cursor:pointer;font-weight:700;font-size:14px;border:none;background:none;width:100%;font-family:inherit;text-align:left}
-.accordion-body{display:none;padding:0 18px 18px;border-top:1px solid #E4E6EA}
-.accordion-body.open{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding-top:12px}
-.apwa-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:7px}
-
-/* Grade screen */
-.step-item{display:flex;gap:12px;margin-bottom:16px}
-.step-num{width:32px;height:32px;border-radius:50%;background:#F47920;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0}
-.step-body{flex:1}
-.step-title{font-weight:700;font-size:14px;margin-bottom:3px}
-.step-desc{font-size:13px;color:#6B7280;line-height:1.6}
-.stat-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.stat-box{background:#F5F6F8;border-radius:10px;padding:12px 8px;text-align:center}
-.stat-box-val{font-size:20px;font-weight:800;color:#111827}
-.stat-box-label{font-size:11px;color:#6B7280;margin-top:2px}
-.elev-display{background:linear-gradient(135deg,rgba(244,121,32,0.1),rgba(244,121,32,0.03));border:2px solid rgba(244,121,32,0.22);border-radius:16px;padding:16px 18px;display:flex;justify-content:space-between;align-items:center}
-.elev-big{font-size:38px;font-weight:900;color:#F47920;line-height:1}
-.bench-item{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:#F5F6F8;border-radius:10px;margin-bottom:8px}
-.bench-delta{font-size:22px;font-weight:900}
-
-/* Export */
-.format-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.format-btn{background:#fff;border:2px solid #E4E6EA;border-radius:16px;padding:16px 14px;cursor:pointer;text-align:left;font-family:inherit;position:relative;transition:all 0.15s;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
-.format-btn:active{transform:scale(0.97)}
-.format-btn.done{background:rgba(244,121,32,0.08);border-color:#F47920}
-.format-icon{font-size:26px;margin-bottom:6px}
-.format-name{font-size:14px;font-weight:800;color:#111827}
-.format-btn.done .format-name{color:#F47920}
-.format-desc{font-size:11px;color:#6B7280;margin-top:2px}
-.format-badge{position:absolute;top:10px;right:10px;border-radius:20px;padding:2px 8px;font-size:9px;font-weight:700}
-.format-done{position:absolute;bottom:10px;right:12px;font-size:11px;font-weight:700;color:#16A34A}
-.save-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-.save-btn{padding:14px 8px;background:#F5F6F8;border:2px solid #E4E6EA;border-radius:10px;cursor:pointer;font-weight:700;font-size:12px;font-family:inherit;transition:all 0.15s;text-align:center}
-.save-btn.active{background:#F47920;border-color:#F47920;color:#fff}
-.save-icon{font-size:22px;display:block;margin-bottom:5px}
-
-/* Projects */
-.project-card{background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,0.08);overflow:hidden;border:2px solid #E4E6EA;margin-bottom:10px;transition:border 0.15s}
-.project-card.active-proj{border-color:#F47920}
-.project-card-body{padding:16px 18px}
-.project-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-.project-tag{display:flex;align-items:center;gap:5px;background:#F5F6F8;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600}
-.project-actions{display:flex;gap:8px}
+/* Map toolbar */
+.map-toolbar{
+position:absolute;top:12px;left:12px;right:12px;
+display:flex;justify-content:space-between;align-items:flex-start;
+pointer-events:none;z-index:500;gap:8px;
+}
+.map-toolbar-left,.map-toolbar-right{display:flex;flex-direction:column;gap:6px;pointer-events:all}
+.map-chip{
+background:rgba(255,255,255,0.96);border-radius:20px;padding:5px 12px;
+font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;
+box-shadow:var(–shadow);backdrop-filter:blur(8px);white-space:nowrap;
+}
+.map-actions{
+position:absolute;bottom:12px;right:12px;
+display:flex;gap:7px;z-index:500;
+}
+.map-hint{
+position:absolute;bottom:12px;left:12px;
+background:rgba(255,255,255,0.92);border-radius:20px;
+padding:5px 12px;font-size:10px;font-weight:600;color:var(–text2);
+box-shadow:var(–shadow);backdrop-filter:blur(8px);z-index:500;
+}
+.map-btn{
+background:rgba(255,255,255,0.96);border:none;border-radius:20px;
+padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;
+box-shadow:var(–shadow);backdrop-filter:blur(8px);font-family:var(–font);
+display:flex;align-items:center;gap:5px;
+}
+.map-btn.primary{background:var(–orange);color:#fff;box-shadow:0 3px 12px rgba(244,121,32,0.4)}
+.map-btn.success{background:#15803D;color:#fff}
+.map-btn:active{transform:scale(.97)}
 
 /* Proximity alert */
-#prox-alert{display:none;background:#DC2626;border-radius:12px;padding:12px 16px;margin-bottom:0;flex-direction:column;gap:0;animation:slideDown 0.25s ease-out;box-shadow:0 4px 20px rgba(220,38,38,0.4)}
-#prox-alert.show{display:flex}
-@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-.prox-row{display:flex;align-items:center;gap:12px}
-.prox-icon{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+#prox-alert{
+display:none;
+background:var(–red);border-radius:var(–radius);
+padding:12px 16px;box-shadow:0 4px 20px rgba(220,38,38,0.4);
+animation:slideDown .2s ease-out;
+}
+#prox-alert.show{display:block}
+@keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.prox-inner{display:flex;align-items:center;gap:12px}
+.prox-icon-wrap{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
 .prox-info{flex:1}
 .prox-title{font-weight:800;font-size:13px;color:#fff}
-.prox-sub{font-size:12px;color:rgba(255,255,255,0.85);margin-top:2px}
+.prox-sub{font-size:11px;color:rgba(255,255,255,.8);margin-top:1px}
 .prox-dist{text-align:right;flex-shrink:0}
-.prox-dist-num{font-size:24px;font-weight:900;color:#fff;line-height:1}
-.prox-dist-unit{font-size:10px;color:rgba(255,255,255,0.75);font-weight:600}
+.prox-dist-num{font-size:26px;font-weight:900;color:#fff;line-height:1}
+.prox-dist-unit{font-size:9px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.5px}
 
-/* Dot pulse animation */
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(0.8)}}
-.pulse-dot{width:8px;height:8px;border-radius:50%;background:#16A34A;animation:pulse 2s infinite;display:inline-block}
-.pulse-dot.orange{background:#F47920}
-.pulse-dot.red{background:#DC2626;animation-duration:0.8s}
+/* Feature legend */
+.feat-group{background:var(–surface);border-radius:var(–radius);overflow:hidden;box-shadow:var(–shadow-sm)}
+.feat-group-hd{display:flex;align-items:center;gap:9px;padding:12px 14px}
+.feat-row{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-top:1px solid var(–border2)}
+.feat-info{flex:1;min-width:0}
+.feat-coord{font-size:11px;color:var(–text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.feat-note{font-size:10px;color:var(–text3);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rm-btn{background:var(–surface2);border:none;border-radius:7px;width:27px;height:27px;cursor:pointer;font-size:14px;color:var(–text3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 
-/* Info box */
-.info-box{border-radius:10px;padding:11px 14px;font-size:12px;line-height:1.6}
-.info-box.blue{background:#DBEAFE;color:#1E40AF}
-.info-box.green{background:#DCFCE7;color:#15803D}
-.info-box.orange{background:rgba(244,121,32,0.08);color:#C95E00;border:1px solid rgba(244,121,32,0.2)}
+/* Accordion */
+.accord{background:var(–surface);border-radius:var(–radius);box-shadow:var(–shadow-sm);overflow:hidden}
+.accord-hd{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;cursor:pointer;font-weight:700;font-size:14px;border:none;background:none;width:100%;font-family:var(–font);text-align:left;color:var(–text)}
+.accord-hd .chevron{font-size:14px;color:var(–text3);transition:transform .2s}
+.accord-hd.open .chevron{transform:rotate(180deg)}
+.accord-body{display:none;padding:4px 16px 16px;border-top:1px solid var(–border2)}
+.accord-body.open{display:block}
+.apwa-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding-top:10px}
+.apwa-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(–radius-xs)}
 
-/* Volume zones */
-.zone-card{background:#F5F6F8;border-radius:10px;padding:14px;margin-bottom:10px}
-.zone-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-.zone-type-row{display:flex;gap:8px}
-.zone-type-btn{flex:1;padding:9px 0;border:1.5px solid #E4E6EA;border-radius:8px;background:#fff;cursor:pointer;font-weight:700;font-size:12px;font-family:inherit}
-.zone-type-btn.cut{background:#FEE2E2;border-color:#DC2626;color:#DC2626}
-.zone-type-btn.fill{background:#DCFCE7;border-color:#16A34A;color:#16A34A}
-.total-vol{background:linear-gradient(135deg,rgba(244,121,32,0.1),rgba(244,121,32,0.03));border:2px solid rgba(244,121,32,0.22);border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+/* Grade screen */
+.step-row{display:flex;gap:12px;margin-bottom:16px}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(–orange);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0}
+.step-body .step-title{font-weight:700;font-size:13px;margin-bottom:3px}
+.step-body .step-desc{font-size:12px;color:var(–text2);line-height:1.6}
+.rtk-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.rtk-stat{background:var(–surface2);border-radius:var(–radius-xs);padding:11px 8px;text-align:center}
+.rtk-stat-val{font-size:19px;font-weight:800;color:var(–text)}
+.rtk-stat-lbl{font-size:10px;color:var(–text3);margin-top:2px}
+.elev-card{background:linear-gradient(135deg,rgba(244,121,32,.08),rgba(244,121,32,.02));border:1.5px solid var(–orange-border);border-radius:var(–radius);padding:16px}
+.elev-num{font-size:36px;font-weight:900;color:var(–orange);line-height:1}
+.bench-item{display:flex;justify-content:space-between;align-items:center;padding:13px 14px;background:var(–surface2);border-radius:var(–radius-xs);margin-bottom:7px;border:1.5px solid var(–border2)}
+.bench-delta{font-size:21px;font-weight:900;line-height:1}
 
-/* Drone teaser */
-.drone-card{background:linear-gradient(135deg,#EFF6FF,#F0F9FF);border:2px dashed #93C5FD;border-radius:16px;padding:20px}
-.drone-title{font-weight:800;font-size:15px;color:#2563EB}
-.drone-badge{font-size:9px;font-weight:700;color:#93C5FD;text-transform:uppercase;letter-spacing:0.5px}
-.drone-desc{font-size:13px;color:#1E40AF;line-height:1.7;margin-top:8px}
+/* Export */
+.format-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.format-card{
+background:var(–surface);border:1.5px solid var(–border);border-radius:var(–radius);
+padding:14px;cursor:pointer;font-family:var(–font);text-align:left;
+box-shadow:var(–shadow-sm);position:relative;transition:all .15s;
+}
+.format-card:active{transform:scale(.97)}
+.format-card.done{background:var(–orange-glow);border-color:var(–orange)}
+.f-icon{font-size:24px;margin-bottom:5px}
+.f-name{font-size:13px;font-weight:800;color:var(–text)}
+.format-card.done .f-name{color:var(–orange)}
+.f-desc{font-size:10px;color:var(–text3);margin-top:2px}
+.f-badge{position:absolute;top:9px;right:9px;border-radius:20px;padding:2px 7px;font-size:9px;font-weight:700}
+.f-done{position:absolute;bottom:9px;right:11px;font-size:10px;font-weight:700;color:var(–green)}
+.save-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.save-opt{
+padding:12px 6px;background:var(–surface2);border:1.5px solid var(–border);
+border-radius:var(–radius-xs);cursor:pointer;font-weight:700;font-size:11px;
+font-family:var(–font);text-align:center;transition:all .15s;
+}
+.save-opt .sico{font-size:20px;display:block;margin-bottom:4px}
+.save-opt.active{background:var(–orange);border-color:var(–orange);color:#fff}
 
-/* NMEA display */
-.nmea-raw{background:#1E1E1E;border-radius:8px;padding:10px 12px;font-size:10px;color:#86efac;font-family:‘Courier New’,monospace;word-break:break-all;line-height:1.7;margin-top:6px}
+/* Projects */
+.proj-card{
+background:var(–surface);border-radius:var(–radius);
+box-shadow:var(–shadow-sm);border:1.5px solid var(–border);
+overflow:hidden;transition:border-color .15s;margin-bottom:10px;
+}
+.proj-card.active-p{border-color:var(–orange)}
+.proj-body{padding:15px 16px}
+.proj-tags{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 13px}
+.proj-tag{display:flex;align-items:center;gap:4px;background:var(–surface2);border-radius:20px;padding:4px 9px;font-size:10px;font-weight:600;color:var(–text3)}
+.proj-actions{display:flex;gap:7px}
+
+/* Volume modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:999;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
+.modal-bg.open{display:flex}
+.modal-sheet{background:var(–surface);border-radius:20px 20px 0 0;padding:22px 18px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;box-shadow:var(–shadow-lg)}
+.modal-handle{width:36px;height:4px;background:var(–border);border-radius:2px;margin:0 auto 18px}
+
+/* Zone cards */
+.zone-card{background:var(–surface2);border-radius:var(–radius-xs);padding:13px;margin-bottom:9px;border:1.5px solid var(–border2)}
+.zone-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
+.zone-type-pair{display:flex;gap:6px}
+.ztype-btn{flex:1;padding:8px 0;border:1.5px solid var(–border);border-radius:var(–radius-xs);background:var(–surface);cursor:pointer;font-weight:700;font-size:12px;font-family:var(–font)}
+.ztype-btn.cut{background:var(–red-bg);border-color:var(–red);color:var(–red)}
+.ztype-btn.fill{background:var(–green-bg);border-color:var(–green);color:var(–green)}
+.vol-total{background:var(–orange-glow);border:1.5px solid var(–orange-border);border-radius:var(–radius-xs);padding:13px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}
+
+/* Util picker modal */
+.util-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.util-opt{
+padding:13px;border-radius:var(–radius-xs);border:1.5px solid transparent;
+cursor:pointer;font-family:var(–font);font-weight:700;font-size:13px;
+display:flex;align-items:center;gap:10px;transition:all .15s;background:var(–surface2);
+}
+.util-opt:active{transform:scale(.97)}
+
+/* NMEA */
+.nmea-box{background:#0F172A;border-radius:var(–radius-xs);padding:10px 12px;font-size:10px;color:#86efac;font-family:‘Courier New’,monospace;word-break:break-all;line-height:1.8;margin-top:7px}
+
+/* Drone card */
+.drone-card{background:linear-gradient(135deg,#EFF6FF,#F0F9FF);border:1.5px dashed #93C5FD;border-radius:var(–radius);padding:18px}
+
+/* Empty state */
+.empty-state{background:var(–surface);border-radius:var(–radius);padding:32px 24px;text-align:center;box-shadow:var(–shadow-sm)}
+.empty-icon{font-size:36px;margin-bottom:10px}
+.empty-title{font-size:14px;font-weight:800;color:var(–text);margin-bottom:5px}
+.empty-sub{font-size:12px;color:var(–text3);line-height:1.6}
+
+/* Leaflet overrides */
+.leaflet-control-zoom{border:none!important;box-shadow:var(–shadow)!important}
+.leaflet-control-zoom a{background:rgba(255,255,255,.96)!important;color:var(–text)!important;font-weight:700!important;backdrop-filter:blur(8px)}
+.leaflet-control-attribution{font-size:9px!important}
+
+/* Util line strip */
+.util-strip{display:flex;gap:7px;overflow-x:auto;padding-bottom:3px}
+.util-strip::-webkit-scrollbar{display:none}
+.util-chip{
+flex-shrink:0;display:flex;align-items:center;gap:5px;
+padding:6px 13px;border-radius:20px;border:1.5px solid var(–border);
+background:var(–surface);font-size:11px;font-weight:700;color:var(–text3);
+cursor:pointer;font-family:var(–font);white-space:nowrap;transition:all .15s;
+}
+.util-chip.active{border-color:var(–dot-color,#3B82F6);background:var(–bg-color,#DBEAFE);color:var(–col-color,#1D4ED8)}
+
+/* Scrollbar for content */
+#content::-webkit-scrollbar{width:3px}
+#content::-webkit-scrollbar-thumb{background:var(–border);border-radius:3px}
+
+/* Summary widget */
+.summary-wrap{display:flex;gap:9px;flex-wrap:wrap}
+.summary-item{background:var(–surface2);border-radius:var(–radius-xs);padding:11px 13px;flex:1;min-width:78px}
+.summary-icon{font-size:17px;margin-bottom:3px}
+.summary-val{font-size:17px;font-weight:900;color:var(–orange)}
+.summary-lbl{font-size:10px;color:var(–text3);margin-top:2px}
 </style>
 
 </head>
 <body>
 <div id="app">
 
-  <!-- HEADER -->
+<!-- HEADER -->
 
-  <div id="header">
-    <div style="display:flex;align-items:center;gap:12px">
-      <div style="width:42px;height:42px;background:#F47920;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(244,121,32,0.35)">
-        <svg viewBox="0 0 32 32" width="24" height="24" fill="white"><path d="M5 26 L13 8 L16 14 L19 8 L27 26 Z" opacity="0.95"/><rect x="10" y="22" width="12" height="4" rx="2"/></svg>
-      </div>
-      <div>
-        <div style="font-size:18px;font-weight:900;letter-spacing:-0.5px;line-height:1">Bobcat</div>
-        <div style="font-size:10px;font-weight:700;color:#F47920;letter-spacing:1.2px;text-transform:uppercase">Digital Station</div>
-      </div>
+<div id="header">
+  <div class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 32 32" width="22" height="22" fill="white">
+        <path d="M5 26L13 8l3 6 3-6 8 18z" opacity=".95"/>
+        <rect x="10" y="22" width="12" height="4" rx="2"/>
+      </svg>
     </div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <span id="active-project-label" style="font-size:12px;font-weight:700;color:#F47920;background:rgba(244,121,32,0.12);border-radius:20px;padding:4px 12px;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:none"></span>
-      <div class="badge badge-green"><span class="pulse-dot"></span>GPS Fix</div>
+    <div>
+      <div class="logo-title">Bobcat</div>
+      <div class="logo-sub">Digital Station</div>
     </div>
   </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span id="active-proj-chip" class="badge badge-orange" style="display:none;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+    <div class="gps-badge"><span class="pulse"></span><span>GPS Fix</span></div>
+  </div>
+</div>
 
-  <!-- TAB BAR -->
+<!-- TABS -->
 
-  <div id="tabbar">
-    <button class="tab active" onclick="showTab('projects')"><span class="tab-icon">📁</span>Projects</button>
-    <button class="tab" onclick="showTab('map')"><span class="tab-icon">🗺️</span>Site Map</button>
-    <button class="tab" onclick="showTab('grade')"><span class="tab-icon">📡</span>Grade</button>
-    <button class="tab" onclick="showTab('export')"><span class="tab-icon">📤</span>Export</button>
+<div id="tabbar">
+  <button class="tab active" onclick="showTab('projects')"><span class="tab-icon">📁</span>Projects</button>
+  <button class="tab" onclick="showTab('map')"><span class="tab-icon">🗺️</span>Site Map</button>
+  <button class="tab" onclick="showTab('grade')"><span class="tab-icon">📡</span>Grade</button>
+  <button class="tab" onclick="showTab('export')"><span class="tab-icon">📤</span>Export</button>
+</div>
+
+<!-- CONTENT -->
+
+<div id="content">
+
+  <!-- ══ PROJECTS ══ -->
+
+  <div id="screen-projects" class="screen active">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="font-size:18px;font-weight:900">Job Site Projects</div>
+      <button class="btn btn-primary btn-sm" onclick="toggleNewProj()">＋ New Site</button>
+    </div>
+    <div id="new-proj-form" style="display:none">
+      <div class="card card-pad">
+        <div class="card-title" style="margin-bottom:10px">New Job Site</div>
+        <div style="display:flex;gap:8px">
+          <input class="input" id="new-proj-name" placeholder="e.g. Main St Utility Run" onkeydown="if(event.key==='Enter')createProject()"/>
+          <button class="btn btn-primary" style="padding:0 18px" onclick="createProject()">Create</button>
+        </div>
+      </div>
+    </div>
+    <div id="proj-list"></div>
   </div>
 
-  <!-- CONTENT -->
+  <!-- ══ MAP ══ -->
 
-  <div id="content">
+  <div id="screen-map" class="screen">
 
 ```
-<!-- ═══ PROJECTS ═══ -->
-<div id="screen-projects" class="screen active">
-  <div style="display:flex;justify-content:space-between;align-items:center">
-    <div style="font-weight:800;font-size:18px">Job Site Projects</div>
-    <button class="btn btn-orange btn-sm" onclick="toggleNewProject()">+ New Site</button>
-  </div>
-  <div id="new-project-form" style="display:none">
-    <div class="card" style="padding:16px">
-      <div style="font-weight:700;font-size:14px;margin-bottom:10px">New Job Site</div>
-      <div style="display:flex;gap:8px">
-        <input id="new-proj-name" placeholder="e.g. Main St Utility Run" onkeydown="if(event.key==='Enter')createProject()"/>
-        <button class="btn btn-orange" style="padding:0 18px;white-space:nowrap" onclick="createProject()">Create</button>
-      </div>
+<!-- Proximity alert -->
+<div id="prox-alert">
+  <div class="prox-inner">
+    <div class="prox-icon-wrap" id="prox-icon">⚡</div>
+    <div class="prox-info">
+      <div class="prox-title" id="prox-title">Gas Line Nearby</div>
+      <div class="prox-sub">Proceed with extreme caution</div>
+    </div>
+    <div class="prox-dist">
+      <div class="prox-dist-num" id="prox-dist-num">2.1</div>
+      <div class="prox-dist-unit">METRES</div>
     </div>
   </div>
-  <div id="projects-list"></div>
 </div>
 
-<!-- ═══ MAP ═══ -->
-<div id="screen-map" class="screen">
+<!-- Mode selector -->
+<div class="pill-selector">
+  <button class="pill-opt active" id="mode-perim" onclick="setMode('perimeter',this)"><span class="pico">📏</span>Perimeter</button>
+  <button class="pill-opt" id="mode-line" onclick="setMode('line',this)"><span class="pico">〰️</span>Run Line</button>
+  <button class="pill-opt" id="mode-view" onclick="setMode('view',this)"><span class="pico">🔍</span>View All</button>
+</div>
 
-  <!-- Proximity alert -->
-  <div id="prox-alert">
-    <div class="prox-row">
-      <div class="prox-icon" id="prox-icon">⚡</div>
-      <div class="prox-info">
-        <div class="prox-title" id="prox-title">Gas Line Nearby</div>
-        <div class="prox-sub">Proceed with extreme caution</div>
-      </div>
-      <div class="prox-dist">
-        <div class="prox-dist-num" id="prox-dist">2.1</div>
-        <div class="prox-dist-unit">METRES</div>
-      </div>
-    </div>
-  </div>
+<!-- Line utility strip -->
+<div id="line-strip" style="display:none">
+  <div class="input-label" style="margin-bottom:7px">Select Utility Type</div>
+  <div class="util-strip" id="util-strip-wrap"></div>
+</div>
 
-  <!-- Map style -->
-  <div class="seg seg-3">
-    <button class="seg-btn active" onclick="setMapStyle('default',this)"><span class="seg-icon">🗺️</span>Default</button>
-    <button class="seg-btn" onclick="setMapStyle('satellite',this)"><span class="seg-icon">🛰️</span>Satellite</button>
-    <button class="seg-btn" onclick="setMapStyle('topo',this)"><span class="seg-icon">🏔️</span>Topo</button>
-  </div>
-
-  <!-- Draw mode -->
-  <div class="seg seg-3">
-    <button class="seg-btn active" id="mode-btn-perimeter" onclick="setMode('perimeter',this)"><span class="seg-icon">📏</span>Perimeter</button>
-    <button class="seg-btn" id="mode-btn-line" onclick="setMode('line',this)"><span class="seg-icon">〰️</span>Run Line</button>
-    <button class="seg-btn" id="mode-btn-features" onclick="setMode('features',this)"><span class="seg-icon">🔍</span>View All</button>
-  </div>
-
-  <!-- Utility type strip (line mode) -->
-  <div id="line-util-strip" style="display:none">
-    <div style="font-size:12px;font-weight:700;color:#6B7280;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Select Utility Type</div>
-    <div style="display:flex;gap:7px;overflow-x:auto;padding-bottom:4px" id="util-strip"></div>
-  </div>
-
-  <!-- Canvas -->
-  <div class="map-wrap">
-    <canvas id="map-canvas"></canvas>
-    <div class="map-overlay-tl">
-      <div id="machine-pill" style="display:none" class="map-pill">
-        <span>🚜</span><span id="machine-pill-text">Locating…</span><span class="pulse-dot orange"></span>
+<!-- Map -->
+<div id="map-wrap">
+  <div id="leaflet-map"></div>
+  <div class="map-toolbar">
+    <div class="map-toolbar-left">
+      <div id="machine-map-chip" class="map-chip" style="display:none;background:rgba(37,99,235,.92);color:#fff">
+        🚜 <span id="machine-chip-txt">Machine</span>
+        <span style="width:6px;height:6px;border-radius:50%;background:#fff;animation:pulse 1.5s infinite"></span>
       </div>
     </div>
-    <div class="map-overlay-tr">
-      <div class="map-pill"><span class="pulse-dot"></span><span style="color:#16A34A;font-weight:600">GPS Active</span></div>
-    </div>
-    <div class="map-overlay-bl">
-      <div class="map-pill" style="font-size:10px;color:#6B7280">Hold = Utility &nbsp;·&nbsp; Tap = Draw</div>
-    </div>
-    <div class="map-overlay-br" id="map-actions"></div>
-  </div>
-
-  <!-- Measurements -->
-  <div id="measurements" style="display:none">
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-label">📏 Perimeter</div>
-        <div class="stat-value" id="stat-perim">—</div>
-        <div class="stat-sub" id="stat-perim-sub"></div>
-      </div>
-      <div class="stat-card accent">
-        <div class="stat-label">📐 Area</div>
-        <div class="stat-value" id="stat-area">—</div>
-        <div class="stat-sub" id="stat-area-sub">Close shape first</div>
-      </div>
+    <div class="map-toolbar-right">
+      <div class="map-chip"><span class="pulse" style="background:var(--green)"></span><span style="color:var(--green);font-weight:600">GPS Active</span></div>
     </div>
   </div>
+  <div class="map-actions" id="map-actions"></div>
+  <div class="map-hint">Hold = Utility &nbsp;·&nbsp; Tap = Draw &nbsp;·&nbsp; Tap pin = Edit</div>
+</div>
 
-  <!-- Volume btn -->
-  <div id="volume-btn-wrap" style="display:none">
-    <button class="card" style="width:100%;text-align:left;border:2px solid #E4E6EA;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:14px 18px" onclick="openVolumeModal()">
+<!-- Measurements -->
+<div id="measurements" style="display:none">
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">📏 Perimeter</div>
+      <div class="stat-value" id="stat-perim">—</div>
+      <div class="stat-sub" id="stat-perim-sub"></div>
+    </div>
+    <div class="stat-card accent">
+      <div class="stat-label">📐 Area</div>
+      <div class="stat-value" id="stat-area">—</div>
+      <div class="stat-sub" id="stat-area-sub">Close shape first</div>
+    </div>
+  </div>
+</div>
+
+<!-- Volume -->
+<div id="vol-btn-wrap" style="display:none">
+  <button class="card card-pad btn-block" style="text-align:left;cursor:pointer;border:1.5px solid var(--border)" onclick="openVolModal()">
+    <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
       <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:22px">📐</span>
+        <span style="font-size:20px">📐</span>
         <div>
-          <div style="font-weight:700;font-size:14px">Volume Calculator</div>
-          <div style="font-size:12px;color:#6B7280;margin-top:1px" id="volume-btn-sub">Tap to add cut/fill depth zones</div>
+          <div style="font-size:14px;font-weight:700">Volume Calculator</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:1px" id="vol-btn-sub">Tap to add cut/fill depth zones</div>
         </div>
       </div>
-      <span style="font-size:18px;color:#F47920">›</span>
-    </button>
-  </div>
-
-  <!-- Machine tracking -->
-  <div class="card" style="padding:0;overflow:hidden">
-    <div style="padding:13px 16px;display:flex;align-items:center;gap:12px">
-      <div style="width:40px;height:40px;border-radius:11px;background:#DBEAFE;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🚜</div>
-      <div style="flex:1">
-        <div style="font-weight:700;font-size:14px">Machine Tracking</div>
-        <div style="font-size:11px;color:#6B7280;margin-top:1px" id="machine-status-text">Off · 3 m proximity alerts when on</div>
-      </div>
-      <button class="toggle" id="machine-toggle" onclick="toggleMachine()"><div class="toggle-thumb"></div></button>
+      <span style="font-size:18px;color:var(--orange)">›</span>
     </div>
-  </div>
-
-  <!-- Feature summary -->
-  <div id="feature-summary" style="display:none" class="card" style="padding:14px 18px">
-    <div style="display:flex;align-items:center;gap:12px;padding:0">
-      <div style="width:44px;height:44px;border-radius:12px;background:rgba(244,121,32,0.1);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📍</div>
-      <div style="flex:1">
-        <div style="font-weight:800;font-size:15px" id="feature-count-text">0 Site Features</div>
-        <div style="font-size:12px;color:#6B7280;margin-top:2px">Weather-proof · Exportable · Crew-shareable</div>
-      </div>
-      <span class="pulse-dot"></span>
-    </div>
-  </div>
-
-  <div style="font-weight:800;font-size:16px">Site Features Layer</div>
-  <div id="feature-legend"></div>
-
-  <!-- APWA -->
-  <div class="accordion">
-    <button class="accordion-header" onclick="toggleAccordion(this)">
-      APWA Color Reference <span style="font-size:16px;color:#9CA3AF;transition:transform 0.2s" id="apwa-arrow">▾</span>
-    </button>
-    <div class="accordion-body" id="apwa-body"></div>
-  </div>
-
-  <button class="btn btn-ghost btn-full" onclick="clearSite()" id="clear-btn" style="display:none">🗑️ Clear Site & Start Over</button>
+  </button>
 </div>
 
-<!-- ═══ GRADE ═══ -->
-<div id="screen-grade" class="screen">
-  <div id="grade-idle">
-    <div class="card">
-      <div class="card-title">Connect Emlid RS3</div>
-      <div style="font-size:13px;color:#6B7280;margin-bottom:20px">Follow these steps before tapping Connect</div>
-      <div class="step-item"><div class="step-num">1</div><div class="step-body"><div class="step-title">Power on your Emlid RS3</div><div class="step-desc">Hold the power button until the LED flashes. The unit will broadcast a WiFi hotspot.</div></div></div>
-      <div class="step-item"><div class="step-num">2</div><div class="step-body"><div class="step-title">Join the RS3 hotspot</div><div class="step-desc">Open your device WiFi settings and connect to the network named reach:xx:xx. Password: emlidreach</div></div></div>
-      <div class="step-item" style="margin-bottom:16px"><div class="step-num">3</div><div class="step-body"><div class="step-title">Return here and connect</div><div class="step-desc">The app opens a direct TCP socket to the unit at 192.168.42.1:9001 and reads the live NMEA stream.</div></div></div>
-      <div class="info-box blue" style="margin-bottom:16px">💡 <strong>Tip:</strong> Configure NTRIP corrections after connecting for sub-centimeter RTK Fix accuracy.</div>
-      <button class="btn btn-orange btn-full" onclick="gradeConnect()">I'm connected to the RS3 hotspot — Connect</button>
+<!-- Machine tracking -->
+<div class="card" style="overflow:hidden">
+  <div class="card-pad" style="padding-bottom:12px">
+    <div class="toggle-row">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:38px;height:38px;border-radius:10px;background:var(--blue-bg);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0">🚜</div>
+        <div>
+          <div style="font-weight:700;font-size:14px">Machine Tracking</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:1px" id="machine-status-txt">Off · 3 m proximity alerts when on</div>
+        </div>
+      </div>
+      <button class="toggle" id="machine-toggle" onclick="toggleMachine()"></button>
     </div>
   </div>
-  <div id="grade-connected" style="display:none;flex-direction:column;gap:14px">
-    <!-- Status -->
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <div>
-          <div style="font-weight:800;font-size:16px">Emlid RS3</div>
-          <div style="font-size:12px;color:#6B7280;margin-top:1px">192.168.42.1 : 9001 · NMEA stream</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <div class="badge" id="fix-badge"><span class="pulse-dot" id="fix-dot"></span><span id="fix-text">RTK Fix</span></div>
-          <button class="btn btn-sm" style="background:#FEE2E2;color:#DC2626;border:none" onclick="gradeDisconnect()">Disconnect</button>
-        </div>
+</div>
+
+<!-- Feature count -->
+<div id="feat-summary" style="display:none" class="card card-pad">
+  <div style="display:flex;align-items:center;gap:11px">
+    <div style="width:42px;height:42px;border-radius:11px;background:var(--orange-glow);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📍</div>
+    <div style="flex:1">
+      <div style="font-weight:800;font-size:14px" id="feat-count-txt">0 Site Features</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:2px">Weather-proof · Exportable · Crew-shareable</div>
+    </div>
+    <span class="pulse"></span>
+  </div>
+</div>
+
+<div class="section-header">Site Features Layer</div>
+<div id="feat-legend"></div>
+
+<div class="accord">
+  <button class="accord-hd" onclick="toggleAccord(this)">
+    APWA Color Reference <span class="chevron">▾</span>
+  </button>
+  <div class="accord-body"><div class="apwa-grid" id="apwa-grid"></div></div>
+</div>
+
+<button class="btn btn-ghost btn-block" onclick="clearSite()" id="clear-btn" style="display:none">🗑️ &nbsp;Clear Site & Start Over</button>
+```
+
+  </div>
+
+  <!-- ══ GRADE ══ -->
+
+  <div id="screen-grade" class="screen">
+    <div id="grade-idle-view">
+      <div class="card card-pad">
+        <div class="card-title">Connect Emlid RS3</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:18px">Follow these steps before connecting</div>
+        <div class="step-row"><div class="step-num">1</div><div class="step-body"><div class="step-title">Power on your Emlid RS3</div><div class="step-desc">Hold the power button until the LED flashes. The RS3 will broadcast its WiFi hotspot.</div></div></div>
+        <div class="step-row"><div class="step-num">2</div><div class="step-body"><div class="step-title">Join the RS3 hotspot</div><div class="step-desc">Open your device WiFi settings. Connect to <strong>reach:xx:xx</strong>. Password: <strong>emlidreach</strong></div></div></div>
+        <div class="step-row" style="margin-bottom:16px"><div class="step-num">3</div><div class="step-body"><div class="step-title">Return here and connect</div><div class="step-desc">The app opens a direct NMEA TCP stream to the unit at 192.168.42.1:9001.</div></div></div>
+        <div class="info-box info-blue" style="margin-bottom:14px">💡 <strong>Tip:</strong> Configure your NTRIP caster after connecting for sub-cm RTK Fix accuracy.</div>
+        <button class="btn btn-primary btn-block" onclick="gradeConnect()">I'm connected to the RS3 hotspot — Connect</button>
       </div>
-      <div class="stat-grid-3" style="margin-bottom:14px">
-        <div class="stat-box"><div style="font-size:20px;margin-bottom:4px">🛰️</div><div class="stat-box-val" id="g-sats">—</div><div class="stat-box-label">Satellites</div></div>
-        <div class="stat-box"><div style="font-size:20px;margin-bottom:4px">📐</div><div class="stat-box-val" id="g-hdop">—</div><div class="stat-box-label">HDOP</div></div>
-        <div class="stat-box"><div style="font-size:20px;margin-bottom:4px">📶</div><div class="stat-box-val" id="g-fixq">—</div><div class="stat-box-label">Fix Quality</div></div>
+    </div>
+
+```
+<div id="grade-live-view" style="display:none">
+  <!-- Status card -->
+  <div class="card card-pad">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div>
+        <div style="font-weight:800;font-size:15px">Emlid RS3</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:1px">192.168.42.1 : 9001 · NMEA stream</div>
       </div>
-      <div class="elev-display">
+      <div style="display:flex;gap:7px;align-items:center">
+        <div class="badge" id="fix-badge"><span class="pulse" id="fix-dot"></span><span id="fix-txt">RTK Fix</span></div>
+        <button class="btn btn-danger btn-sm" onclick="gradeDisconnect()">Disconnect</button>
+      </div>
+    </div>
+    <div class="rtk-stats">
+      <div class="rtk-stat"><div style="font-size:17px;margin-bottom:3px">🛰️</div><div class="rtk-stat-val" id="g-sats">—</div><div class="rtk-stat-lbl">Satellites</div></div>
+      <div class="rtk-stat"><div style="font-size:17px;margin-bottom:3px">📐</div><div class="rtk-stat-val" id="g-hdop">—</div><div class="rtk-stat-lbl">HDOP</div></div>
+      <div class="rtk-stat"><div style="font-size:17px;margin-bottom:3px">📶</div><div class="rtk-stat-val" id="g-fixq">—</div><div class="rtk-stat-lbl">Fix Quality</div></div>
+    </div>
+    <div class="elev-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
         <div>
-          <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Live Elevation (HAE)</div>
-          <div class="elev-big" id="g-elev">—</div>
-          <div style="font-size:13px;color:#6B7280;margin-top:6px" id="g-elev-ft"></div>
+          <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Live Elevation (HAE)</div>
+          <div class="elev-num" id="g-elev">—</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:5px" id="g-elev-ft"></div>
         </div>
-        <div style="text-align:right;font-size:12px;color:#6B7280;line-height:2">
+        <div style="text-align:right;font-size:11px;color:var(--text3);line-height:2">
           <div id="g-lat">—</div><div id="g-lng">—</div>
         </div>
       </div>
-      <button style="margin-top:12px;background:none;border:none;color:#9CA3AF;font-size:11px;cursor:pointer;font-family:inherit;padding:0" onclick="toggleNMEA()">▸ Show raw NMEA</button>
-      <div class="nmea-raw" id="nmea-raw" style="display:none"></div>
     </div>
-    <!-- NTRIP -->
-    <div class="accordion">
-      <button class="accordion-header" onclick="toggleAccordion(this)">
-        🛰️ NTRIP Corrections <span style="font-size:16px;color:#9CA3AF">▾</span>
-      </button>
-      <div class="accordion-body" id="ntrip-body">
-        <div style="padding-top:12px;display:flex;flex-direction:column;gap:10px">
-          <div><div style="font-size:11px;font-weight:700;color:#6B7280;margin-bottom:4px;text-transform:uppercase">Caster Host</div><input id="ntrip-host" placeholder="e.g. ntrip.state.mn.us"/></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-            <div><div style="font-size:11px;font-weight:700;color:#6B7280;margin-bottom:4px;text-transform:uppercase">Port</div><input id="ntrip-port" value="2101"/></div>
-            <div><div style="font-size:11px;font-weight:700;color:#6B7280;margin-bottom:4px;text-transform:uppercase">Mountpoint</div><input id="ntrip-mount" placeholder="e.g. MINN_RTCM3"/></div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-            <div><div style="font-size:11px;font-weight:700;color:#6B7280;margin-bottom:4px;text-transform:uppercase">Username</div><input id="ntrip-user"/></div>
-            <div><div style="font-size:11px;font-weight:700;color:#6B7280;margin-bottom:4px;text-transform:uppercase">Password</div><input type="password" id="ntrip-pass"/></div>
-          </div>
-          <button class="btn btn-orange btn-full" onclick="saveNtrip()">Save & Apply NTRIP Config</button>
+    <button style="margin-top:10px;background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer;font-family:var(--font)" onclick="toggleNMEA()">▸ Show raw NMEA</button>
+    <div class="nmea-box" id="nmea-box" style="display:none"></div>
+  </div>
+  <!-- NTRIP -->
+  <div class="accord">
+    <button class="accord-hd" onclick="toggleAccord(this)">🛰️ &nbsp;NTRIP Corrections <span class="chevron">▾</span></button>
+    <div class="accord-body">
+      <div style="display:flex;flex-direction:column;gap:9px;padding-top:10px">
+        <div><div class="input-label">Caster Host</div><input class="input" id="ntrip-host" placeholder="e.g. ntrip.state.mn.us"/></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div><div class="input-label">Port</div><input class="input" id="ntrip-port" value="2101"/></div>
+          <div><div class="input-label">Mountpoint</div><input class="input" id="ntrip-mount" placeholder="e.g. MINN_RTCM3"/></div>
         </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div><div class="input-label">Username</div><input class="input" id="ntrip-user"/></div>
+          <div><div class="input-label">Password</div><input class="input" type="password" id="ntrip-pass"/></div>
+        </div>
+        <button class="btn btn-primary btn-block" onclick="saveNtrip()">Save & Apply NTRIP Config</button>
       </div>
     </div>
-    <!-- Benchmarks -->
-    <div class="card">
-      <div class="card-title">Benchmarks & Grade Points</div>
-      <div style="display:flex;gap:8px;margin-bottom:10px">
-        <input id="bm-name" placeholder="Label (e.g. BM-1)" style="flex:1"/>
-        <input id="bm-elev" type="number" placeholder="Elev (m)" style="width:100px"/>
-        <button class="btn btn-orange" style="padding:0 16px" onclick="addBench()">Set</button>
-      </div>
-      <button class="btn btn-ghost btn-full" style="margin-bottom:12px" onclick="snapBench()">📍 Snap Benchmark from Live Position</button>
-      <div id="bench-list"></div>
-    </div>
   </div>
-</div>
-
-<!-- ═══ EXPORT ═══ -->
-<div id="screen-export" class="screen">
-  <div class="card">
-    <div class="card-title">Save Mode</div>
-    <div class="save-grid">
-      <button class="save-btn" onclick="setSaveMode('device',this)"><span class="save-icon">💾</span>On-Device</button>
-      <button class="save-btn" onclick="setSaveMode('cloud',this)"><span class="save-icon">☁️</span>Cloud</button>
-      <button class="save-btn active" onclick="setSaveMode('both',this)"><span class="save-icon">🔄</span>Both</button>
+  <!-- Benchmarks -->
+  <div class="card card-pad">
+    <div class="card-title">Benchmarks & Grade Points</div>
+    <div style="display:flex;gap:7px;margin-bottom:9px">
+      <input class="input" id="bm-name" placeholder="Label (e.g. BM-1)" style="flex:1"/>
+      <input class="input" id="bm-elev" type="number" placeholder="Elev (m)" style="width:96px"/>
+      <button class="btn btn-primary" style="padding:0 15px" onclick="addBench()">Set</button>
     </div>
-    <div class="info-box green" style="margin-top:12px;display:flex;align-items:center;gap:8px" id="save-mode-info">
-      <span class="pulse-dot"></span> Auto-save on — your map is weather-proof
-    </div>
-  </div>
-  <div class="card">
-    <div class="card-title">Dataset Summary</div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap" id="export-summary"></div>
-  </div>
-  <div style="font-weight:800;font-size:16px">Export Format</div>
-  <div class="format-grid" id="format-grid"></div>
-  <div class="drone-card">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-      <span style="font-size:26px">🚁</span>
-      <div>
-        <div class="drone-title">Drone Site Vision</div>
-        <div class="drone-badge">Coming Soon</div>
-      </div>
-    </div>
-    <div class="drone-desc">Pair with DJI Enterprise or Skydio to overlay utility maps in real time — no-dig zones, buried lines, and benchmarks visible from the air.</div>
+    <button class="btn btn-ghost btn-block" style="margin-bottom:11px" onclick="snapBench()">📍 &nbsp;Snap from Live Position</button>
+    <div id="bench-list"></div>
   </div>
 </div>
 ```
 
-  </div><!-- end content -->
+  </div>
+
+  <!-- ══ EXPORT ══ -->
+
+  <div id="screen-export" class="screen">
+    <div class="card card-pad">
+      <div class="card-title">Save Mode</div>
+      <div class="save-row">
+        <button class="save-opt" onclick="setSaveMode('device',this)"><span class="sico">💾</span>On-Device</button>
+        <button class="save-opt" onclick="setSaveMode('cloud',this)"><span class="sico">☁️</span>Cloud</button>
+        <button class="save-opt active" onclick="setSaveMode('both',this)"><span class="sico">🔄</span>Both</button>
+      </div>
+      <div class="info-box info-green" style="margin-top:11px" id="save-mode-info">
+        <span class="pulse"></span> Auto-save active — your map is weather-proof
+      </div>
+    </div>
+    <div class="card card-pad">
+      <div class="card-title">Dataset Summary</div>
+      <div class="summary-wrap" id="export-summary"></div>
+    </div>
+    <div class="section-header">Export Format</div>
+    <div class="format-grid" id="format-grid"></div>
+    <div class="drone-card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <span style="font-size:24px">🚁</span>
+        <div>
+          <div style="font-size:15px;font-weight:800;color:var(--blue)">Drone Site Vision</div>
+          <div style="font-size:9px;font-weight:700;color:#93C5FD;text-transform:uppercase;letter-spacing:.5px">Coming Soon</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:#1E40AF;line-height:1.7">Pair with DJI Enterprise or Skydio to overlay utility maps, no-dig zones, and benchmarks in real time from the air.</div>
+    </div>
+  </div>
+
+</div><!-- end content -->
 </div><!-- end app -->
 
 <!-- UTILITY PICKER MODAL -->
 
 <div class="modal-bg" id="util-modal" onclick="closeUtilModal()">
-  <div class="modal" onclick="event.stopPropagation()">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
-    <div style="font-weight:800;font-size:16px">Place Utility Marker</div>
-    <div style="font-size:13px;color:#6B7280;margin-top:4px">Select the type to drop a pin at this location</div>
+    <div style="font-size:16px;font-weight:800;margin-bottom:4px">Place Utility Marker</div>
+    <div style="font-size:12px;color:var(--text3)">Select the utility type to drop a pin</div>
     <div class="util-grid" id="util-grid"></div>
   </div>
 </div>
 
 <!-- VOLUME MODAL -->
 
-<div class="modal-bg" id="volume-modal" onclick="closeVolumeModal()">
-  <div class="modal" onclick="event.stopPropagation()">
+<div class="modal-bg" id="vol-modal" onclick="closeVolModal()">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
-    <div style="font-weight:800;font-size:18px">Volume Calculator</div>
-    <div style="font-size:13px;color:#6B7280;margin-top:4px;margin-bottom:20px" id="vol-area-label"></div>
+    <div style="font-size:17px;font-weight:800;margin-bottom:3px">Volume Calculator</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:18px" id="vol-area-lbl"></div>
     <div id="zone-list"></div>
-    <button class="btn btn-ghost btn-full" style="margin-bottom:14px" onclick="addZone()">+ Add Zone</button>
-    <div class="total-vol" id="total-vol-display" style="display:none">
-      <div style="font-size:13px;font-weight:600;color:#6B7280">Total Est. Volume</div>
-      <div style="font-size:26px;font-weight:900;color:#F47920" id="total-vol-num">—</div>
+    <button class="btn btn-ghost btn-block" style="margin-bottom:13px" onclick="addZone()">＋ Add Zone</button>
+    <div class="vol-total" id="vol-total" style="display:none">
+      <div style="font-size:12px;font-weight:600;color:var(--text3)">Total Est. Volume</div>
+      <div style="font-size:24px;font-weight:900;color:var(--orange)" id="vol-total-num">—</div>
     </div>
-    <button class="btn btn-orange btn-full" onclick="saveVolume()">Save Volume Data</button>
+    <button class="btn btn-primary btn-block" onclick="saveVol()">Save Volume Data</button>
   </div>
 </div>
 
 <script>
-// ─── STATE ────────────────────────────────────────────────────────────────────
-const UTILS = [
-  {id:'gas',      label:'Gas / Oil',    color:'#CA8A04', bg:'#FEF9C3', emoji:'⚡', dot:'#FACC15'},
-  {id:'electric', label:'Electric',     color:'#DC2626', bg:'#FEE2E2', emoji:'🔌', dot:'#EF4444'},
-  {id:'water',    label:'Water',        color:'#1D4ED8', bg:'#DBEAFE', emoji:'💧', dot:'#3B82F6'},
-  {id:'sewer',    label:'Sewer',        color:'#15803D', bg:'#DCFCE7', emoji:'🌿', dot:'#22C55E'},
-  {id:'telecom',  label:'Telecom',      color:'#C2410C', bg:'#FFEDD5', emoji:'📡', dot:'#F97316'},
-  {id:'drain',    label:'Storm Drain',  color:'#0E7490', bg:'#CFFAFE', emoji:'🌊', dot:'#06B6D4'},
-  {id:'manhole',  label:'Manhole',      color:'#7C3AED', bg:'#EDE9FE', emoji:'🔘', dot:'#A855F7'},
-  {id:'nodig',    label:'No-Dig Zone',  color:'#B91C1C', bg:'#FEE2E2', emoji:'⛔', dot:'#EF4444'},
+// ═══════════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════════
+const UTILS=[
+  {id:'gas',     label:'Gas / Oil',   color:'#CA8A04',bg:'#FEF9C3',emoji:'⚡',dot:'#FACC15'},
+  {id:'electric',label:'Electric',    color:'#DC2626',bg:'#FEE2E2',emoji:'🔌',dot:'#EF4444'},
+  {id:'water',   label:'Water',       color:'#1D4ED8',bg:'#DBEAFE',emoji:'💧',dot:'#3B82F6'},
+  {id:'sewer',   label:'Sewer',       color:'#15803D',bg:'#DCFCE7',emoji:'🌿',dot:'#22C55E'},
+  {id:'telecom', label:'Telecom',     color:'#C2410C',bg:'#FFEDD5',emoji:'📡',dot:'#F97316'},
+  {id:'drain',   label:'Storm Drain', color:'#0E7490',bg:'#CFFAFE',emoji:'🌊',dot:'#06B6D4'},
+  {id:'manhole', label:'Manhole',     color:'#7C3AED',bg:'#EDE9FE',emoji:'🔘',dot:'#A855F7'},
+  {id:'nodig',   label:'No-Dig Zone', color:'#B91C1C',bg:'#FEE2E2',emoji:'⛔',dot:'#EF4444'},
 ];
 
-const FORMATS = [
-  {name:'DXF',    desc:'AutoCAD / Civil 3D',  icon:'📐', badge:'Industry Std', bc:'#1D4ED8'},
-  {name:'SHP',    desc:'Esri / ArcGIS',        icon:'🗺️', badge:'GIS Ready',   bc:'#15803D'},
-  {name:'LandXML',desc:'Survey & Site Design', icon:'🏗️', badge:'Survey Grade',bc:'#7C3AED'},
-  {name:'KMZ',    desc:'Google Earth',         icon:'🌍', badge:'',            bc:'#0E7490'},
-  {name:'GeoJSON',desc:'Web GIS / Mapbox',     icon:'🔗', badge:'Open Format', bc:'#C2410C'},
-  {name:'CSV',    desc:'Raw coordinates',      icon:'📊', badge:'',            bc:'#374151'},
+const FORMATS=[
+  {name:'DXF',    desc:'AutoCAD / Civil 3D',  icon:'📐',badge:'Industry Std',bc:'#1D4ED8'},
+  {name:'SHP',    desc:'Esri / ArcGIS',        icon:'🗺️',badge:'GIS Ready',  bc:'#15803D'},
+  {name:'LandXML',desc:'Survey & Site Design', icon:'🏗️',badge:'Survey Grade',bc:'#7C3AED'},
+  {name:'KMZ',    desc:'Google Earth',         icon:'🌍',badge:'',           bc:'#0E7490'},
+  {name:'GeoJSON',desc:'Web GIS / Mapbox',     icon:'🔗',badge:'Open Format',bc:'#C2410C'},
+  {name:'CSV',    desc:'Raw coordinates',      icon:'📊',badge:'',           bc:'#374151'},
 ];
 
-const MOCK = {lat:44.428, lng:-95.376};
+const DEFAULT_LAT=44.428, DEFAULT_LNG=-95.376;
 
-let projects = [{
-  id: 1, name: 'Main St Utility Run',
-  created: new Date().toLocaleDateString(),
-  perimPts: [], closed: false, features: [], zones: [], mapStyle: 'default'
-}];
-let activeId = 1;
-let mapMode = 'perimeter';
-let mapStyle = 'default';
-let linePts = [];
-let activeUtil = 'gas';
-let pendingPin = null; // {x,y} canvas coords for util picker
-let machineEnabled = false;
-let machinePos = null;
-let machineSimAngle = 0;
-let machineSimTimer = null;
-let doneFormat = null;
-let saveMode = 'both';
+let projects=[{id:1,name:'Main St Utility Run',created:new Date().toLocaleDateString(),perimPts:[],closed:false,features:[],zones:[]}];
+let activeId=1;
+let mapMode='perimeter';
+let activeUtil='gas';
+let linePts=[];
+let machineEnabled=false, machinePos=null, machineAngle=0, machineTmr=null;
+let gradeData=null, gradeTmr=null, gradeTick=0;
+let benches=[], showNmea=false;
+let zones=[], doneFormat=null, saveMode='both';
 
-// Grade state
-let gradeConnected = false;
-let gradeData = null;
-let gradeSimTimer = null;
-let gradeTick = 0;
-let benches = [];
-let showNmeaRaw = false;
+// Leaflet map state
+let leafMap=null, perimLayer=null, featureMarkers=[], linePolylines=[];
+let machineMarker=null, drawLayer=null;
+let pendingLatLng=null; // for util picker
+let longPressTimer=null;
 
-// Volume state
-let zones = [];
+function getActive(){return projects.find(p=>p.id===activeId)||projects[0];}
 
-function getActive() { return projects.find(p=>p.id===activeId)||projects[0]; }
-
-// ─── GEO MATH ─────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+// GEO MATH
+// ═══════════════════════════════════════════════════════════════════
 function haversine(a,b){
   const R=6371000,r=x=>x*Math.PI/180;
   const dLat=r(b.lat-a.lat),dLng=r(b.lng-a.lng);
@@ -581,8 +759,7 @@ function polyArea(pts){
     x:haversine({lat:ref.lat,lng:ref.lng},{lat:ref.lat,lng:p.lng})*(p.lng>=ref.lng?1:-1),
     y:haversine({lat:ref.lat,lng:ref.lng},{lat:p.lat,lng:ref.lng})*(p.lat>=ref.lat?1:-1),
   }));
-  let a=0;
-  for(let i=0;i<xy.length;i++){const j=(i+1)%xy.length;a+=xy[i].x*xy[j].y-xy[j].x*xy[i].y;}
+  let a=0;for(let i=0;i<xy.length;i++){const j=(i+1)%xy.length;a+=xy[i].x*xy[j].y-xy[j].x*xy[i].y;}
   return Math.abs(a/2);
 }
 function perimM(pts){
@@ -590,351 +767,242 @@ function perimM(pts){
   let d=0;for(let i=0;i<pts.length;i++)d+=haversine(pts[i],pts[(i+1)%pts.length]);
   return d;
 }
-const toAc=m=>m/4046.86, toSqFt=m=>m*10.7639, toFt=m=>m*3.28084;
+const toAc=m=>m/4046.86,toSqFt=m=>m*10.7639,toFt=m=>m*3.28084;
 function fmt(n,d=1){return Number(n).toLocaleString(undefined,{maximumFractionDigits:d,minimumFractionDigits:d});}
 
-// ─── PROJECTION ────────────────────────────────────────────────────────────────
-function buildRef(p,f,l){
-  const pts=[...p];
-  f.forEach(ft=>{if(ft.lat!=null)pts.push({lat:ft.lat,lng:ft.lng});if(ft.pts)pts.push(...ft.pts);});
-  if(l.length)pts.push(...l);
-  return pts.length?pts:[MOCK,{lat:MOCK.lat+0.001,lng:MOCK.lng+0.001}];
-}
-function project(ref,p,W,H){
-  const pad=56,lats=ref.map(r=>r.lat),lngs=ref.map(r=>r.lng);
-  const minLat=Math.min(...lats),maxLat=Math.max(...lats);
-  const minLng=Math.min(...lngs),maxLng=Math.max(...lngs);
-  const sc=Math.min((W-pad*2)/(maxLng-minLng||0.001),(H-pad*2)/(maxLat-minLat||0.001));
-  const ox=(W-(maxLng-minLng)*sc)/2,oy=(H-(maxLat-minLat)*sc)/2;
-  return{x:(p.lng-minLng)*sc+ox,y:H-((p.lat-minLat)*sc+oy)};
-}
-function unproject(ref,px,py,W,H){
-  const pad=56,lats=ref.map(r=>r.lat),lngs=ref.map(r=>r.lng);
-  const minLat=Math.min(...lats),maxLat=Math.max(...lats);
-  const minLng=Math.min(...lngs),maxLng=Math.max(...lngs);
-  const sc=Math.min((W-pad*2)/(maxLng-minLng||0.001),(H-pad*2)/(maxLat-minLat||0.001));
-  const ox=(W-(maxLng-minLng)*sc)/2,oy=(H-(maxLat-minLat)*sc)/2;
-  return{lat:(H-py-oy)/sc+minLat,lng:(px-ox)/sc+minLng};
-}
-function roundRect(ctx,x,y,w,h,r){
-  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
-  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
-  ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
-  ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();
-}
+// ═══════════════════════════════════════════════════════════════════
+// LEAFLET MAP INIT
+// ═══════════════════════════════════════════════════════════════════
+function initMap(){
+  if(leafMap) return;
 
-// ─── CANVAS ────────────────────────────────────────────────────────────────────
-const canvas = document.getElementById('map-canvas');
-const ctx = canvas.getContext('2d');
-let W, H;
+  leafMap = L.map('leaflet-map',{
+    center:[DEFAULT_LAT, DEFAULT_LNG],
+    zoom:17,
+    zoomControl:true,
+    attributionControl:true,
+  });
 
-function resizeCanvas(){
-  const wrap = canvas.parentElement;
-  W = wrap.clientWidth;
-  H = 300;
-  canvas.width = W;
-  canvas.height = H;
-  drawMap();
+  // OpenStreetMap tiles — free, no API key
+  L.tileLayer('[https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png]https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'© <a href="[https://openstreetmap.org">OpenStreetMap</a]https://openstreetmap.org">OpenStreetMap</a>',
+    maxZoom:22,
+  }).addTo(leafMap);
+
+  // Satellite layer option
+  window.satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{
+    attribution:'© Esri World Imagery',maxZoom:20
+  });
+
+  // Draw layer group
+  drawLayer = L.layerGroup().addTo(leafMap);
+
+  // Map click handler
+  leafMap.on('click', onMapClick);
+  leafMap.on('contextmenu', e=>{ e.originalEvent.preventDefault(); openUtilAtLatLng(e.latlng); });
+
+  // Long-press for mobile
+  leafMap.on('mousedown touchstart', e=>{
+    const latlng = e.latlng || (e.touches&&leafMap.mouseEventToLatLng(e.touches[0]));
+    if(!latlng) return;
+    longPressTimer = setTimeout(()=>{ longPressTimer=null; openUtilAtLatLng(latlng); }, 500);
+  });
+  leafMap.on('mouseup touchend mousemove touchmove', ()=>{ if(longPressTimer){clearTimeout(longPressTimer);longPressTimer=null;} });
+
+  redrawMap();
 }
 
-function drawMap(){
-  if(!ctx||!W) return;
-  ctx.clearRect(0,0,W,H);
-  const proj_active = getActive();
-  const {perimPts, closed, features} = proj_active;
-  const ref = buildRef(perimPts, features, linePts);
-
-  // Background
-  if(mapStyle==='satellite'){
-    ctx.fillStyle='#2D3A2E'; ctx.fillRect(0,0,W,H);
-    [{x:0,y:0,w:W*.55,h:H*.45,c:'#3A4F2C'},{x:W*.55,y:0,w:W*.45,h:H*.42,c:'#2E3D20'},
-     {x:0,y:H*.45,w:W*.6,h:H*.55,c:'#354428'},{x:W*.6,y:H*.42,w:W*.4,h:H*.58,c:'#293820'}]
-    .forEach(p=>{ctx.fillStyle=p.c;ctx.fillRect(p.x,p.y,p.w,p.h);});
-    ctx.strokeStyle='rgba(255,255,255,0.1)';ctx.lineWidth=1;
-    for(let x=0;x<W;x+=60){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-    ctx.strokeStyle='rgba(120,100,60,0.7)';ctx.lineWidth=7;ctx.setLineDash([]);
-    ctx.beginPath();ctx.moveTo(0,H*.4);ctx.lineTo(W,H*.4);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(W*.62,0);ctx.lineTo(W*.62,H);ctx.stroke();
-  } else if(mapStyle==='topo'){
-    ctx.fillStyle='#EEE8D5';ctx.fillRect(0,0,W,H);
-    ctx.strokeStyle='rgba(180,150,80,0.35)';ctx.lineWidth=1;
-    for(let i=0;i<8;i++){ctx.beginPath();ctx.ellipse(W*.4,H*.5,70+i*35,45+i*24,0.3,0,Math.PI*2);ctx.stroke();}
-    ctx.strokeStyle='rgba(200,160,80,0.8)';ctx.lineWidth=6;ctx.setLineDash([]);
-    ctx.beginPath();ctx.moveTo(0,H*.4);ctx.lineTo(W,H*.4);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(W*.62,0);ctx.lineTo(W*.62,H);ctx.stroke();
-    ctx.strokeStyle='rgba(160,120,60,0.4)';ctx.lineWidth=1;ctx.setLineDash([6,6]);
-    ctx.beginPath();ctx.moveTo(0,H*.4);ctx.lineTo(W,H*.4);ctx.stroke();
-    ctx.setLineDash([]);
-  } else {
-    ctx.fillStyle='#E8ECF0';ctx.fillRect(0,0,W,H);
-    ctx.strokeStyle='rgba(255,255,255,0.65)';ctx.lineWidth=1;
-    for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-    for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-    ctx.strokeStyle='rgba(255,255,255,0.9)';ctx.lineWidth=8;ctx.setLineDash([]);
-    ctx.beginPath();ctx.moveTo(0,H*.4);ctx.lineTo(W,H*.4);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(W*.62,0);ctx.lineTo(W*.62,H);ctx.stroke();
-    ctx.strokeStyle='rgba(200,200,200,0.5)';ctx.lineWidth=1;ctx.setLineDash([8,8]);
-    ctx.beginPath();ctx.moveTo(0,H*.4);ctx.lineTo(W,H*.4);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(W*.62,0);ctx.lineTo(W*.62,H);ctx.stroke();
-    ctx.setLineDash([]);
-  }
-
-  // Empty hint
-  if(!perimPts.length&&!features.length&&!linePts.length){
-    const col=mapStyle==='satellite'?'rgba(255,255,255,0.6)':'rgba(0,0,0,0.22)';
-    ctx.fillStyle=col;ctx.font='600 13px Segoe UI,system-ui';
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText('Hold = Place utility  ·  Tap = Draw boundary',W/2,H/2-8);
-    ctx.font='400 11px Segoe UI,system-ui';
-    ctx.fillStyle=mapStyle==='satellite'?'rgba(255,255,255,0.35)':'rgba(0,0,0,0.14)';
-    ctx.fillText('Perimeters, utility lines & markers in one map',W/2,H/2+14);
-    return;
-  }
-
-  // Polygon fill
-  if(perimPts.length>2&&closed){
-    const xys=perimPts.map(p=>project(ref,p,W,H));
-    ctx.beginPath();ctx.moveTo(xys[0].x,xys[0].y);
-    xys.forEach(p=>ctx.lineTo(p.x,p.y));ctx.closePath();
-    ctx.fillStyle='rgba(244,121,32,0.12)';ctx.fill();
-  }
-
-  // Perimeter
-  if(perimPts.length>1){
-    const xys=perimPts.map(p=>project(ref,p,W,H));
-    ctx.beginPath();ctx.moveTo(xys[0].x,xys[0].y);
-    xys.forEach(p=>ctx.lineTo(p.x,p.y));
-    if(closed)ctx.closePath();
-    ctx.strokeStyle='#F47920';ctx.lineWidth=closed?3:2.5;
-    ctx.setLineDash(closed?[]:[8,5]);ctx.stroke();ctx.setLineDash([]);
-
-    // Segment labels
-    const segs=closed?perimPts.length:perimPts.length-1;
-    for(let i=0;i<segs;i++){
-      const a=xys[i],b=xys[(i+1)%xys.length];
-      const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
-      const d=haversine(perimPts[i],perimPts[(i+1)%perimPts.length]);
-      const txt=d<1000?`${d.toFixed(1)} m`:`${(d/1000).toFixed(2)} km`;
-      ctx.font='600 10px Segoe UI,system-ui';
-      const tw=ctx.measureText(txt).width;
-      ctx.fillStyle='white';ctx.shadowBlur=6;ctx.shadowColor='rgba(0,0,0,0.1)';
-      roundRect(ctx,mx-tw/2-7,my-9,tw+14,18,5);ctx.fill();ctx.shadowBlur=0;
-      ctx.fillStyle='#F47920';ctx.textAlign='center';ctx.textBaseline='middle';
-      ctx.fillText(txt,mx,my);
+function onMapClick(e){
+  if(mapMode==='perimeter'){
+    const p=getActive();
+    if(p.closed) return;
+    // Snap close check
+    if(p.perimPts.length>2){
+      const first=p.perimPts[0];
+      const d=haversine({lat:e.latlng.lat,lng:e.latlng.lng},first);
+      if(d<3){closePerim();return;}
     }
+    p.perimPts.push({lat:e.latlng.lat,lng:e.latlng.lng});
+    redrawMap();updateMeasurements();updateMapActions();
+    document.getElementById('clear-btn').style.display='block';
+  } else if(mapMode==='line'){
+    linePts.push({lat:e.latlng.lat,lng:e.latlng.lng});
+    redrawMap();updateMapActions();
+  }
+}
 
+function openUtilAtLatLng(latlng){
+  pendingLatLng={lat:latlng.lat,lng:latlng.lng};
+  document.getElementById('util-modal').classList.add('open');
+}
+
+// Map style switching
+function setMapStyle(style){
+  if(!leafMap) return;
+  if(style==='satellite'){
+    window.satelliteLayer.addTo(leafMap);
+  } else {
+    if(leafMap.hasLayer(window.satelliteLayer)) leafMap.removeLayer(window.satelliteLayer);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MAP DRAW
+// ═══════════════════════════════════════════════════════════════════
+
+// Custom divIcon for pins
+function makeIcon(emoji, bg, dot, alert){
+  const ring=alert?'border:2.5px solid #DC2626;box-shadow:0 0 0 4px rgba(220,38,38,0.2)':'border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.25)';
+  return L.divIcon({
+    className:'',
+    html:`<div style="width:34px;height:34px;border-radius:50%;background:${bg};${ring};display:flex;align-items:center;justify-content:center;font-size:17px">${emoji}</div>`,
+    iconSize:[34,34],iconAnchor:[17,17],
+  });
+}
+
+function makeMachineIcon(alert){
+  const bg=alert?'#DC2626':'#2563EB';
+  return L.divIcon({
+    className:'',
+    html:`<div style="position:relative">
+      <div style="width:36px;height:36px;border-radius:50%;background:${bg};border:3px solid #fff;box-shadow:0 2px 12px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;font-size:16px">🚜</div>
+      <div style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);background:${bg};color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;white-space:nowrap;font-family:var(--font)">Machine</div>
+    </div>`,
+    iconSize:[36,58],iconAnchor:[18,47],
+  });
+}
+
+function redrawMap(){
+  if(!leafMap||!drawLayer) return;
+  drawLayer.clearLayers();
+  featureMarkers=[];linePolylines=[];
+
+  const p=getActive();
+  const {perimPts,closed,features}=p;
+
+  // Perimeter polygon/polyline
+  if(perimPts.length>1){
+    const latlngs=perimPts.map(pt=>[pt.lat,pt.lng]);
+    if(closed&&perimPts.length>2){
+      L.polygon(latlngs,{
+        color:'#F47920',weight:2.5,fillColor:'#F47920',fillOpacity:.1,dashArray:null
+      }).addTo(drawLayer);
+    } else {
+      L.polyline(latlngs,{color:'#F47920',weight:2.5,dashArray:'8,5'}).addTo(drawLayer);
+    }
     // Nodes
-    perimPts.forEach((p,i)=>{
-      const{x,y}=project(ref,p,W,H);
-      ctx.shadowBlur=10;ctx.shadowColor='rgba(244,121,32,0.3)';
-      ctx.beginPath();ctx.arc(x,y,i===0?11:7,0,Math.PI*2);
-      ctx.fillStyle='#F47920';ctx.fill();ctx.shadowBlur=0;
-      ctx.strokeStyle='white';ctx.lineWidth=2.5;ctx.stroke();
-      ctx.fillStyle='white';ctx.font=`bold ${i===0?10:9}px Segoe UI,system-ui`;
-      ctx.textAlign='center';ctx.textBaseline='middle';
-      ctx.fillText(i===0?'A':String(i+1),x,y);
+    perimPts.forEach((pt,i)=>{
+      const ic=L.divIcon({
+        className:'',
+        html:`<div style="width:${i===0?26:20}px;height:${i===0?26:20}px;border-radius:50%;background:#F47920;border:2.5px solid #fff;box-shadow:0 2px 8px rgba(244,121,32,0.4);display:flex;align-items:center;justify-content:center;color:#fff;font-size:${i===0?11:9}px;font-weight:800">${i===0?'A':i+1}</div>`,
+        iconSize:[i===0?26:20,i===0?26:20],iconAnchor:[i===0?13:10,i===0?13:10],
+      });
+      const m=L.marker([pt.lat,pt.lng],{icon:ic,draggable:false}).addTo(drawLayer);
     });
   }
 
-  // Active line
+  // Active line being drawn
   if(mapMode==='line'&&linePts.length>0){
     const u=UTILS.find(u=>u.id===activeUtil)||UTILS[0];
-    const xys=linePts.map(p=>project(ref,p,W,H));
-    ctx.beginPath();ctx.moveTo(xys[0].x,xys[0].y);
-    xys.forEach(p=>ctx.lineTo(p.x,p.y));
-    ctx.strokeStyle=u.dot;ctx.lineWidth=4;ctx.setLineDash([10,6]);
-    ctx.shadowBlur=6;ctx.shadowColor=u.dot+'88';
-    ctx.stroke();ctx.setLineDash([]);ctx.shadowBlur=0;
-    xys.forEach(({x,y})=>{ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fillStyle=u.dot;ctx.fill();ctx.strokeStyle='white';ctx.lineWidth=1.5;ctx.stroke();});
+    L.polyline(linePts.map(p=>[p.lat,p.lng]),{color:u.dot,weight:4,dashArray:'10,5'}).addTo(drawLayer);
+    linePts.forEach(pt=>{
+      const ic=L.divIcon({className:'',html:`<div style="width:10px;height:10px;border-radius:50%;background:${u.dot};border:2px solid #fff"></div>`,iconSize:[10,10],iconAnchor:[5,5]});
+      L.marker([pt.lat,pt.lng],{icon:ic}).addTo(drawLayer);
+    });
   }
 
-  // Saved feature lines
+  // Feature lines
   features.filter(f=>f.pts&&f.pts.length>1).forEach(f=>{
     const u=UTILS.find(u=>u.id===f.type)||UTILS[0];
-    const xys=f.pts.map(p=>project(ref,p,W,H));
-    ctx.beginPath();ctx.moveTo(xys[0].x,xys[0].y);
-    xys.forEach(p=>ctx.lineTo(p.x,p.y));
-    ctx.strokeStyle=u.dot;ctx.lineWidth=4;ctx.setLineDash([12,6]);
-    ctx.shadowBlur=5;ctx.shadowColor=u.dot+'77';
-    ctx.stroke();ctx.setLineDash([]);ctx.shadowBlur=0;
-    [xys[0],xys[xys.length-1]].forEach(({x,y})=>{ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fillStyle=u.dot;ctx.fill();ctx.strokeStyle='white';ctx.lineWidth=2;ctx.stroke();});
-    const mid=xys[Math.floor(xys.length/2)];
-    ctx.font='600 10px Segoe UI,system-ui';
-    const tw=ctx.measureText(u.label).width;
-    ctx.fillStyle=u.bg;ctx.shadowBlur=4;ctx.shadowColor='rgba(0,0,0,0.1)';
-    roundRect(ctx,mid.x-tw/2-9,mid.y-21,tw+18,16,5);ctx.fill();ctx.shadowBlur=0;
-    ctx.fillStyle=u.color;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(u.label,mid.x,mid.y-13);
+    const pl=L.polyline(f.pts.map(p=>[p.lat,p.lng]),{color:u.dot,weight:4,dashArray:'12,5'}).addTo(drawLayer);
+    pl.bindTooltip(u.label,{permanent:false,direction:'top'});
+    linePolylines.push(pl);
   });
 
   // Feature point pins
   features.filter(f=>f.lat!=null).forEach(f=>{
     const u=UTILS.find(u=>u.id===f.type)||UTILS[0];
-    const{x,y}=project(ref,{lat:f.lat,lng:f.lng},W,H);
-    ctx.beginPath();ctx.arc(x,y,20,0,Math.PI*2);ctx.fillStyle=u.bg+'BB';ctx.fill();
-    ctx.shadowBlur=8;ctx.shadowColor=u.dot+'44';
-    ctx.beginPath();ctx.arc(x,y,13,0,Math.PI*2);ctx.fillStyle=u.bg;ctx.fill();
-    ctx.strokeStyle=u.dot;ctx.lineWidth=2.5;ctx.stroke();ctx.shadowBlur=0;
-    ctx.font='14px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(u.emoji,x,y+1);
-    if(f.photo){
-      ctx.beginPath();ctx.arc(x+9,y-9,7,0,Math.PI*2);ctx.fillStyle='#2563EB';ctx.fill();ctx.strokeStyle='white';ctx.lineWidth=1.5;ctx.stroke();
-      ctx.font='8px system-ui';ctx.fillStyle='white';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('📷',x+9,y-9);
-    }
+    const alert=machineEnabled&&machinePos&&haversine(machinePos,{lat:f.lat,lng:f.lng})<=3;
+    const m=L.marker([f.lat,f.lng],{icon:makeIcon(u.emoji,u.bg,u.dot,alert)}).addTo(drawLayer);
+    m.bindPopup(`<div style="font-family:var(--font);min-width:140px">
+      <div style="font-weight:700;font-size:13px;margin-bottom:4px">${u.emoji} ${u.label}</div>
+      ${f.note?`<div style="font-size:11px;color:#6B7280;margin-bottom:4px">📝 ${f.note}</div>`:''}
+      <div style="font-size:10px;color:#9CA3AF">${f.lat.toFixed(6)}, ${f.lng.toFixed(6)}</div>
+    </div>`,{maxWidth:200});
+    m.on('click',()=>m.openPopup());
+    featureMarkers.push({id:f.id,marker:m});
   });
 
   // Machine dot
   if(machineEnabled&&machinePos){
-    const prox=nearestAlert();
-    const{x,y}=project(ref,{lat:machinePos.lat,lng:machinePos.lng},W,H);
-    // Ring
-    ctx.beginPath();ctx.arc(x,y,20,0,Math.PI*2);
-    ctx.fillStyle=prox?'rgba(220,38,38,0.15)':'rgba(37,99,235,0.12)';ctx.fill();
-    // Dot
-    ctx.shadowBlur=12;ctx.shadowColor=prox?'rgba(220,38,38,0.4)':'rgba(37,99,235,0.35)';
-    ctx.beginPath();ctx.arc(x,y,12,0,Math.PI*2);
-    ctx.fillStyle=prox?'#DC2626':'#2563EB';ctx.fill();ctx.shadowBlur=0;
-    ctx.strokeStyle='white';ctx.lineWidth=3;ctx.stroke();
-    ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();
-    // Label
-    ctx.font='600 10px Segoe UI,system-ui';
-    const tag='🚜 Machine';const tw=ctx.measureText(tag).width;
-    ctx.shadowBlur=5;ctx.shadowColor='rgba(0,0,0,0.12)';
-    roundRect(ctx,x-tw/2-7,y-32,tw+14,18,5);ctx.fillStyle=prox?'#DC2626':'#2563EB';ctx.fill();ctx.shadowBlur=0;
-    ctx.fillStyle='white';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(tag,x,y-23);
+    const alert=nearestAlert()!=null;
+    if(machineMarker) machineMarker.remove();
+    machineMarker=L.marker([machinePos.lat,machinePos.lng],{icon:makeMachineIcon(alert),zIndexOffset:1000}).addTo(drawLayer);
   }
 }
 
-// ─── PROXIMITY ─────────────────────────────────────────────────────────────────
-function nearestAlert(){
-  if(!machinePos) return null;
-  const features=getActive().features;
-  let nearest=null,minDist=Infinity;
-  features.forEach(f=>{
-    const pts=f.lat!=null?[{lat:f.lat,lng:f.lng}]:(f.pts||[]);
-    pts.forEach(p=>{
-      const d=haversine(machinePos,p);
-      if(d<minDist){minDist=d;nearest={feature:f,dist:d};}
-    });
-  });
-  return nearest&&nearest.dist<=3?nearest:null;
+// ═══════════════════════════════════════════════════════════════════
+// MAP CONTROLS
+// ═══════════════════════════════════════════════════════════════════
+function setMode(mode,btn){
+  mapMode=mode;
+  document.querySelectorAll('.pill-opt').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('line-strip').style.display=mode==='line'?'block':'none';
+  if(mode!=='line'){linePts=[];}
+  redrawMap();updateMapActions();
 }
 
-function updateProxAlert(){
-  const alert=nearestAlert();
-  const el=document.getElementById('prox-alert');
-  if(alert&&machineEnabled){
-    const u=UTILS.find(u=>u.id===alert.feature.type)||UTILS[0];
-    document.getElementById('prox-icon').textContent=u.emoji;
-    document.getElementById('prox-title').textContent=`⚠️ ${alert.feature.label} Nearby`;
-    document.getElementById('prox-dist').textContent=alert.dist.toFixed(1);
-    el.classList.add('show');
-  } else {
-    el.classList.remove('show');
-  }
-}
-
-// ─── CANVAS EVENTS ─────────────────────────────────────────────────────────────
-let pressTimer=null, touchStartY=0, touchStartX=0;
-
-function getCanvasXY(e){
-  const rect=canvas.getBoundingClientRect();
-  const clientX=e.touches?e.touches[0].clientX:e.clientX;
-  const clientY=e.touches?e.touches[0].clientY:e.clientY;
-  return{px:(clientX-rect.left)*(W/rect.width),py:(clientY-rect.top)*(H/rect.height),clientX,clientY};
-}
-
-canvas.addEventListener('mousedown',e=>{
-  const{px,py}=getCanvasXY(e);
-  touchStartX=e.clientX;touchStartY=e.clientY;
-  pressTimer=setTimeout(()=>{pressTimer=null;openUtilModal(px,py);},450);
-});
-
-canvas.addEventListener('touchstart',e=>{
-  const{px,py,clientX,clientY}=getCanvasXY(e);
-  touchStartX=clientX;touchStartY=clientY;
-  pressTimer=setTimeout(()=>{pressTimer=null;openUtilModal(px,py);},450);
-},{passive:true});
-
-canvas.addEventListener('touchmove',e=>{
-  if(!pressTimer)return;
-  const dy=Math.abs(e.touches[0].clientY-touchStartY);
-  if(dy>10){clearTimeout(pressTimer);pressTimer=null;}
-},{passive:true});
-
-function handleTap(px,py,clientX,clientY){
-  if(pressTimer){clearTimeout(pressTimer);pressTimer=null;}
-  else return;
-  const dx=Math.abs(clientX-touchStartX),dy=Math.abs(clientY-touchStartY);
-  if(dx>8||dy>8)return;
-  const proj=getActive();
-  const {perimPts,closed,features}=proj;
-  const ref=buildRef(perimPts,features,linePts);
-
-  // Check tap on existing pin
-  const tapped=features.find(f=>{
-    if(f.lat==null)return false;
-    const{x,y}=project(ref,{lat:f.lat,lng:f.lng},W,H);
-    return Math.hypot(px-x,py-y)<22;
-  });
-  if(tapped){showPinEdit(tapped);return;}
-
-  const pt=unproject(ref,px,py,W,H);
-  if(mapMode==='perimeter'){
-    if(closed)return;
-    if(perimPts.length>2){
-      const fp=project(ref,perimPts[0],W,H);
-      if(Math.hypot(px-fp.x,py-fp.y)<24){closePerimleter();return;}
-    }
-    proj.perimPts.push(pt);
-    updateMeasurements();drawMap();updateMapActions();updateFeatureSummary();
-    document.getElementById('clear-btn').style.display='block';
-  } else if(mapMode==='line'){
-    linePts.push(pt);
-    drawMap();updateMapActions();
-  }
-}
-
-canvas.addEventListener('mouseup',e=>{
-  const{px,py}=getCanvasXY(e);
-  handleTap(px,py,e.clientX,e.clientY);
-});
-canvas.addEventListener('touchend',e=>{
-  const{px,py}=getCanvasXY({clientX:e.changedTouches[0].clientX,clientY:e.changedTouches[0].clientY});
-  handleTap(px,py,e.changedTouches[0].clientX,e.changedTouches[0].clientY);
-});
-
-// ─── MAP ACTIONS ───────────────────────────────────────────────────────────────
 function updateMapActions(){
-  const{perimPts,closed}=getActive();
+  const {perimPts,closed}=getActive();
   const el=document.getElementById('map-actions');
   let html='';
   if(perimPts.length>0&&!closed&&mapMode==='perimeter'){
-    html+=`<button class="map-pill" style="cursor:pointer;font-weight:700;color:#111" onclick="undoPerim()">↩ Undo</button>`;
+    html+=`<button class="map-btn" onclick="undoPerim()">↩ Undo</button>`;
   }
   if(perimPts.length>2&&!closed&&mapMode==='perimeter'){
-    html+=`<button class="map-pill" style="cursor:pointer;background:#F47920;color:white;font-weight:700" onclick="closePerimleter()">Close ✓</button>`;
+    html+=`<button class="map-btn primary" onclick="closePerim()">Close ✓</button>`;
   }
   if(mapMode==='line'&&linePts.length>1){
-    html+=`<button class="map-pill" style="cursor:pointer;background:#16A34A;color:white;font-weight:700" onclick="finishLine()">Save Line ✓</button>`;
+    html+=`<button class="map-btn success" onclick="finishLine()">Save Line ✓</button>`;
   }
   el.innerHTML=html;
 }
 
-function undoPerim(){getActive().perimPts.pop();updateMeasurements();drawMap();updateMapActions();}
-function closePerimleter(){getActive().closed=true;updateMeasurements();drawMap();updateMapActions();updateVolumeBtn();}
+function undoPerim(){
+  getActive().perimPts.pop();
+  redrawMap();updateMeasurements();updateMapActions();
+}
+
+function closePerim(){
+  getActive().closed=true;
+  redrawMap();updateMeasurements();updateMapActions();updateVolBtn();
+}
+
 function finishLine(){
   if(linePts.length<2)return;
   const u=UTILS.find(u=>u.id===activeUtil)||UTILS[0];
   getActive().features.push({type:activeUtil,pts:[...linePts],label:u.label,id:Date.now()});
-  linePts=[];drawMap();updateMapActions();updateFeatureLegend();updateFeatureSummary();
+  linePts=[];
+  redrawMap();updateMapActions();updateFeatLegend();updateFeatSummary();
 }
 
-// ─── MEASUREMENTS ──────────────────────────────────────────────────────────────
+function clearSite(){
+  const p=getActive();
+  p.perimPts=[];p.closed=false;p.features=[];p.zones=[];linePts=[];
+  redrawMap();updateMeasurements();updateVolBtn();updateFeatLegend();updateFeatSummary();updateMapActions();
+  document.getElementById('clear-btn').style.display='none';
+  document.getElementById('prox-alert').classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MEASUREMENTS
+// ═══════════════════════════════════════════════════════════════════
 function updateMeasurements(){
-  const{perimPts,closed}=getActive();
-  const measEl=document.getElementById('measurements');
+  const {perimPts,closed}=getActive();
+  const el=document.getElementById('measurements');
   if(perimPts.length>1){
-    measEl.style.display='block';
+    el.style.display='block';
     const pm=perimM(perimPts);
     document.getElementById('stat-perim').textContent=`${fmt(pm)} m`;
     document.getElementById('stat-perim-sub').textContent=`${fmt(toFt(pm),0)} ft`;
@@ -947,410 +1015,337 @@ function updateMeasurements(){
       document.getElementById('stat-area-sub').textContent='Close shape first';
     }
   } else {
-    measEl.style.display='none';
+    el.style.display='none';
   }
 }
 
-function updateVolumeBtn(){
-  const{perimPts,closed,zones}=getActive();
-  const el=document.getElementById('volume-btn-wrap');
+function updateVolBtn(){
+  const {perimPts,closed,zones}=getActive();
+  const el=document.getElementById('vol-btn-wrap');
   const area=polyArea(perimPts);
   if(closed&&area>0){
     el.style.display='block';
-    document.getElementById('volume-btn-sub').textContent=
-      zones&&zones.length?`${zones.length} zone${zones.length!==1?'s':''} defined`:'Tap to add cut/fill depth zones';
+    const z=zones&&zones.length;
+    document.getElementById('vol-btn-sub').textContent=
+      z?`${z} zone${z!==1?'s':''} defined`:'Tap to add cut/fill depth zones';
   } else {
     el.style.display='none';
   }
 }
 
-// ─── MAP CONTROLS ─────────────────────────────────────────────────────────────
-function setMapStyle(style, btn){
-  mapStyle=style;
-  getActive().mapStyle=style;
-  document.querySelectorAll('#screen-map .seg:nth-of-type(1) .seg-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  drawMap();
-}
-
-function setMode(mode, btn){
-  mapMode=mode;
-  document.querySelectorAll('#screen-map .seg:nth-of-type(2) .seg-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  const strip=document.getElementById('line-util-strip');
-  strip.style.display=mode==='line'?'block':'none';
-  if(mode!=='line'){linePts=[];}
-  drawMap();updateMapActions();
-}
-
-function clearSite(){
-  const p=getActive();
-  p.perimPts=[];p.closed=false;p.features=[];p.zones=[];
-  linePts=[];
-  updateMeasurements();updateVolumeBtn();updateFeatureLegend();updateFeatureSummary();
-  drawMap();updateMapActions();
-  document.getElementById('clear-btn').style.display='none';
-  document.getElementById('prox-alert').classList.remove('show');
-}
-
-// ─── UTILITY PICKER ───────────────────────────────────────────────────────────
-let pendingCanvasXY=null;
-
-function openUtilModal(px,py){
-  pendingCanvasXY={px,py};
-  document.getElementById('util-modal').classList.add('open');
+// ═══════════════════════════════════════════════════════════════════
+// UTILITY PICKER
+// ═══════════════════════════════════════════════════════════════════
+function placeUtil(u){
+  if(!pendingLatLng) return;
+  getActive().features.push({type:u.id,lat:pendingLatLng.lat,lng:pendingLatLng.lng,label:u.label,id:Date.now()});
+  pendingLatLng=null;
+  closeUtilModal();
+  redrawMap();updateFeatLegend();updateFeatSummary();
+  document.getElementById('clear-btn').style.display='block';
 }
 function closeUtilModal(){document.getElementById('util-modal').classList.remove('open');}
 
-function placeUtil(u){
-  if(!pendingCanvasXY)return;
-  const{perimPts,features}=getActive();
-  const ref=buildRef(perimPts,features,linePts);
-  const pt=unproject(ref,pendingCanvasXY.px,pendingCanvasXY.py,W,H);
-  const feat={type:u.id,lat:pt.lat,lng:pt.lng,label:u.label,id:Date.now()};
-  getActive().features.push(feat);
-  closeUtilModal();
-  drawMap();updateFeatureLegend();updateFeatureSummary();
-  document.getElementById('clear-btn').style.display='block';
+function buildUtilGrid(){
+  document.getElementById('util-grid').innerHTML=UTILS.map(u=>
+    `<button class="util-opt" style="background:${u.bg};border-color:${u.dot}" onclick="placeUtil({id:'${u.id}',label:'${u.label}',emoji:'${u.emoji}'})">
+      <span style="font-size:22px">${u.emoji}</span>
+      <span style="color:${u.color}">${u.label}</span>
+    </button>`).join('');
 }
 
-// ─── PIN EDIT (simple prompt-based for pure JS) ──────────────────────────────
-function showPinEdit(feat){
-  const note=prompt(`Note for ${feat.label}:`,feat.note||'');
-  if(note!==null)feat.note=note;
-  updateFeatureLegend();drawMap();
-}
-
-// ─── FEATURE LEGEND ───────────────────────────────────────────────────────────
-function updateFeatureLegend(){
+// ═══════════════════════════════════════════════════════════════════
+// FEATURE LEGEND
+// ═══════════════════════════════════════════════════════════════════
+function updateFeatLegend(){
   const features=getActive().features;
-  const el=document.getElementById('feature-legend');
+  const el=document.getElementById('feat-legend');
   if(!features.length){
-    el.innerHTML=`<div class="card" style="text-align:center;padding:28px">
-      <div style="font-size:34px;margin-bottom:10px">🏗️</div>
-      <div style="font-weight:700;font-size:15px;margin-bottom:6px">No features placed yet</div>
-      <div style="font-size:13px;color:#6B7280;line-height:1.6">Hold anywhere on the map to open the utility picker</div>
-    </div>`;
+    el.innerHTML=`<div class="empty-state"><div class="empty-icon">🏗️</div><div class="empty-title">No features placed yet</div><div class="empty-sub">Hold anywhere on the map to open the utility picker and drop a marker or trace a line</div></div>`;
     return;
   }
   const grouped={};
   features.forEach(f=>{if(!grouped[f.type])grouped[f.type]=[];grouped[f.type].push(f);});
   el.innerHTML=Object.entries(grouped).map(([type,items])=>{
     const u=UTILS.find(x=>x.id===type)||UTILS[0];
-    return `<div class="feature-group" style="border-top:3px solid ${u.dot}">
-      <div class="feature-group-header" style="background:${u.bg}">
-        <span style="width:10px;height:10px;border-radius:50%;background:${u.dot};flex-shrink:0;display:inline-block"></span>
-        <span style="font-size:14px;font-weight:700;color:${u.color}">${u.emoji} ${u.label}</span>
-        <span style="margin-left:auto;background:white;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700;color:${u.color}">${items.length}</span>
+    return `<div class="feat-group" style="border-top:3px solid ${u.dot};margin-bottom:9px">
+      <div class="feat-group-hd" style="background:${u.bg}">
+        <span style="width:9px;height:9px;border-radius:50%;background:${u.dot};flex-shrink:0;display:inline-block"></span>
+        <span style="font-size:13px;font-weight:700;color:${u.color}">${u.emoji} ${u.label}</span>
+        <span style="margin-left:auto;background:#fff;border-radius:20px;padding:1px 9px;font-size:11px;font-weight:700;color:${u.color}">${items.length}</span>
       </div>
       ${items.map(f=>`
-        <div class="feature-item">
-          <div class="feature-item-info">
-            <div class="feature-item-label">${f.pts?`Line · ${f.pts.length} nodes`:`${f.lat.toFixed(5)}, ${f.lng.toFixed(5)}`}</div>
-            ${f.note?`<div class="feature-item-note">📝 ${f.note}</div>`:''}
+        <div class="feat-row">
+          <div class="feat-info">
+            <div class="feat-coord">${f.pts?`Line · ${f.pts.length} nodes`:`${f.lat.toFixed(5)},  ${f.lng.toFixed(5)}`}</div>
+            ${f.note?`<div class="feat-note">📝 ${f.note}</div>`:''}
           </div>
-          <button class="remove-btn" onclick="removeFeature(${f.id})">×</button>
+          <button class="rm-btn" onclick="removeFeature(${f.id})">×</button>
         </div>`).join('')}
     </div>`;
   }).join('');
 }
 
 function removeFeature(id){
-  const p=getActive();
-  p.features=p.features.filter(f=>f.id!==id);
-  updateFeatureLegend();updateFeatureSummary();drawMap();
+  const p=getActive();p.features=p.features.filter(f=>f.id!==id);
+  redrawMap();updateFeatLegend();updateFeatSummary();
 }
 
-function updateFeatureSummary(){
-  const features=getActive().features;
-  const el=document.getElementById('feature-summary');
-  if(features.length){
-    el.style.display='block';
-    document.getElementById('feature-count-text').textContent=
-      `${features.length} Site Feature${features.length!==1?'s':''}`;
-  } else {
-    el.style.display='none';
-  }
+function updateFeatSummary(){
+  const f=getActive().features;
+  const el=document.getElementById('feat-summary');
+  el.style.display=f.length?'block':'none';
+  document.getElementById('feat-count-txt').textContent=`${f.length} Site Feature${f.length!==1?'s':''}`;
 }
 
-// ─── ACCORDION ─────────────────────────────────────────────────────────────────
-function toggleAccordion(btn){
-  const body=btn.nextElementSibling;
-  const isOpen=body.classList.contains('open');
-  body.classList.toggle('open');
-  const arrow=btn.querySelector('span:last-child');
-  if(arrow)arrow.style.transform=isOpen?'rotate(0deg)':'rotate(180deg)';
-}
-
-// ─── APWA REFERENCE ────────────────────────────────────────────────────────────
-function buildAPWA(){
-  document.getElementById('apwa-body').innerHTML=UTILS.map(u=>
-    `<div class="apwa-item" style="background:${u.bg}">
-      <span style="width:10px;height:10px;border-radius:50%;background:${u.dot};display:inline-block;flex-shrink:0"></span>
-      <span style="font-size:12px;font-weight:600;color:${u.color}">${u.emoji} ${u.label}</span>
-    </div>`).join('');
-}
-
-// ─── UTIL STRIP ────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+// UTILITY STRIP (line mode)
+// ═══════════════════════════════════════════════════════════════════
 function buildUtilStrip(){
-  document.getElementById('util-strip').innerHTML=UTILS.filter(u=>u.id!=='nodig').map(u=>
-    `<button onclick="setActiveUtil('${u.id}',this)" id="util-strip-${u.id}"
-      style="flex-shrink:0;padding:7px 14px;background:${u.id===activeUtil?u.bg:'white'};
-      border:2px solid ${u.id===activeUtil?u.dot:'#E4E6EA'};border-radius:20px;
-      color:${u.id===activeUtil?u.color:'#6B7280'};font-size:12px;font-weight:700;
-      cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;white-space:nowrap">
-      ${u.emoji} ${u.label}</button>`).join('');
-}
-
-function setActiveUtil(id, btn){
-  activeUtil=id;buildUtilStrip();
-}
-
-function buildUtilGrid(){
-  document.getElementById('util-grid').innerHTML=UTILS.map(u=>
-    `<button class="util-btn" style="border-color:${u.dot};background:${u.bg}"
-      onclick="placeUtil({id:'${u.id}',label:'${u.label}',emoji:'${u.emoji}'})">
-      <span style="font-size:22px">${u.emoji}</span>
-      <span style="color:${u.color}">${u.label}</span>
+  document.getElementById('util-strip-wrap').innerHTML=UTILS.filter(u=>u.id!=='nodig').map(u=>
+    `<button class="util-chip${activeUtil===u.id?' active':''}"
+      style="${activeUtil===u.id?`--dot-color:${u.dot};--bg-color:${u.bg};--col-color:${u.color}`:''}"
+      onclick="setActiveUtil('${u.id}')">
+      ${u.emoji} ${u.label}
     </button>`).join('');
 }
 
-// ─── MACHINE TRACKING ──────────────────────────────────────────────────────────
+function setActiveUtil(id){
+  activeUtil=id;buildUtilStrip();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// APWA
+// ═══════════════════════════════════════════════════════════════════
+function buildAPWA(){
+  document.getElementById('apwa-grid').innerHTML=UTILS.map(u=>
+    `<div class="apwa-item" style="background:${u.bg}">
+      <span style="width:9px;height:9px;border-radius:50%;background:${u.dot};flex-shrink:0;display:inline-block"></span>
+      <span style="font-size:11px;font-weight:600;color:${u.color}">${u.emoji} ${u.label}</span>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MACHINE TRACKING
+// ═══════════════════════════════════════════════════════════════════
 function toggleMachine(){
   machineEnabled=!machineEnabled;
-  const toggle=document.getElementById('machine-toggle');
-  const pill=document.getElementById('machine-pill');
-  toggle.classList.toggle('on',machineEnabled);
-  if(machineEnabled){
-    pill.style.display='flex';
-    startMachineSim();
-  } else {
-    pill.style.display='none';
-    stopMachineSim();
-    machinePos=null;
-    document.getElementById('machine-status-text').textContent='Off · 3 m proximity alerts when on';
+  const t=document.getElementById('machine-toggle');
+  const chip=document.getElementById('machine-map-chip');
+  t.classList.toggle('on',machineEnabled);
+  if(machineEnabled){chip.style.display='flex';startMachineSim();}
+  else {
+    chip.style.display='none';stopMachineSim();machinePos=null;
+    if(machineMarker){machineMarker.remove();machineMarker=null;}
+    document.getElementById('machine-status-txt').textContent='Off · 3 m proximity alerts when on';
     document.getElementById('prox-alert').classList.remove('show');
-    drawMap();
+    redrawMap();
   }
 }
 
 function startMachineSim(){
-  stopMachineSim();
-  machineSimAngle=0;
-  machineSimTimer=setInterval(()=>{
-    machineSimAngle+=0.04;
+  stopMachineSim();machineAngle=0;
+  machineTmr=setInterval(()=>{
+    machineAngle+=0.04;
     machinePos={
-      lat:MOCK.lat+Math.sin(machineSimAngle)*0.00025,
-      lng:MOCK.lng+Math.cos(machineSimAngle)*0.00025,
-      elev:312.1+Math.sin(machineSimAngle*2)*0.3,
-      heading:((machineSimAngle*180/Math.PI)%360+360)%360
+      lat:DEFAULT_LAT+Math.sin(machineAngle)*0.00025,
+      lng:DEFAULT_LNG+Math.cos(machineAngle)*0.00025,
     };
-    document.getElementById('machine-status-text').textContent=
-      `Simulated · RTK Fix · ${machinePos.lat.toFixed(6)}N`;
-    document.getElementById('machine-pill-text').textContent='Machine · RTK Fix';
+    document.getElementById('machine-status-txt').textContent=`Simulated · RTK Fix · ${machinePos.lat.toFixed(6)}N`;
+    document.getElementById('machine-chip-txt').textContent=`Machine · RTK Fix`;
     updateProxAlert();
-    drawMap();
+    redrawMap();
   },800);
 }
+function stopMachineSim(){if(machineTmr){clearInterval(machineTmr);machineTmr=null;}}
 
-function stopMachineSim(){
-  if(machineSimTimer){clearInterval(machineSimTimer);machineSimTimer=null;}
+function nearestAlert(){
+  if(!machinePos) return null;
+  const features=getActive().features;
+  let nearest=null,minDist=Infinity;
+  features.forEach(f=>{
+    const pts=f.lat!=null?[{lat:f.lat,lng:f.lng}]:(f.pts||[]);
+    pts.forEach(p=>{const d=haversine(machinePos,p);if(d<minDist){minDist=d;nearest={feature:f,dist:d};}});
+  });
+  return nearest&&nearest.dist<=3?nearest:null;
 }
 
-// ─── PROJECTS ──────────────────────────────────────────────────────────────────
-function toggleNewProject(){
-  const el=document.getElementById('new-project-form');
+function updateProxAlert(){
+  const a=nearestAlert();
+  const el=document.getElementById('prox-alert');
+  if(a&&machineEnabled){
+    const u=UTILS.find(u=>u.id===a.feature.type)||UTILS[0];
+    document.getElementById('prox-icon').textContent=u.emoji;
+    document.getElementById('prox-title').textContent=`⚠️ ${a.feature.label} Nearby`;
+    document.getElementById('prox-dist-num').textContent=a.dist.toFixed(1);
+    el.classList.add('show');
+  } else {
+    el.classList.remove('show');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// PROJECTS
+// ═══════════════════════════════════════════════════════════════════
+function toggleNewProj(){
+  const el=document.getElementById('new-proj-form');
   el.style.display=el.style.display==='none'?'block':'none';
   if(el.style.display==='block')document.getElementById('new-proj-name').focus();
 }
 
 function createProject(){
-  const name=document.getElementById('new-proj-name').value.trim();
-  if(!name)return;
-  const p={id:Date.now(),name,created:new Date().toLocaleDateString(),perimPts:[],closed:false,features:[],zones:[],mapStyle:'default'};
+  const name=document.getElementById('new-proj-name').value.trim();if(!name)return;
+  const p={id:Date.now(),name,created:new Date().toLocaleDateString(),perimPts:[],closed:false,features:[],zones:[]};
   projects.push(p);
   selectProject(p.id);
   document.getElementById('new-proj-name').value='';
-  document.getElementById('new-project-form').style.display='none';
-  renderProjects();
+  document.getElementById('new-proj-form').style.display='none';
+  renderProjList();
   showTab('map');
 }
 
 function selectProject(id){
-  activeId=id;
-  linePts=[];
+  activeId=id;linePts=[];
   const p=getActive();
-  mapStyle=p.mapStyle||'default';
-  document.getElementById('active-project-label').textContent=p.name;
-  document.getElementById('active-project-label').style.display='block';
-  updateMeasurements();updateVolumeBtn();updateFeatureLegend();updateFeatureSummary();
-  drawMap();updateMapActions();
-  document.getElementById('clear-btn').style.display=
-    (p.perimPts.length||p.features.length)?'block':'none';
-  renderProjects();
+  document.getElementById('active-proj-chip').textContent=p.name;
+  document.getElementById('active-proj-chip').style.display='inline-flex';
+  updateMeasurements();updateVolBtn();updateFeatLegend();updateFeatSummary();
+  updateMapActions();
+  document.getElementById('clear-btn').style.display=(p.perimPts.length||p.features.length)?'block':'none';
+  renderProjList();
+  redrawMap();
+  // Re-center map on features if any
+  if(p.perimPts.length>0&&leafMap){
+    const lats=p.perimPts.map(pt=>pt.lat),lngs=p.perimPts.map(pt=>pt.lng);
+    leafMap.setView([(Math.min(...lats)+Math.max(...lats))/2,(Math.min(...lngs)+Math.max(...lngs))/2],17);
+  }
 }
 
 function deleteProject(id){
   if(projects.length===1)return;
   projects=projects.filter(p=>p.id!==id);
   if(activeId===id)selectProject(projects[0].id);
-  renderProjects();
+  renderProjList();
 }
 
-function renderProjects(){
-  const el=document.getElementById('projects-list');
-  if(!projects.length){
-    el.innerHTML=`<div class="card" style="text-align:center;padding:36px">
-      <div style="font-size:40px;margin-bottom:12px">🏗️</div>
-      <div style="font-weight:700;font-size:15px;margin-bottom:6px">No projects yet</div>
-    </div>`;
-    return;
-  }
+function renderProjList(){
+  const el=document.getElementById('proj-list');
+  if(!projects.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">🏗️</div><div class="empty-title">No projects yet</div></div>`;return;}
   el.innerHTML=projects.map(p=>{
-    const isActive=p.id===activeId;
-    const hasPerim=p.perimPts.length>2;
-    const fc=p.features.length;
-    const vz=p.zones&&p.zones.length;
-    return `<div class="project-card ${isActive?'active-proj':''}">
-      <div class="project-card-body">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+    const isA=p.id===activeId;
+    const hasP=p.perimPts.length>2,fc=p.features.length,vz=p.zones&&p.zones.length;
+    return `<div class="proj-card ${isA?'active-p':''}">
+      <div class="proj-body">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
           <div>
             <div style="font-weight:800;font-size:15px">${p.name}</div>
-            <div style="font-size:12px;color:#6B7280;margin-top:2px">Created ${p.created}</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px">Created ${p.created}</div>
           </div>
-          ${isActive?`<span class="badge badge-orange">Active</span>`:''}
+          ${isA?`<span class="badge badge-orange">Active</span>`:''}
         </div>
-        <div class="project-tags">
-          <span class="project-tag" style="color:${hasPerim?'#16A34A':'#9CA3AF'}">📏 ${hasPerim?'Perimeter mapped':'No perimeter'}</span>
-          <span class="project-tag" style="color:${fc>0?'#2563EB':'#9CA3AF'}">📍 ${fc} feature${fc!==1?'s':''}</span>
-          <span class="project-tag" style="color:${vz?'#F47920':'#9CA3AF'}">📐 ${vz?vz+' vol zone'+(vz!==1?'s':''):'No volume data'}</span>
+        <div class="proj-tags">
+          <span class="proj-tag" style="color:${hasP?'var(--green)':'var(--text3)'}">📏 ${hasP?'Perimeter mapped':'No perimeter'}</span>
+          <span class="proj-tag" style="color:${fc>0?'var(--blue)':'var(--text3)'}">📍 ${fc} feature${fc!==1?'s':''}</span>
+          <span class="proj-tag" style="color:${vz?'var(--orange)':'var(--text3)'}">📐 ${vz?vz+' vol zone'+(vz!==1?'s':''):'No volume data'}</span>
         </div>
-        <div class="project-actions">
-          <button class="btn ${isActive?'btn-orange':'btn-ghost'}" style="flex:1;padding:10px 0;font-size:13px" onclick="selectProject(${p.id});showTab('map')">
-            ${isActive?'Currently Editing':'Open Site'}
-          </button>
-          ${projects.length>1?`<button class="btn btn-ghost" style="padding:10px 14px;font-size:13px;color:#DC2626" onclick="deleteProject(${p.id})">Delete</button>`:''}
+        <div class="proj-actions">
+          <button class="btn ${isA?'btn-primary':'btn-ghost'}" style="flex:1;font-size:13px" onclick="selectProject(${p.id});showTab('map')">${isA?'Currently Editing':'Open Site'}</button>
+          ${projects.length>1?`<button class="btn btn-danger" style="font-size:13px" onclick="deleteProject(${p.id})">Delete</button>`:''}
         </div>
       </div>
     </div>`;
   }).join('');
 }
 
-// ─── VOLUME MODAL ──────────────────────────────────────────────────────────────
-function openVolumeModal(){
+// ═══════════════════════════════════════════════════════════════════
+// VOLUME
+// ═══════════════════════════════════════════════════════════════════
+function openVolModal(){
   zones=[...(getActive().zones||[])];
   if(!zones.length)zones=[{id:Date.now(),label:'Zone A',depth:'',type:'cut'}];
-  renderZones();
   const area=polyArea(getActive().perimPts);
-  document.getElementById('vol-area-label').textContent=
-    `Site area: ${fmt(toAc(area),3)} ac (${fmt(toSqFt(area),0)} sq ft)`;
-  document.getElementById('volume-modal').classList.add('open');
-}
-function closeVolumeModal(){document.getElementById('volume-modal').classList.remove('open');}
-
-function addZone(){
-  zones.push({id:Date.now(),label:`Zone ${String.fromCharCode(65+zones.length)}`,depth:'',type:'cut'});
+  document.getElementById('vol-area-lbl').textContent=`Site area: ${fmt(toAc(area),3)} ac (${fmt(toSqFt(area),0)} sq ft)`;
   renderZones();
+  document.getElementById('vol-modal').classList.add('open');
 }
+function closeVolModal(){document.getElementById('vol-modal').classList.remove('open');}
+
+function addZone(){zones.push({id:Date.now(),label:`Zone ${String.fromCharCode(65+zones.length)}`,depth:'',type:'cut'});renderZones();}
 
 function renderZones(){
   const area=polyArea(getActive().perimPts);
-  const el=document.getElementById('zone-list');
-  el.innerHTML=zones.map((z,i)=>{
-    const vol=z.depth?((area/zones.length)*parseFloat(z.depth)):0;
+  document.getElementById('zone-list').innerHTML=zones.map((z,i)=>{
+    const vol=z.depth?(area/zones.length)*parseFloat(z.depth):0;
     return `<div class="zone-card">
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <input value="${z.label}" onchange="zones[${i}].label=this.value" style="font-weight:700;font-size:14px;border:none;background:transparent;width:120px;padding:0"/>
-        ${zones.length>1?`<button onclick="zones.splice(${i},1);renderZones()" style="background:none;border:none;color:#9CA3AF;cursor:pointer;font-size:16px">×</button>`:''}
+        <input value="${z.label}" onchange="zones[${i}].label=this.value" style="font-weight:700;font-size:14px;border:none;background:transparent;width:120px;font-family:var(--font);color:var(--text)"/>
+        ${zones.length>1?`<button onclick="zones.splice(${i},1);renderZones()" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px">×</button>`:''}
       </div>
       <div class="zone-row">
         <div>
-          <div style="font-size:11px;font-weight:700;color:#6B7280;margin-bottom:5px;text-transform:uppercase">Avg Depth (m)</div>
-          <input type="number" value="${z.depth}" placeholder="0.00" onchange="zones[${i}].depth=this.value;renderZones()" style="font-size:14px;font-weight:700"/>
+          <div class="input-label">Avg Depth (m)</div>
+          <input type="number" class="input" value="${z.depth}" placeholder="0.00" onchange="zones[${i}].depth=this.value;renderZones()"/>
         </div>
         <div>
-          <div style="font-size:11px;font-weight:700;color:#6B7280;margin-bottom:5px;text-transform:uppercase">Type</div>
-          <div class="zone-type-row">
-            <button class="zone-type-btn ${z.type==='cut'?'cut':''}" onclick="zones[${i}].type='cut';renderZones()">▼ Cut</button>
-            <button class="zone-type-btn ${z.type==='fill'?'fill':''}" onclick="zones[${i}].type='fill';renderZones()">▲ Fill</button>
+          <div class="input-label">Type</div>
+          <div class="zone-type-pair">
+            <button class="ztype-btn ${z.type==='cut'?'cut':''}" onclick="zones[${i}].type='cut';renderZones()">▼ Cut</button>
+            <button class="ztype-btn ${z.type==='fill'?'fill':''}" onclick="zones[${i}].type='fill';renderZones()">▲ Fill</button>
           </div>
         </div>
       </div>
-      ${vol?`<div style="margin-top:10px;font-size:12px;color:#6B7280">Zone volume: <strong style="color:${z.type==='cut'?'#DC2626':'#16A34A'}">${fmt(vol,1)} m³</strong></div>`:''}
+      ${vol?`<div style="margin-top:9px;font-size:11px;color:var(--text3)">Zone volume: <strong style="color:${z.type==='cut'?'var(--red)':'var(--green)'}">${fmt(vol,1)} m³</strong></div>`:''}
     </div>`;
   }).join('');
 
-  const totalVol=zones.reduce((s,z)=>s+(z.depth?(area/zones.length)*parseFloat(z.depth):0),0);
-  const tvEl=document.getElementById('total-vol-display');
-  if(totalVol>0){
-    tvEl.style.display='flex';
-    document.getElementById('total-vol-num').textContent=`${fmt(totalVol,1)} m³`;
-  } else {
-    tvEl.style.display='none';
-  }
+  const total=zones.reduce((s,z)=>s+(z.depth?(area/zones.length)*parseFloat(z.depth):0),0);
+  const tv=document.getElementById('vol-total');
+  tv.style.display=total>0?'flex':'none';
+  document.getElementById('vol-total-num').textContent=`${fmt(total,1)} m³`;
 }
 
-function saveVolume(){
-  getActive().zones=[...zones];
-  closeVolumeModal();updateVolumeBtn();
-}
+function saveVol(){getActive().zones=[...zones];closeVolModal();updateVolBtn();}
 
-// ─── GRADE SCREEN ─────────────────────────────────────────────────────────────
-function parseGGA(line){
-  if(!line.startsWith('$GNGGA')&&!line.startsWith('$GPGGA'))return null;
-  const p=line.split(',');if(p.length<15)return null;
-  const fixQ=parseInt(p[6]);if(!fixQ)return null;
-  const latRaw=parseFloat(p[2]),latDir=p[3];
-  const lngRaw=parseFloat(p[4]),lngDir=p[5];
-  if(isNaN(latRaw)||isNaN(lngRaw))return null;
-  const lat=(Math.floor(latRaw/100)+(latRaw%100)/60)*(latDir==='S'?-1:1);
-  const lng=(Math.floor(lngRaw/100)+(lngRaw%100)/60)*(lngDir==='W'?-1:1);
-  const sats=parseInt(p[7])||0,hdop=parseFloat(p[8])||99;
-  const alt=parseFloat(p[9])||0,geoid=parseFloat(p[11])||0;
-  const fixType=fixQ===4?'RTK Fix':fixQ===5?'RTK Float':fixQ===2?'DGPS':'GPS';
-  return{lat,lng,elev:alt+geoid,sats,hdop,fixType,fixQ};
-}
-
+// ═══════════════════════════════════════════════════════════════════
+// GRADE
+// ═══════════════════════════════════════════════════════════════════
 function gradeConnect(){
-  document.getElementById('grade-idle').style.display='none';
-  document.getElementById('grade-connected').style.display='flex';
+  document.getElementById('grade-idle-view').style.display='none';
+  document.getElementById('grade-live-view').style.display='block';
   gradeTick=0;
-  gradeSimTimer=setInterval(()=>{
+  gradeTmr=setInterval(()=>{
     gradeTick++;
     const fixQ=gradeTick<3?1:gradeTick<6?2:gradeTick<10?5:4;
-    const lat=44.4280+(Math.random()-0.5)*0.00002;
-    const lng=-95.3755+(Math.random()-0.5)*0.00002;
-    const elev=312.441+(Math.random()-0.5)*0.003;
+    const lat=44.4280+(Math.random()-.5)*.00002,lng=-95.3755+(Math.random()-.5)*.00002;
+    const elev=312.441+(Math.random()-.5)*.003;
     const sats=gradeTick<3?8:gradeTick<6?12:16+(gradeTick%3);
-    const hdop=gradeTick<6?1.2:0.7+(Math.random()*0.2);
+    const hdop=gradeTick<6?1.2:.7+(Math.random()*.2);
     const fixType=fixQ===4?'RTK Fix':fixQ===5?'RTK Float':fixQ===2?'DGPS':'GPS';
     gradeData={lat,lng,elev,sats,hdop,fixType,fixQ};
-    const latDeg=Math.floor(lat);const latMin=(lat-latDeg)*60;
-    const lngDeg=Math.abs(Math.floor(lng));const lngMin=(Math.abs(lng)-lngDeg)*60;
+    const latDeg=Math.floor(lat),latMin=(lat-latDeg)*60;
+    const lngDeg=Math.abs(Math.floor(lng)),lngMin=(Math.abs(lng)-lngDeg)*60;
     const nmea=`$GNGGA,${new Date().toISOString().slice(11,19).replace(/:/g,'')}.00,${(latDeg*100+latMin).toFixed(5)},N,${(lngDeg*100+lngMin).toFixed(5)},W,${fixQ},${sats},${hdop.toFixed(1)},${(elev-30).toFixed(3)},M,30.000,M,,*6A`;
-    document.getElementById('nmea-raw').textContent=nmea;
-    updateGradeUI();
-    renderBenches();
+    document.getElementById('nmea-box').textContent=nmea;
+    updateGradeUI();renderBenches();
   },1000);
 }
 
 function gradeDisconnect(){
-  clearInterval(gradeSimTimer);gradeSimTimer=null;gradeData=null;
-  document.getElementById('grade-idle').style.display='block';
-  document.getElementById('grade-connected').style.display='none';
+  clearInterval(gradeTmr);gradeTmr=null;gradeData=null;
+  document.getElementById('grade-idle-view').style.display='block';
+  document.getElementById('grade-live-view').style.display='none';
 }
 
 function updateGradeUI(){
-  if(!gradeData)return;
+  if(!gradeData) return;
   const{fixType,fixQ,sats,hdop,elev,lat,lng}=gradeData;
-  const fixColors={4:'#16A34A',5:'#D97706',1:'#6B7280',2:'#2563EB'};
-  const fixBgs={4:'#DCFCE7',5:'#FEF3C7',1:'#F0F1F3',2:'#DBEAFE'};
-  const col=fixColors[fixQ]||'#6B7280';
-  const bg=fixBgs[fixQ]||'#F0F1F3';
+  const cols={4:'var(--green)',5:'#D97706',2:'var(--blue)',1:'var(--text3)'};
+  const bgs={4:'var(--green-bg)',5:'#FEF3C7',2:'var(--blue-bg)',1:'var(--surface2)'};
+  const col=cols[fixQ]||'var(--text3)',bg=bgs[fixQ]||'var(--surface2)';
   const badge=document.getElementById('fix-badge');
   badge.style.background=bg;badge.style.color=col;
   document.getElementById('fix-dot').style.background=col;
-  document.getElementById('fix-text').textContent=fixType;
+  document.getElementById('fix-txt').textContent=fixType;
   document.getElementById('g-sats').textContent=sats;
   document.getElementById('g-hdop').textContent=hdop.toFixed(1);
   document.getElementById('g-fixq').textContent=fixQ+' / 4';
@@ -1360,15 +1355,12 @@ function updateGradeUI(){
   document.getElementById('g-lng').textContent=`${Math.abs(lng).toFixed(7)}°W`;
 }
 
-function toggleNMEA(){
-  showNmeaRaw=!showNmeaRaw;
-  document.getElementById('nmea-raw').style.display=showNmeaRaw?'block':'none';
-}
+function toggleNMEA(){showNmea=!showNmea;document.getElementById('nmea-box').style.display=showNmea?'block':'none';}
 
 function addBench(){
   const name=document.getElementById('bm-name').value.trim();
   const elev=document.getElementById('bm-elev').value;
-  if(!name||!elev)return;
+  if(!name||!elev) return;
   benches.push({id:Date.now(),name,elev:parseFloat(elev)});
   document.getElementById('bm-name').value='';
   document.getElementById('bm-elev').value='';
@@ -1376,7 +1368,7 @@ function addBench(){
 }
 
 function snapBench(){
-  if(!gradeData)return;
+  if(!gradeData) return;
   benches.push({id:Date.now(),name:`BM-${benches.length+1}`,elev:gradeData.elev});
   renderBenches();
 }
@@ -1389,95 +1381,100 @@ function saveNtrip(){
 
 function renderBenches(){
   const el=document.getElementById('bench-list');
-  if(!benches.length){el.innerHTML=`<div style="text-align:center;color:#9CA3AF;font-size:13px;padding:16px">No benchmarks set yet</div>`;return;}
+  if(!benches.length){el.innerHTML=`<div style="text-align:center;color:var(--text3);font-size:12px;padding:14px">No benchmarks set yet</div>`;return;}
   const live=gradeData?gradeData.elev:null;
   el.innerHTML=benches.map(bm=>{
-    const delta=live!=null?live-bm.elev:null;
-    const cut=delta!=null&&delta>0;
-    return `<div class="bench-item" style="border:1.5px solid ${delta!=null?(cut?'rgba(220,38,38,0.15)':'rgba(22,163,74,0.15)'):'#E4E6EA'}">
+    const delta=live!=null?live-bm.elev:null,cut=delta!=null&&delta>0;
+    return `<div class="bench-item" style="border-color:${delta!=null?(cut?'rgba(220,38,38,.2)':'rgba(21,128,61,.2)'):'var(--border2)'}">
       <div>
         <div style="font-weight:700;font-size:14px">${bm.name}</div>
-        <div style="font-size:12px;color:#6B7280;margin-top:2px">Design: ${bm.elev.toFixed(4)} m</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:1px">Design: ${bm.elev.toFixed(4)} m</div>
       </div>
       <div style="text-align:right">
-        ${delta!=null?`<div class="bench-delta" style="color:${cut?'#DC2626':'#16A34A'}">${cut?'+':''}${delta.toFixed(4)} m</div>
-        <div style="font-size:11px;font-weight:700;color:${cut?'#DC2626':'#16A34A'};margin-top:2px">${cut?'▲ Fill':'▼ Cut'}</div>`
-        :'<div style="font-size:13px;color:#9CA3AF">Waiting…</div>'}
+        ${delta!=null?`<div class="bench-delta" style="color:${cut?'var(--red)':'var(--green)'}">${cut?'+':''}${delta.toFixed(4)} m</div><div style="font-size:10px;font-weight:700;color:${cut?'var(--red)':'var(--green)'};margin-top:1px">${cut?'▲ Fill':'▼ Cut'}</div>`:'<div style="font-size:12px;color:var(--text3)">Waiting…</div>'}
       </div>
     </div>`;
   }).join('');
 }
 
-// ─── EXPORT ───────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════════════════════
 function setSaveMode(mode,btn){
   saveMode=mode;
-  document.querySelectorAll('.save-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.save-opt').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  const info=document.getElementById('save-mode-info');
-  info.style.display=mode!=='device'?'flex':'none';
+  document.getElementById('save-mode-info').style.display=mode!=='device'?'flex':'none';
 }
 
 function buildFormatGrid(){
-  document.getElementById('format-grid').innerHTML=FORMATS.map(f=>`
-    <button class="format-btn ${doneFormat===f.name?'done':''}" onclick="doExport('${f.name}',this)">
-      <div class="format-icon">${f.icon}</div>
-      <div class="format-name">.${f.name}</div>
-      <div class="format-desc">${f.desc}</div>
-      ${f.badge?`<div class="format-badge" style="background:${f.bc}18;color:${f.bc}">${f.badge}</div>`:''}
-      ${doneFormat===f.name?`<div class="format-done">✓ Exported</div>`:''}
+  document.getElementById('format-grid').innerHTML=FORMATS.map(f=>
+    `<button class="format-card ${doneFormat===f.name?'done':''}" onclick="doExport('${f.name}')">
+      <div class="f-icon">${f.icon}</div>
+      <div class="f-name">.${f.name}</div>
+      <div class="f-desc">${f.desc}</div>
+      ${f.badge?`<div class="f-badge" style="background:${f.bc}1A;color:${f.bc}">${f.badge}</div>`:''}
+      ${doneFormat===f.name?`<div class="f-done">✓ Exported</div>`:''}
     </button>`).join('');
 }
 
-function doExport(fmt, btn){
-  doneFormat=fmt;
-  buildFormatGrid();
-  setTimeout(()=>{doneFormat=null;buildFormatGrid();},2500);
-}
+function doExport(fmt){doneFormat=fmt;buildFormatGrid();setTimeout(()=>{doneFormat=null;buildFormatGrid();},2500);}
 
 function buildExportSummary(){
-  const p=getActive();
-  const area=polyArea(p.perimPts);
-  const photoCount=p.features.filter(f=>f.photo).length;
-  const items=[
-    [String(p.perimPts.length),'Perimeter pts','📏'],
-    [String(p.features.length),'Site features','📍'],
-    [String(photoCount),'Photo pins','📷'],
-    ...(area>0?[[`${toAc(area).toFixed(3)} ac`,'Total area','📐']]:[]),
-  ];
+  const p=getActive(),area=polyArea(p.perimPts);
+  const items=[[String(p.perimPts.length),'Perimeter pts','📏'],[String(p.features.length),'Site features','📍'],
+    ...(area>0?[[`${toAc(area).toFixed(3)} ac`,'Total area','📐']]:[[]])].filter(x=>x.length);
   document.getElementById('export-summary').innerHTML=items.map(([v,l,ic])=>
-    `<div style="background:#F5F6F8;border-radius:10px;padding:12px 14px;flex:1;min-width:80px">
-      <div style="font-size:18px;margin-bottom:4px">${ic}</div>
-      <div style="font-size:18px;font-weight:800;color:#F47920">${v}</div>
-      <div style="font-size:11px;color:#6B7280;margin-top:2px">${l}</div>
-    </div>`).join('');
+    `<div class="summary-item"><div class="summary-icon">${ic}</div><div class="summary-val">${v}</div><div class="summary-lbl">${l}</div></div>`).join('');
 }
 
-// ─── TABS ─────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+// ACCORDION
+// ═══════════════════════════════════════════════════════════════════
+function toggleAccord(btn){
+  const body=btn.nextElementSibling;
+  const open=body.classList.toggle('open');
+  btn.classList.toggle('open',open);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════════════════
 function showTab(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('screen-'+id).classList.add('active');
   const tabs=['projects','map','grade','export'];
   document.querySelectorAll('.tab')[tabs.indexOf(id)].classList.add('active');
+  if(id==='map'){
+    // Init map after screen is visible so Leaflet can measure dimensions
+    setTimeout(()=>{
+      initMap();
+      if(leafMap) leafMap.invalidateSize();
+    },50);
+  }
   if(id==='export'){buildExportSummary();buildFormatGrid();}
-  if(id==='map'){drawMap();}
 }
 
-// ─── INIT ─────────────────────────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded',()=>{
-  resizeCanvas();
+// ═══════════════════════════════════════════════════════════════════
+// MAP STYLE SWITCHER (attached to pill selector in map screen)
+// ═══════════════════════════════════════════════════════════════════
+// Override pill-selector row 1 to be map style
+document.addEventListener('DOMContentLoaded',()=>{
+  // Build static elements
   buildAPWA();
-  buildUtilStrip();
   buildUtilGrid();
-  renderProjects();
-  updateFeatureLegend();
+  buildUtilStrip();
+  renderProjList();
+  updateFeatLegend();
 
   // Set active project label
-  document.getElementById('active-project-label').textContent=getActive().name;
-  document.getElementById('active-project-label').style.display='block';
+  const p=getActive();
+  document.getElementById('active-proj-chip').textContent=p.name;
+  document.getElementById('active-proj-chip').style.display='inline-flex';
 });
 
-window.addEventListener('resize', resizeCanvas);
+window.addEventListener('resize',()=>{if(leafMap)leafMap.invalidateSize();});
 </script>
 
 </body>
