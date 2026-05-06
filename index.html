@@ -14,26 +14,27 @@
     html,body{height:100%;background:#F5F6F8}
     #root{min-height:100%}
     #loader{position:fixed;inset:0;background:#F5F6F8;display:flex;flex-direction:column;
-      align-items:center;justify-content:center;gap:16px;z-index:9999}
+      align-items:center;justify-content:center;gap:16px;z-index:9999;font-family:system-ui}
     #loader-logo{width:64px;height:64px;background:#F47920;border-radius:16px;
       display:flex;align-items:center;justify-content:center}
-    #loader h1{font-family:system-ui;font-size:22px;font-weight:900;color:#111}
-    #loader p{font-family:system-ui;font-size:13px;color:#6B7280}
-    #loader-bar{width:200px;height:4px;background:#E4E6EA;border-radius:2px;overflow:hidden}
-    #loader-fill{height:100%;background:#F47920;border-radius:2px;animation:load 2s ease-in-out infinite}
-    @keyframes load{0%{width:0%}60%{width:85%}100%{width:95%}}
+    #loader h1{font-size:22px;font-weight:900;color:#111827}
+    #loader p{font-size:13px;color:#6B7280}
+    #loader-bar{width:220px;height:5px;background:#E4E6EA;border-radius:3px;overflow:hidden}
+    #loader-fill{height:100%;background:#F47920;border-radius:3px;
+      animation:load 2.5s ease-in-out forwards}
+    @keyframes load{0%{width:5%}70%{width:80%}100%{width:95%}}
   </style>
 </head>
 <body>
   <div id="loader">
     <div id="loader-logo">
-      <svg viewBox="0 0 32 32" width="36" height="36" fill="white">
-        <path d="M5 26 L13 8 L16 14 L19 8 L27 26 Z" opacity="0.95"/>
+      <svg viewBox="0 0 32 32" width="38" height="38" fill="white">
+        <path d="M5 26 L13 8 L16 14 L19 8 L27 26 Z"/>
         <rect x="10" y="22" width="12" height="4" rx="2"/>
       </svg>
     </div>
     <h1>Bobcat Digital Station</h1>
-    <p>Loading application…</p>
+    <p id="loader-msg">Starting up…</p>
     <div id="loader-bar"><div id="loader-fill"></div></div>
   </div>
   <div id="root"></div>
@@ -45,11 +46,12 @@
   <script src="https://unpkg.com/@babel/standalone@7.23.4/babel.min.js"></script>
 
   <script>
-    // Wait for Babel to load then compile and run
-    window.addEventListener('load', function() {
-      try {
-        const { useState, useRef, useEffect } = React;
-        const appSource = `
+    const {useState,useRef,useEffect} = React;
+    document.getElementById('loader-msg').textContent = 'Loading components…';
+  </script>
+
+  <script type="text/babel">
+
 
 // ─── TOKENS ──────────────────────────────────────────────────────────────────
 const T = {
@@ -153,7 +155,7 @@ function RadialPicker({sx,sy,onPick,onClose}){
       onPointerDown={onClose}>
       <div style={{position:"absolute",left:sx,top:sy,width:0,height:0}}>
         <div style={{position:"absolute",left:-22,top:-22,width:44,height:44,borderRadius:"50%",
-          background:T.orange,boxShadow:\`0 0 0 4px white,0 4px 24px rgba(244,121,32,0.45)\`,
+          background:T.orange,boxShadow:`0 0 0 4px white,0 4px 24px rgba(244,121,32,0.45)`,
           display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none"}}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><path d="M12 5v14M5 12h14"/></svg>
         </div>
@@ -223,7 +225,7 @@ function PhotoPinModal({feature,onSave,onClose}){
           </div>
         ):(
           <button onClick={()=>fileRef.current.click()}
-            style={{width:"100%",height:120,background:T.bg,border:\`2px dashed \${T.border}\`,borderRadius:T.radiusSm,cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,marginBottom:14}}>
+            style={{width:"100%",height:120,background:T.bg,border:`2px dashed ${T.border}`,borderRadius:T.radiusSm,cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,marginBottom:14}}>
             <span style={{fontSize:32}}>📷</span>
             <span style={{fontSize:13,fontWeight:600,color:T.textSub}}>Tap to attach a site photo</span>
           </button>
@@ -232,10 +234,10 @@ function PhotoPinModal({feature,onSave,onClose}){
 
         {/* Notes */}
         <textarea value={note} onChange={e=>setNote(e.target.value)} placeholder="Add a note — depth, condition, access point…"
-          style={{width:"100%",border:\`1.5px solid \${T.border}\`,borderRadius:T.radiusSm,color:T.text,padding:"11px 14px",fontSize:13,outline:"none",fontFamily:"inherit",background:T.bg,resize:"none",height:80,marginBottom:14}}/>
+          style={{width:"100%",border:`1.5px solid ${T.border}`,borderRadius:T.radiusSm,color:T.text,padding:"11px 14px",fontSize:13,outline:"none",fontFamily:"inherit",background:T.bg,resize:"none",height:80,marginBottom:14}}/>
 
         <button onClick={()=>onSave({...feature,note,photo:photoPreview})}
-          style={{width:"100%",background:T.orange,border:"none",borderRadius:T.radiusSm,color:"white",padding:14,fontSize:15,fontWeight:700,cursor:"pointer",boxShadow:\`0 4px 16px rgba(244,121,32,0.3)\`}}>
+          style={{width:"100%",background:T.orange,border:"none",borderRadius:T.radiusSm,color:"white",padding:14,fontSize:15,fontWeight:700,cursor:"pointer",boxShadow:`0 4px 16px rgba(244,121,32,0.3)`}}>
           Save Pin
         </button>
       </div>
@@ -247,7 +249,7 @@ function PhotoPinModal({feature,onSave,onClose}){
 function VolumeModal({area, zones, onSave, onClose}){
   const[zoneList,setZoneList]=useState(zones.length?zones:[{id:Date.now(),label:"Zone A",depth:"",type:"cut"}]);
 
-  const addZone=()=>setZoneList(z=>[...z,{id:Date.now(),label:\`Zone \${String.fromCharCode(65+z.length)}\`,depth:"",type:"cut"}]);
+  const addZone=()=>setZoneList(z=>[...z,{id:Date.now(),label:`Zone ${String.fromCharCode(65+z.length)}`,depth:"",type:"cut"}]);
   const update=(id,field,val)=>setZoneList(z=>z.map(z=>z.id===id?{...z,[field]:val}:z));
   const remove=id=>setZoneList(z=>z.filter(x=>x.id!==id));
 
@@ -278,14 +280,14 @@ function VolumeModal({area, zones, onSave, onClose}){
               <div>
                 <div style={{fontSize:11,fontWeight:600,color:T.textSub,marginBottom:5}}>AVG DEPTH (m)</div>
                 <input type="number" value={z.depth} onChange={e=>update(z.id,"depth",e.target.value)} placeholder="0.00"
-                  style={{width:"100%",border:\`1.5px solid \${T.border}\`,borderRadius:T.radiusXs,padding:"9px 12px",fontSize:14,fontWeight:700,color:T.text,outline:"none",fontFamily:"inherit",background:"white"}}/>
+                  style={{width:"100%",border:`1.5px solid ${T.border}`,borderRadius:T.radiusXs,padding:"9px 12px",fontSize:14,fontWeight:700,color:T.text,outline:"none",fontFamily:"inherit",background:"white"}}/>
               </div>
               <div>
                 <div style={{fontSize:11,fontWeight:600,color:T.textSub,marginBottom:5}}>TYPE</div>
                 <div style={{display:"flex",gap:6}}>
                   {["cut","fill"].map(t=>(
                     <button key={t} onClick={()=>update(z.id,"type",t)}
-                      style={{flex:1,padding:"9px 0",background:z.type===t?(t==="cut"?T.red:T.green):"white",border:\`1.5px solid \${z.type===t?(t==="cut"?T.red:T.green):T.border}\`,borderRadius:T.radiusXs,color:z.type===t?"white":T.textSub,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
+                      style={{flex:1,padding:"9px 0",background:z.type===t?(t==="cut"?T.red:T.green):"white",border:`1.5px solid ${z.type===t?(t==="cut"?T.red:T.green):T.border}`,borderRadius:T.radiusXs,color:z.type===t?"white":T.textSub,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>
                       {t==="cut"?"▼ Cut":"▲ Fill"}
                     </button>
                   ))}
@@ -303,19 +305,23 @@ function VolumeModal({area, zones, onSave, onClose}){
           </div>
         ))}
 
-        <button onClick={addZone} style={{width:"100%",background:T.bg,border:\`1.5px dashed \${T.border}\`,borderRadius:T.radiusSm,color:T.textSub,padding:11,fontSize:13,fontWeight:600,cursor:"pointer",marginBottom:16,fontFamily:"inherit"}}>
+        <button onClick={addZone} style={{width:"100%",background:T.bg,border:`1.5px dashed ${T.border}`,borderRadius:T.radiusSm,color:T.textSub,padding:11,fontSize:13,fontWeight:600,cursor:"pointer",marginBottom:16,fontFamily:"inherit"}}>
           + Add Zone
         </button>
 
         {totalVol>0&&(
-          <div style={{background:\`linear-gradient(135deg,rgba(244,121,32,0.1),rgba(244,121,32,0.03))\`,border:\`2px solid rgba(244,121,32,0.25)\`,borderRadius:T.radiusSm,padding:"14px 18px",marginBottom:16,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <div style={{background:`linear-gradient(135deg,rgba(244,121,32,0.1),rgba(244,121,32,0.03))`,border:`2px solid rgba(244,121,32,0.25)`,borderRadius:T.radiusSm,padding:"14px 18px",marginBottom:16,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
             <div style={{fontSize:13,fontWeight:600,color:T.textSub}}>Total Est. Volume</div>
             <div style={{fontSize:26,fontWeight:900,color:T.orange}}>{fmt(totalVol,1)} m³</div>
+  </script>
+
+  <script type="text/babel">
+l,1)} m³</div>
           </div>
         )}
 
         <button onClick={()=>onSave(zoneList)}
-          style={{width:"100%",background:T.orange,border:"none",borderRadius:T.radiusSm,color:"white",padding:14,fontSize:15,fontWeight:700,cursor:"pointer",boxShadow:\`0 4px 16px rgba(244,121,32,0.3)\`}}>
+          style={{width:"100%",background:T.orange,border:"none",borderRadius:T.radiusSm,color:"white",padding:14,fontSize:15,fontWeight:700,cursor:"pointer",boxShadow:`0 4px 16px rgba(244,121,32,0.3)`}}>
           Save Volume Data
         </button>
       </div>
@@ -360,9 +366,9 @@ function useMachinePosition(enabled, ip, port){
     }
 
     try{
-      const ws=new WebSocket(\`ws://\${ip}:\${port}\`);
+      const ws=new WebSocket(`ws://${ip}:${port}`);
       ws.onopen=()=>{settled=true;setSource("rs3");};
-      ws.onmessage=e=>e.data.split("\\n").forEach(l=>{const p=parseGGA(l.trim());if(p){setPos(p);}});
+      ws.onmessage=e=>e.data.split("\n").forEach(l=>{const p=parseGGA(l.trim());if(p){setPos(p);}});
       ws.onerror=()=>{if(!settled)tryGPS();};
       wsRef.current=ws;
     }catch{tryGPS();}
@@ -507,7 +513,7 @@ function MapCanvas({project:proj,features,onAddPerim,onUndo,onClose,onAddFeature
         const a=xys[i],b=xys[(i+1)%xys.length];
         const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
         const d=haversine(perimPts[i],perimPts[(i+1)%perimPts.length]);
-        const txt=d<1000?\`\${d.toFixed(1)} m\`:\`\${(d/1000).toFixed(2)} km\`;
+        const txt=d<1000?`${d.toFixed(1)} m`:`${(d/1000).toFixed(2)} km`;
         ctx.font="600 11px DM Sans,system-ui";
         const tw=ctx.measureText(txt).width;
         ctx.fillStyle="white";ctx.shadowBlur=8;ctx.shadowColor="rgba(0,0,0,0.12)";
@@ -521,7 +527,7 @@ function MapCanvas({project:proj,features,onAddPerim,onUndo,onClose,onAddFeature
         ctx.beginPath();ctx.arc(x,y,i===0?12:8,0,Math.PI*2);
         ctx.fillStyle=T.orange;ctx.fill();ctx.shadowBlur=0;
         ctx.strokeStyle="white";ctx.lineWidth=2.5;ctx.stroke();
-        ctx.fillStyle="white";ctx.font=\`bold \${i===0?11:10}px DM Sans,system-ui\`;
+        ctx.fillStyle="white";ctx.font=`bold ${i===0?11:10}px DM Sans,system-ui`;
         ctx.textAlign="center";ctx.textBaseline="middle";
         ctx.fillText(i===0?"A":String(i+1),x,y);
       });
@@ -654,6 +660,10 @@ function MapCanvas({project:proj,features,onAddPerim,onUndo,onClose,onAddFeature
     if(touchStartRef.current){
       const dx=Math.abs(e.clientX-touchStartRef.current.sx);
       const dy=Math.abs(e.clientY-touchStartRef.current.sy);
+  </script>
+
+  <script type="text/babel">
+h.abs(e.clientY-touchStartRef.current.sy);
       if(dx>8||dy>8)return;
     }
     const ref=buildRef(perimPts,features,linePts);
@@ -725,7 +735,7 @@ function MapCanvas({project:proj,features,onAddPerim,onUndo,onClose,onAddFeature
         <div style={{position:"absolute",top:12,left:12,background:machinePos?"rgba(37,99,235,0.92)":"rgba(0,0,0,0.55)",borderRadius:20,padding:"6px 12px",display:"flex",alignItems:"center",gap:6,boxShadow:T.shadow}}>
           <span style={{fontSize:13}}>🚜</span>
           <span style={{fontSize:11,fontWeight:700,color:"white"}}>
-            {machinePos?\`Machine · \${machinePos.fixType}\`:"Locating machine…"}
+            {machinePos?`Machine · ${machinePos.fixType}`:"Locating machine…"}
           </span>
           {machinePos&&<span style={{width:6,height:6,borderRadius:"50%",background:"white",animation:"gpsPulse 1.5s infinite"}}/>}
         </div>
@@ -769,7 +779,7 @@ function MapCanvas({project:proj,features,onAddPerim,onUndo,onClose,onAddFeature
         )}
         {perimPts.length>2&&!closed&&mapMode==="perimeter"&&(
           <button onPointerDown={e=>{e.stopPropagation();onClose();}}
-            style={{background:T.orange,border:"none",borderRadius:22,padding:"9px 20px",fontWeight:700,fontSize:13,color:"white",boxShadow:\`0 4px 16px rgba(244,121,32,0.35)\`,cursor:"pointer",fontFamily:"inherit"}}>
+            style={{background:T.orange,border:"none",borderRadius:22,padding:"9px 20px",fontWeight:700,fontSize:13,color:"white",boxShadow:`0 4px 16px rgba(244,121,32,0.35)`,cursor:"pointer",fontFamily:"inherit"}}>
             Close Shape ✓
           </button>
         )}
@@ -813,7 +823,7 @@ function ProjectsScreen({projects,activeId,onSelect,onCreate,onDelete}){
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
         <div style={{fontWeight:800,fontSize:18,color:T.text}}>Job Site Projects</div>
         <button onClick={()=>setShowNew(s=>!s)}
-          style={{background:T.orange,border:"none",borderRadius:22,padding:"8px 18px",color:"white",fontWeight:700,fontSize:13,cursor:"pointer",boxShadow:\`0 4px 12px rgba(244,121,32,0.3)\`,fontFamily:"inherit"}}>
+          style={{background:T.orange,border:"none",borderRadius:22,padding:"8px 18px",color:"white",fontWeight:700,fontSize:13,cursor:"pointer",boxShadow:`0 4px 12px rgba(244,121,32,0.3)`,fontFamily:"inherit"}}>
           + New Site
         </button>
       </div>
@@ -825,7 +835,7 @@ function ProjectsScreen({projects,activeId,onSelect,onCreate,onDelete}){
             <input value={newName} onChange={e=>setNewName(e.target.value)}
               onKeyDown={e=>e.key==="Enter"&&create()}
               placeholder="e.g.  Main St Utility Run, Lot 14 Grading…"
-              style={{flex:1,border:\`1.5px solid \${T.border}\`,borderRadius:T.radiusSm,padding:"11px 14px",fontSize:13,color:T.text,outline:"none",fontFamily:"inherit",background:T.bg}}
+              style={{flex:1,border:`1.5px solid ${T.border}`,borderRadius:T.radiusSm,padding:"11px 14px",fontSize:13,color:T.text,outline:"none",fontFamily:"inherit",background:T.bg}}
               autoFocus/>
             <button onClick={create}
               style={{background:T.orange,border:"none",borderRadius:T.radiusSm,color:"white",padding:"0 20px",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"inherit"}}>
@@ -848,20 +858,20 @@ function ProjectsScreen({projects,activeId,onSelect,onCreate,onDelete}){
         const featureCount=p.features.length;
         const hasPerim=p.perimPts.length>2;
         return(
-          <div key={p.id} style={{background:T.surface,borderRadius:T.radius,boxShadow:T.shadow,overflow:"hidden",border:\`2px solid \${isActive?T.orange:T.border}\`,transition:"border 0.15s"}}>
+          <div key={p.id} style={{background:T.surface,borderRadius:T.radius,boxShadow:T.shadow,overflow:"hidden",border:`2px solid ${isActive?T.orange:T.border}`,transition:"border 0.15s"}}>
             <div style={{padding:"16px 18px"}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
                 <div style={{flex:1}}>
                   <div style={{fontWeight:800,fontSize:15,color:T.text}}>{p.name}</div>
                   <div style={{fontSize:12,color:T.textSub,marginTop:2}}>Created {p.created}</div>
                 </div>
-                {isActive&&<span style={{background:T.orangeGlow,border:\`1px solid \${T.orange}\`,borderRadius:20,padding:"3px 10px",fontSize:11,fontWeight:700,color:T.orange,flexShrink:0}}>Active</span>}
+                {isActive&&<span style={{background:T.orangeGlow,border:`1px solid ${T.orange}`,borderRadius:20,padding:"3px 10px",fontSize:11,fontWeight:700,color:T.orange,flexShrink:0}}>Active</span>}
               </div>
               <div style={{display:"flex",gap:8,marginBottom:14,flexWrap:"wrap"}}>
                 {[
                   [hasPerim?"Perimeter mapped":"No perimeter",hasPerim?T.green:T.textMuted,"📏"],
-                  [\`\${featureCount} feature\${featureCount!==1?"s":""}\`,featureCount>0?T.blue:T.textMuted,"📍"],
-                  [p.zones?.length?\`\${p.zones.length} vol zone\${p.zones.length!==1?"s":""}\` :"No volume data",p.zones?.length?T.orange:T.textMuted,"📐"],
+                  [`${featureCount} feature${featureCount!==1?"s":""}`,featureCount>0?T.blue:T.textMuted,"📍"],
+                  [p.zones?.length?`${p.zones.length} vol zone${p.zones.length!==1?"s":""}` :"No volume data",p.zones?.length?T.orange:T.textMuted,"📐"],
                 ].map(([label,color,ic])=>(
                   <div key={label} style={{display:"flex",alignItems:"center",gap:5,background:T.bg,borderRadius:20,padding:"4px 10px"}}>
                     <span style={{fontSize:12}}>{ic}</span>
@@ -871,12 +881,12 @@ function ProjectsScreen({projects,activeId,onSelect,onCreate,onDelete}){
               </div>
               <div style={{display:"flex",gap:8}}>
                 <button onClick={()=>onSelect(p.id)}
-                  style={{flex:1,background:isActive?T.orangeGlow:T.bg,border:\`1.5px solid \${isActive?T.orange:T.border}\`,borderRadius:T.radiusSm,padding:"10px 0",fontWeight:700,fontSize:13,color:isActive?T.orange:T.text,cursor:"pointer",fontFamily:"inherit"}}>
+                  style={{flex:1,background:isActive?T.orangeGlow:T.bg,border:`1.5px solid ${isActive?T.orange:T.border}`,borderRadius:T.radiusSm,padding:"10px 0",fontWeight:700,fontSize:13,color:isActive?T.orange:T.text,cursor:"pointer",fontFamily:"inherit"}}>
                   {isActive?"Currently Editing":"Open Site"}
                 </button>
                 {projects.length>1&&(
                   <button onClick={()=>onDelete(p.id)}
-                    style={{background:T.bg,border:\`1.5px solid \${T.border}\`,borderRadius:T.radiusSm,padding:"10px 14px",fontWeight:700,fontSize:13,color:T.red,cursor:"pointer",fontFamily:"inherit"}}>
+                    style={{background:T.bg,border:`1.5px solid ${T.border}`,borderRadius:T.radiusSm,padding:"10px 14px",fontWeight:700,fontSize:13,color:T.red,cursor:"pointer",fontFamily:"inherit"}}>
                     Delete
                   </button>
                 )}
@@ -892,7 +902,7 @@ function ProjectsScreen({projects,activeId,onSelect,onCreate,onDelete}){
 // ─── STAT CARD ────────────────────────────────────────────────────────────────
 function StatCard({label,value,sub,accent,icon}){
   return(
-    <div style={{background:T.surface,borderRadius:T.radius,padding:"16px 18px",boxShadow:T.shadow,border:\`1.5px solid \${accent?T.orange+"33":T.borderSoft}\`,flex:1}}>
+    <div style={{background:T.surface,borderRadius:T.radius,padding:"16px 18px",boxShadow:T.shadow,border:`1.5px solid ${accent?T.orange+"33":T.borderSoft}`,flex:1}}>
       <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:8}}>
         {icon&&<span style={{fontSize:16}}>{icon}</span>}
         <span style={{fontSize:11,fontWeight:700,color:T.textMuted,textTransform:"uppercase",letterSpacing:0.6}}>{label}</span>
@@ -926,16 +936,20 @@ function FeatureLegend({features,onRemove,onEdit}){
               <span style={{marginLeft:"auto",background:"white",borderRadius:20,padding:"2px 10px",fontSize:11,fontWeight:700,color:u.color}}>{items.length}</span>
             </div>
             {items.map(f=>(
-              <div key={f.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 14px",borderTop:\`1px solid \${T.border}\`,gap:8}}>
+              <div key={f.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 14px",borderTop:`1px solid ${T.border}`,gap:8}}>
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{fontSize:12,color:T.textSub,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>
-                    {f.pts?\`Line · \${f.pts.length} nodes\`:\`\${f.lat?.toFixed(5)}, \${f.lng?.toFixed(5)}\`}
+                    {f.pts?`Line · ${f.pts.length} nodes`:`${f.lat?.toFixed(5)}, ${f.lng?.toFixed(5)}`}
                   </div>
                   {f.note&&<div style={{fontSize:11,color:T.textMuted,marginTop:2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>📝 {f.note}</div>}
                 </div>
                 <div style={{display:"flex",gap:6,flexShrink:0}}>
                   {f.lat!=null&&(
                     <button onClick={()=>onEdit(f)} style={{background:T.blueBg,border:"none",borderRadius:8,color:T.blue,cursor:"pointer",width:30,height:30,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13}}>
+  </script>
+
+  <script type="text/babel">
+r",width:30,height:30,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13}}>
                       {f.photo?"📷":"📝"}
                     </button>
                   )}
@@ -960,7 +974,7 @@ function APWAAccordion(){
         <span style={{fontSize:16,color:T.textMuted,display:"inline-block",transform:open?"rotate(180deg)":"rotate(0deg)",transition:"transform 0.2s"}}>▾</span>
       </button>
       {open&&(
-        <div style={{padding:"4px 18px 18px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,borderTop:\`1px solid \${T.border}\`}}>
+        <div style={{padding:"4px 18px 18px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,borderTop:`1px solid ${T.border}`}}>
           {UTILS.map(u=>(
             <div key={u.id} style={{display:"flex",alignItems:"center",gap:9,padding:"8px 10px",background:u.bg,borderRadius:T.radiusXs}}>
               <span style={{width:10,height:10,borderRadius:"50%",background:u.dot,flexShrink:0}}/>
@@ -1033,11 +1047,11 @@ function GradeScreen(){
       const fixType=fixQ===4?"RTK Fix":fixQ===5?"RTK Float":fixQ===2?"DGPS":"GPS";
       const latDeg=Math.floor(lat);const latMin=(lat-latDeg)*60;
       const lngDeg=Math.abs(Math.floor(lng));const lngMin=(Math.abs(lng)-lngDeg)*60;
-      const nmea=\`$GNGGA,\${new Date().toISOString().slice(11,19).replace(/:/g,"")}.00,\`+
-        \`\${(latDeg*100+latMin).toFixed(5)},N,\`+
-        \`\${(lngDeg*100+lngMin).toFixed(5)},W,\`+
-        \`\${fixQ},\${sats},\${hdop.toFixed(1)},\`+
-        \`\${(elev-30).toFixed(3)},M,30.000,M,,*6A\`;
+      const nmea=`$GNGGA,${new Date().toISOString().slice(11,19).replace(/:/g,"")}.00,`+
+        `${(latDeg*100+latMin).toFixed(5)},N,`+
+        `${(lngDeg*100+lngMin).toFixed(5)},W,`+
+        `${fixQ},${sats},${hdop.toFixed(1)},`+
+        `${(elev-30).toFixed(3)},M,30.000,M,,*6A`;
       setRawNmea(nmea);
       const parsed=parseGGA(nmea);
       if(parsed)setFixData(parsed);
@@ -1051,7 +1065,7 @@ function GradeScreen(){
       const ws=new WebSocket("ws://192.168.42.1:9001");
       ws.onopen=()=>{setStage("connected");};
       ws.onmessage=e=>{
-        const lines=e.data.split("\\n");
+        const lines=e.data.split("\n");
         lines.forEach(l=>{const p=parseGGA(l.trim());if(p){setFixData(p);setRawNmea(l.trim());}});
       };
       ws.onerror=()=>{
@@ -1084,7 +1098,7 @@ function GradeScreen(){
   const addBench=()=>{if(!nb.name||!nb.elev)return;setBenches(b=>[...b,{...nb,id:Date.now()}]);setNb({name:"",elev:""});};
   const snapBench=()=>{
     if(!fixData)return;
-    setBenches(b=>[...b,{name:\`BM-\${b.length+1}\`,elev:fixData.elev.toFixed(4),id:Date.now()}]);
+    setBenches(b=>[...b,{name:`BM-${b.length+1}`,elev:fixData.elev.toFixed(4),id:Date.now()}]);
   };
 
   const fixColor=fixData?(fixData.fixQ===4?T.green:fixData.fixQ===5?"#F59E0B":T.red):T.textMuted;
@@ -1118,7 +1132,7 @@ function GradeScreen(){
           </div>
 
           <button onClick={()=>setStage("wifi_guide")}
-            style={{width:"100%",background:T.orange,border:"none",borderRadius:T.radiusSm,color:"white",padding:14,fontSize:15,fontWeight:700,cursor:"pointer",boxShadow:\`0 4px 16px rgba(244,121,32,0.3)\`,fontFamily:"inherit"}}>
+            style={{width:"100%",background:T.orange,border:"none",borderRadius:T.radiusSm,color:"white",padding:14,fontSize:15,fontWeight:700,cursor:"pointer",boxShadow:`0 4px 16px rgba(244,121,32,0.3)`,fontFamily:"inherit"}}>
             I'm connected to the RS3 hotspot — Connect
           </button>
         </div>
@@ -1213,6 +1227,10 @@ function GradeScreen(){
           <div style={{background:T.surface,borderRadius:T.radius,boxShadow:T.shadow,overflow:"hidden"}}>
             <button onClick={()=>setNtripOpen(o=>!o)} style={{width:"100%",background:"none",border:"none",padding:"15px 18px",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer",fontFamily:"inherit"}}>
               <div style={{display:"flex",alignItems:"center",gap:10}}>
+  </script>
+
+  <script type="text/babel">
+ms:"center",gap:10}}>
                 <span style={{fontSize:18}}>🛰️</span>
                 <div style={{textAlign:"left"}}>
                   <div style={{fontWeight:700,fontSize:14,color:T.text}}>NTRIP Corrections</div>
@@ -1222,7 +1240,7 @@ function GradeScreen(){
               <span style={{fontSize:16,color:T.textMuted,display:"inline-block",transform:ntripOpen?"rotate(180deg)":"rotate(0deg)",transition:"transform 0.2s"}}>▾</span>
             </button>
             {ntripOpen&&(
-              <div style={{padding:"0 18px 18px",borderTop:\`1px solid \${T.border}\`}}>
+              <div style={{padding:"0 18px 18px",borderTop:`1px solid ${T.border}`}}>
                 <div style={{fontSize:12,color:T.textSub,marginBottom:14,marginTop:12,lineHeight:1.6}}>
                   Enter your NTRIP caster details to stream RTCM3 correction data to the RS3 over the internet. Your network provider (e.g. CORS, SmartNet, Trimble RTX) supplies these credentials.
                 </div>
@@ -1237,7 +1255,7 @@ function GradeScreen(){
                     <div style={{fontSize:11,fontWeight:700,color:T.textSub,marginBottom:4,textTransform:"uppercase",letterSpacing:0.4}}>{label}</div>
                     <input type={field==="pass"?"password":"text"} value={ntrip[field]}
                       onChange={e=>setNtrip(n=>({...n,[field]:e.target.value}))} placeholder={ph}
-                      style={{width:"100%",border:\`1.5px solid \${T.border}\`,borderRadius:T.radiusXs,padding:"9px 12px",fontSize:13,color:T.text,outline:"none",fontFamily:"inherit",background:T.bg}}/>
+                      style={{width:"100%",border:`1.5px solid ${T.border}`,borderRadius:T.radiusXs,padding:"9px 12px",fontSize:13,color:T.text,outline:"none",fontFamily:"inherit",background:T.bg}}/>
                   </div>
                 ))}
                 <button onClick={()=>{setNtripSaved(true);setNtripOpen(false);}}
@@ -1253,14 +1271,14 @@ function GradeScreen(){
             <div style={{fontWeight:800,fontSize:16,color:T.text,marginBottom:14}}>Benchmarks & Grade Points</div>
             <div style={{display:"flex",gap:8,marginBottom:10}}>
               <input value={nb.name} onChange={e=>setNb(b=>({...b,name:e.target.value}))} placeholder="Label  (e.g. BM-1)"
-                style={{flex:1,border:\`1.5px solid \${T.border}\`,borderRadius:T.radiusSm,color:T.text,padding:"11px 14px",fontSize:13,outline:"none",fontFamily:"inherit",background:T.bg}}/>
+                style={{flex:1,border:`1.5px solid ${T.border}`,borderRadius:T.radiusSm,color:T.text,padding:"11px 14px",fontSize:13,outline:"none",fontFamily:"inherit",background:T.bg}}/>
               <input value={nb.elev} onChange={e=>setNb(b=>({...b,elev:e.target.value}))} placeholder="Elev (m)" type="number"
-                style={{width:104,border:\`1.5px solid \${T.border}\`,borderRadius:T.radiusSm,color:T.text,padding:"11px 12px",fontSize:13,outline:"none",fontFamily:"inherit",background:T.bg}}/>
+                style={{width:104,border:`1.5px solid ${T.border}`,borderRadius:T.radiusSm,color:T.text,padding:"11px 12px",fontSize:13,outline:"none",fontFamily:"inherit",background:T.bg}}/>
               <button onClick={addBench} style={{background:T.orange,border:"none",borderRadius:T.radiusSm,color:"white",padding:"0 18px",fontWeight:700,fontSize:14,cursor:"pointer",fontFamily:"inherit"}}>Set</button>
             </div>
             <button onClick={snapBench} disabled={!fixData}
-              style={{width:"100%",background:fixData?T.bg:T.surfaceAlt,border:\`1.5px dashed \${fixData?T.border:T.borderSoft}\`,borderRadius:T.radiusSm,color:fixData?T.textSub:T.textMuted,padding:12,fontSize:13,fontWeight:600,cursor:fixData?"pointer":"not-allowed",marginBottom:12,fontFamily:"inherit"}}>
-              📍  Snap Benchmark from Live Position {fixData?\`(\${fixData.fixType})\`:"(waiting for fix…)"}
+              style={{width:"100%",background:fixData?T.bg:T.surfaceAlt,border:`1.5px dashed ${fixData?T.border:T.borderSoft}`,borderRadius:T.radiusSm,color:fixData?T.textSub:T.textMuted,padding:12,fontSize:13,fontWeight:600,cursor:fixData?"pointer":"not-allowed",marginBottom:12,fontFamily:"inherit"}}>
+              📍  Snap Benchmark from Live Position {fixData?`(${fixData.fixType})`:"(waiting for fix…)"}
             </button>
             {!benches.length&&<div style={{textAlign:"center",color:T.textMuted,fontSize:13,padding:16}}>No benchmarks set yet</div>}
             {benches.map(bm=>{
@@ -1268,7 +1286,7 @@ function GradeScreen(){
               const delta=liveE!=null?liveE-parseFloat(bm.elev):null;
               const cut=delta!=null&&delta>0;
               return(
-                <div key={bm.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 16px",background:T.bg,borderRadius:T.radiusSm,marginBottom:8,border:\`1.5px solid \${delta!=null?(cut?"rgba(220,38,38,0.15)":"rgba(22,163,74,0.15)"):T.border}\`}}>
+                <div key={bm.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 16px",background:T.bg,borderRadius:T.radiusSm,marginBottom:8,border:`1.5px solid ${delta!=null?(cut?"rgba(220,38,38,0.15)":"rgba(22,163,74,0.15)"):T.border}`}}>
                   <div>
                     <div style={{fontWeight:700,fontSize:14,color:T.text}}>{bm.name}</div>
                     <div style={{fontSize:12,color:T.textSub,marginTop:2}}>Design: {parseFloat(bm.elev).toFixed(4)} m</div>
@@ -1313,7 +1331,7 @@ function ExportScreen({perimPts,features,zones}){
         <div style={{fontWeight:800,fontSize:16,color:T.text,marginBottom:14}}>Save Mode</div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10}}>
           {[["device","On-Device","💾"],["cloud","Cloud","☁️"],["both","Both","🔄"]].map(([id,lbl,ico])=>(
-            <button key={id} onClick={()=>setSaveMode(id)} style={{padding:"14px 8px",background:saveMode===id?T.orange:T.bg,border:\`2px solid \${saveMode===id?T.orange:T.border}\`,borderRadius:T.radiusSm,color:saveMode===id?"white":T.text,cursor:"pointer",fontWeight:700,fontSize:12,fontFamily:"inherit",transition:"all 0.15s"}}>
+            <button key={id} onClick={()=>setSaveMode(id)} style={{padding:"14px 8px",background:saveMode===id?T.orange:T.bg,border:`2px solid ${saveMode===id?T.orange:T.border}`,borderRadius:T.radiusSm,color:saveMode===id?"white":T.text,cursor:"pointer",fontWeight:700,fontSize:12,fontFamily:"inherit",transition:"all 0.15s"}}>
               <div style={{fontSize:22,marginBottom:5}}>{ico}</div>{lbl}
             </button>
           ))}
@@ -1333,7 +1351,7 @@ function ExportScreen({perimPts,features,zones}){
             [String(perimPts.length),"Perimeter pts","📏"],
             [String(features.length),"Site features","📍"],
             [String(photoCount),"Photo pins","📷"],
-            ...(area>0?[[\`\${toAc(area).toFixed(3)} ac\`,"Total area","📐"]]:[[],]),
+            ...(area>0?[[`${toAc(area).toFixed(3)} ac`,"Total area","📐"]]:[[],]),
           ].filter(x=>x.length).map(([v,l,ic])=>(
             <div key={l} style={{background:T.bg,borderRadius:T.radiusSm,padding:"12px 14px",flex:1,minWidth:80}}>
               <div style={{fontSize:18,marginBottom:4}}>{ic}</div>
@@ -1347,7 +1365,7 @@ function ExportScreen({perimPts,features,zones}){
       <div style={{fontWeight:800,fontSize:16,color:T.text}}>Export Format</div>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
         {formats.map(f=>(
-          <button key={f.name} onClick={()=>doExport(f.name)} style={{background:done===f.name?"rgba(244,121,32,0.08)":T.surface,border:\`2px solid \${done===f.name?T.orange:T.border}\`,borderRadius:T.radius,padding:"16px 14px",cursor:"pointer",textAlign:"left",boxShadow:T.shadow,position:"relative",transition:"all 0.15s",fontFamily:"inherit"}}>
+          <button key={f.name} onClick={()=>doExport(f.name)} style={{background:done===f.name?"rgba(244,121,32,0.08)":T.surface,border:`2px solid ${done===f.name?T.orange:T.border}`,borderRadius:T.radius,padding:"16px 14px",cursor:"pointer",textAlign:"left",boxShadow:T.shadow,position:"relative",transition:"all 0.15s",fontFamily:"inherit"}}>
             <div style={{fontSize:26,marginBottom:6}}>{f.icon}</div>
             <div style={{fontSize:14,fontWeight:800,color:done===f.name?T.orange:T.text}}>.{f.name}</div>
             <div style={{fontSize:11,color:T.textSub,marginTop:2}}>{f.desc}</div>
@@ -1418,7 +1436,7 @@ function App(){
 
   return(
     <div style={{minHeight:"100vh",background:T.bg,display:"flex",flexDirection:"column",maxWidth:480,margin:"0 auto",fontFamily:"'DM Sans','Helvetica Neue',system-ui,sans-serif"}}>
-      <style>{\`
+      <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800;9..40,900&display=swap');
         @keyframes gpsPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(0.8)}}
         @keyframes alertSlide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
@@ -1427,13 +1445,13 @@ function App(){
         input::placeholder,textarea::placeholder{color:#C0C4CC}
         ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#DDD;border-radius:4px}
         button:active{transform:scale(0.97);transition:transform 0.08s}
-      \`}</style>
+      `}</style>
 
 ```
   {/* Header */}
-  <div style={{background:T.surface,borderBottom:\`1px solid \${T.border}\`,padding:"12px 18px",display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,zIndex:50,boxShadow:"0 1px 0 rgba(0,0,0,0.05)"}}>
+  <div style={{background:T.surface,borderBottom:`1px solid ${T.border}`,padding:"12px 18px",display:"flex",alignItems:"center",justifyContent:"space-between",position:"sticky",top:0,zIndex:50,boxShadow:"0 1px 0 rgba(0,0,0,0.05)"}}>
     <div style={{display:"flex",alignItems:"center",gap:12}}>
-      <div style={{width:42,height:42,background:T.orange,borderRadius:12,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:\`0 4px 14px rgba(244,121,32,0.35)\`}}>
+      <div style={{width:42,height:42,background:T.orange,borderRadius:12,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:`0 4px 14px rgba(244,121,32,0.35)`}}>
         <svg viewBox="0 0 32 32" width="24" height="24" fill="white">
           <path d="M5 26 L13 8 L16 14 L19 8 L27 26 Z" opacity="0.95"/>
           <rect x="10" y="22" width="12" height="4" rx="2"/>
@@ -1446,235 +1464,236 @@ function App(){
     </div>
     <div style={{display:"flex",alignItems:"center",gap:8}}>
       {tab==="map"&&(
-        <div style={{fontSize:12,fontWeight:700,color:T.orange,background:T.orangeGlow,borderRadius:20,padding:"4px 12px",maxWidth:130,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{active.name}</div>
-      )}
-      <div style={{background:T.greenBg,borderRadius:20,padding:"6px 12px",display:"flex",alignItems:"center",gap:6}}>
-        <span style={{width:7,height:7,borderRadius:"50%",background:T.green,display:"inline-block",animation:"gpsPulse 2s infinite"}}/>
-        <span style={{fontSize:12,fontWeight:700,color:T.green}}>GPS Fix</span>
+```
+
+  </script>
+
+  <script type="text/babel">
+==="map"&&(
+            <div style={{fontSize:12,fontWeight:700,color:T.orange,background:T.orangeGlow,borderRadius:20,padding:"4px 12px",maxWidth:130,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{active.name}</div>
+          )}
+          <div style={{background:T.greenBg,borderRadius:20,padding:"6px 12px",display:"flex",alignItems:"center",gap:6}}>
+            <span style={{width:7,height:7,borderRadius:"50%",background:T.green,display:"inline-block",animation:"gpsPulse 2s infinite"}}/>
+            <span style={{fontSize:12,fontWeight:700,color:T.green}}>GPS Fix</span>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
-  {/* Tabs */}
-  <div style={{background:T.surface,borderBottom:\`1px solid \${T.border}\`,display:"flex",padding:"0 4px"}}>
-    {tabs.map(t=>(
-      <button key={t.id} onClick={()=>setTab(t.id)} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3,padding:"9px 0 11px",background:"none",border:"none",borderBottom:tab===t.id?\`3px solid \${T.orange}\`:"3px solid transparent",color:tab===t.id?T.orange:T.textMuted,cursor:"pointer",fontSize:10,fontWeight:700,transition:"all 0.15s",letterSpacing:0.3}}>
-        <span style={{fontSize:17,opacity:tab===t.id?1:0.5}}>{t.icon}</span>
-        {t.label}
-      </button>
-    ))}
-  </div>
+      {/* Tabs */}
+      <div style={{background:T.surface,borderBottom:`1px solid ${T.border}`,display:"flex",padding:"0 4px"}}>
+        {tabs.map(t=>(
+          <button key={t.id} onClick={()=>setTab(t.id)} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3,padding:"9px 0 11px",background:"none",border:"none",borderBottom:tab===t.id?`3px solid ${T.orange}`:"3px solid transparent",color:tab===t.id?T.orange:T.textMuted,cursor:"pointer",fontSize:10,fontWeight:700,transition:"all 0.15s",letterSpacing:0.3}}>
+            <span style={{fontSize:17,opacity:tab===t.id?1:0.5}}>{t.icon}</span>
+            {t.label}
+          </button>
+        ))}
+      </div>
 
-  {/* Content */}
-  <div style={{flex:1,overflowY:"auto",padding:16}}>
+      {/* Content */}
+      <div style={{flex:1,overflowY:"auto",padding:16}}>
 
-    {/* PROJECTS */}
-    {tab==="projects"&&(
-      <ProjectsScreen
-        projects={projects} activeId={activeId}
-        onSelect={id=>{setActiveId(id);setTab("map");}}
-        onCreate={name=>{const p=newProject(name);setProjects(ps=>[...ps,p]);setActiveId(p.id);setTab("map");}}
-        onDelete={id=>setProjects(ps=>{const next=ps.filter(p=>p.id!==id);if(activeId===id)setActiveId(next[0]?.id);return next;})}
-      />
-    )}
+        {/* PROJECTS */}
+        {tab==="projects"&&(
+          <ProjectsScreen
+            projects={projects} activeId={activeId}
+            onSelect={id=>{setActiveId(id);setTab("map");}}
+            onCreate={name=>{const p=newProject(name);setProjects(ps=>[...ps,p]);setActiveId(p.id);setTab("map");}}
+            onDelete={id=>setProjects(ps=>{const next=ps.filter(p=>p.id!==id);if(activeId===id)setActiveId(next[0]?.id);return next;})}
+          />
+        )}
 
-    {/* MAP */}
-    {tab==="map"&&(
-      <div style={{display:"flex",flexDirection:"column",gap:14}}>
+        {/* MAP */}
+        {tab==="map"&&(
+          <div style={{display:"flex",flexDirection:"column",gap:14}}>
 
-        {/* Map style switcher */}
-        <div style={{background:T.surface,borderRadius:T.radius,padding:5,boxShadow:T.shadow,display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4}}>
-          {MAP_STYLES.map(s=>(
-            <button key={s.id} onClick={()=>setMapStyle(s.id)} style={{padding:"9px 0",background:mapStyle===s.id?T.bg:"transparent",border:\`1.5px solid \${mapStyle===s.id?T.border:"transparent"}\`,borderRadius:T.radiusSm,color:mapStyle===s.id?T.text:T.textMuted,fontSize:11,fontWeight:700,cursor:"pointer",transition:"all 0.15s",boxShadow:mapStyle===s.id?T.shadow:"none"}}>
-              <div style={{fontSize:16,marginBottom:2}}>{s.id==="default"?"🗺️":s.id==="satellite"?"🛰️":"🏔️"}</div>
-              {s.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Draw mode */}
-        <div style={{background:T.surface,borderRadius:T.radius,padding:5,boxShadow:T.shadow,display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4}}>
-          {[["perimeter","📏","Perimeter"],["line","〰️","Run Line"],["features","🔍","View All"]].map(([id,ico,lbl])=>(
-            <button key={id} onClick={()=>{setMapMode(id);if(id!=="line")setLinePts([]);}} style={{padding:"10px 0",background:mapMode===id?T.orange:"transparent",border:"none",borderRadius:T.radiusSm,color:mapMode===id?"white":T.textSub,fontSize:12,fontWeight:700,cursor:"pointer",transition:"all 0.15s"}}>
-              <div style={{fontSize:18,marginBottom:2}}>{ico}</div>{lbl}
-            </button>
-          ))}
-        </div>
-
-        {/* Line util strip */}
-        {mapMode==="line"&&(
-          <div>
-            <div style={{fontSize:12,fontWeight:700,color:T.textSub,marginBottom:8,textTransform:"uppercase",letterSpacing:0.5}}>Select Utility Type</div>
-            <div style={{display:"flex",gap:7,overflowX:"auto",paddingBottom:2}}>
-              {UTILS.filter(u=>u.id!=="nodig").map(u=>(
-                <button key={u.id} onClick={()=>setActiveUtil(u.id)} style={{flexShrink:0,padding:"7px 14px",background:activeUtil===u.id?u.bg:"white",border:\`2px solid \${activeUtil===u.id?u.dot:T.border}\`,borderRadius:20,color:activeUtil===u.id?u.color:T.textSub,fontSize:12,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:6,whiteSpace:"nowrap"}}>
-                  {u.emoji} {u.label}
+            {/* Map style switcher */}
+            <div style={{background:T.surface,borderRadius:T.radius,padding:5,boxShadow:T.shadow,display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4}}>
+              {MAP_STYLES.map(s=>(
+                <button key={s.id} onClick={()=>setMapStyle(s.id)} style={{padding:"9px 0",background:mapStyle===s.id?T.bg:"transparent",border:`1.5px solid ${mapStyle===s.id?T.border:"transparent"}`,borderRadius:T.radiusSm,color:mapStyle===s.id?T.text:T.textMuted,fontSize:11,fontWeight:700,cursor:"pointer",transition:"all 0.15s",boxShadow:mapStyle===s.id?T.shadow:"none"}}>
+                  <div style={{fontSize:16,marginBottom:2}}>{s.id==="default"?"🗺️":s.id==="satellite"?"🛰️":"🏔️"}</div>
+                  {s.label}
                 </button>
               ))}
             </div>
-          </div>
-        )}
 
-        {/* Machine tracking toggle */}
-        <div style={{background:T.surface,borderRadius:T.radius,boxShadow:T.shadow,overflow:"hidden"}}>
-          <div style={{padding:"13px 16px",display:"flex",alignItems:"center",gap:12}}>
-            <div style={{width:40,height:40,borderRadius:11,background:machineEnabled?T.blueBg:T.surfaceAlt,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>🚜</div>
-            <div style={{flex:1}}>
-              <div style={{fontWeight:700,fontSize:14,color:T.text}}>Machine Tracking</div>
-              <div style={{fontSize:11,color:machineEnabled?(machinePos?T.green:T.textSub):T.textMuted,marginTop:1}}>
-                {machineEnabled?(machinePos?\`\${machineSource==="rs3"?"RS3":"Simulated"} · \${machinePos.fixType} · \${machinePos.lat.toFixed(6)}N\`:"Locating…"):"Off · 3 m proximity alerts when on"}
-              </div>
+            {/* Draw mode */}
+            <div style={{background:T.surface,borderRadius:T.radius,padding:5,boxShadow:T.shadow,display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4}}>
+              {[["perimeter","📏","Perimeter"],["line","〰️","Run Line"],["features","🔍","View All"]].map(([id,ico,lbl])=>(
+                <button key={id} onClick={()=>{setMapMode(id);if(id!=="line")setLinePts([]);}} style={{padding:"10px 0",background:mapMode===id?T.orange:"transparent",border:"none",borderRadius:T.radiusSm,color:mapMode===id?"white":T.textSub,fontSize:12,fontWeight:700,cursor:"pointer",transition:"all 0.15s"}}>
+                  <div style={{fontSize:18,marginBottom:2}}>{ico}</div>{lbl}
+                </button>
+              ))}
             </div>
-            {/* Toggle */}
-            <div onClick={()=>setMachineEnabled(e=>!e)}
-              style={{width:48,height:28,borderRadius:14,background:machineEnabled?T.blue:T.border,cursor:"pointer",position:"relative",transition:"background 0.2s",flexShrink:0}}>
-              <div style={{position:"absolute",top:3,left:machineEnabled?22:3,width:22,height:22,borderRadius:"50%",background:"white",boxShadow:"0 1px 4px rgba(0,0,0,0.2)",transition:"left 0.2s"}}/>
-            </div>
-          </div>
-          {machineEnabled&&(
-            <>
-              <button onClick={()=>setShowMachineConfig(s=>!s)}
-                style={{width:"100%",background:"none",border:"none",borderTop:\`1px solid \${T.border}\`,padding:"10px 16px",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer",fontFamily:"inherit"}}>
-                <span style={{fontSize:12,fontWeight:600,color:T.textSub}}>🔧 RS3 Connection · {machineIp}:{machinePort}</span>
-                <span style={{fontSize:13,color:T.textMuted,transform:showMachineConfig?"rotate(180deg)":"none",transition:"transform 0.2s",display:"inline-block"}}>▾</span>
-              </button>
-              {showMachineConfig&&(
-                <div style={{padding:"4px 16px 14px",borderTop:\`1px solid \${T.border}\`}}>
-                  <div style={{fontSize:11,color:T.textSub,marginBottom:10,lineHeight:1.6}}>
-                    Connect a second Emlid RS3 mounted on the machine. Join its WiFi hotspot then enter its IP below. Port 9002 is the RS3's secondary NMEA TCP output.
-                  </div>
-                  <div style={{display:"flex",gap:8}}>
-                    <input value={machineIp} onChange={e=>setMachineIp(e.target.value)} placeholder="192.168.42.1"
-                      style={{flex:1,border:\`1.5px solid \${T.border}\`,borderRadius:T.radiusXs,padding:"8px 10px",fontSize:12,color:T.text,outline:"none",fontFamily:"inherit",background:T.bg}}/>
-                    <input value={machinePort} onChange={e=>setMachinePort(e.target.value)} placeholder="9002"
-                      style={{width:72,border:\`1.5px solid \${T.border}\`,borderRadius:T.radiusXs,padding:"8px 10px",fontSize:12,color:T.text,outline:"none",fontFamily:"inherit",background:T.bg}}/>
-                  </div>
-                  <div style={{fontSize:11,color:T.textMuted,marginTop:8}}>No RS3 on network? App uses a simulated track so you can demo the proximity alerts.</div>
+
+            {/* Line util strip */}
+            {mapMode==="line"&&(
+              <div>
+                <div style={{fontSize:12,fontWeight:700,color:T.textSub,marginBottom:8,textTransform:"uppercase",letterSpacing:0.5}}>Select Utility Type</div>
+                <div style={{display:"flex",gap:7,overflowX:"auto",paddingBottom:2}}>
+                  {UTILS.filter(u=>u.id!=="nodig").map(u=>(
+                    <button key={u.id} onClick={()=>setActiveUtil(u.id)} style={{flexShrink:0,padding:"7px 14px",background:activeUtil===u.id?u.bg:"white",border:`2px solid ${activeUtil===u.id?u.dot:T.border}`,borderRadius:20,color:activeUtil===u.id?u.color:T.textSub,fontSize:12,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:6,whiteSpace:"nowrap"}}>
+                      {u.emoji} {u.label}
+                    </button>
+                  ))}
                 </div>
+              </div>
+            )}
+
+            {/* Machine tracking toggle */}
+            <div style={{background:T.surface,borderRadius:T.radius,boxShadow:T.shadow,overflow:"hidden"}}>
+              <div style={{padding:"13px 16px",display:"flex",alignItems:"center",gap:12}}>
+                <div style={{width:40,height:40,borderRadius:11,background:machineEnabled?T.blueBg:T.surfaceAlt,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>🚜</div>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:700,fontSize:14,color:T.text}}>Machine Tracking</div>
+                  <div style={{fontSize:11,color:machineEnabled?(machinePos?T.green:T.textSub):T.textMuted,marginTop:1}}>
+                    {machineEnabled?(machinePos?`${machineSource==="rs3"?"RS3":"Simulated"} · ${machinePos.fixType} · ${machinePos.lat.toFixed(6)}N`:"Locating…"):"Off · 3 m proximity alerts when on"}
+                  </div>
+                </div>
+                {/* Toggle */}
+                <div onClick={()=>setMachineEnabled(e=>!e)}
+                  style={{width:48,height:28,borderRadius:14,background:machineEnabled?T.blue:T.border,cursor:"pointer",position:"relative",transition:"background 0.2s",flexShrink:0}}>
+                  <div style={{position:"absolute",top:3,left:machineEnabled?22:3,width:22,height:22,borderRadius:"50%",background:"white",boxShadow:"0 1px 4px rgba(0,0,0,0.2)",transition:"left 0.2s"}}/>
+                </div>
+              </div>
+              {machineEnabled&&(
+                <>
+                  <button onClick={()=>setShowMachineConfig(s=>!s)}
+                    style={{width:"100%",background:"none",border:"none",borderTop:`1px solid ${T.border}`,padding:"10px 16px",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer",fontFamily:"inherit"}}>
+                    <span style={{fontSize:12,fontWeight:600,color:T.textSub}}>🔧 RS3 Connection · {machineIp}:{machinePort}</span>
+                    <span style={{fontSize:13,color:T.textMuted,transform:showMachineConfig?"rotate(180deg)":"none",transition:"transform 0.2s",display:"inline-block"}}>▾</span>
+                  </button>
+                  {showMachineConfig&&(
+                    <div style={{padding:"4px 16px 14px",borderTop:`1px solid ${T.border}`}}>
+                      <div style={{fontSize:11,color:T.textSub,marginBottom:10,lineHeight:1.6}}>
+                        Connect a second Emlid RS3 mounted on the machine. Join its WiFi hotspot then enter its IP below. Port 9002 is the RS3's secondary NMEA TCP output.
+                      </div>
+                      <div style={{display:"flex",gap:8}}>
+                        <input value={machineIp} onChange={e=>setMachineIp(e.target.value)} placeholder="192.168.42.1"
+                          style={{flex:1,border:`1.5px solid ${T.border}`,borderRadius:T.radiusXs,padding:"8px 10px",fontSize:12,color:T.text,outline:"none",fontFamily:"inherit",background:T.bg}}/>
+                        <input value={machinePort} onChange={e=>setMachinePort(e.target.value)} placeholder="9002"
+                          style={{width:72,border:`1.5px solid ${T.border}`,borderRadius:T.radiusXs,padding:"8px 10px",fontSize:12,color:T.text,outline:"none",fontFamily:"inherit",background:T.bg}}/>
+                      </div>
+                      <div style={{fontSize:11,color:T.textMuted,marginTop:8}}>No RS3 on network? App uses a simulated track so you can demo the proximity alerts.</div>
+                    </div>
+                  )}
+                </>
               )}
-            </>
-          )}
-        </div>
+            </div>
 
-        {/* Canvas */}
-        <div style={{height:300,borderRadius:T.radius,overflow:"hidden",boxShadow:T.shadowMd}}>
-          <MapCanvas
-            project={active}
-            features={active.features}
-            onAddPerim={addPerim} onUndo={undoPerim} onClose={closePerim}
-            onAddFeature={addFeature}
-            onUpdateFeature={updateFeature}
-            mapMode={mapMode} activeUtil={activeUtil}
-            linePts={linePts} onAddLinePt={p=>setLinePts(x=>[...x,p])} onFinishLine={finishLine}
-            mapStyle={mapStyle}
-            machinePos={machinePos}
-            machineEnabled={machineEnabled}
-          />
-        </div>
+            {/* Canvas */}
+            <div style={{height:300,borderRadius:T.radius,overflow:"hidden",boxShadow:T.shadowMd}}>
+              <MapCanvas
+                project={active}
+                features={active.features}
+                onAddPerim={addPerim} onUndo={undoPerim} onClose={closePerim}
+                onAddFeature={addFeature}
+                onUpdateFeature={updateFeature}
+                mapMode={mapMode} activeUtil={activeUtil}
+                linePts={linePts} onAddLinePt={p=>setLinePts(x=>[...x,p])} onFinishLine={finishLine}
+                mapStyle={mapStyle}
+                machinePos={machinePos}
+                machineEnabled={machineEnabled}
+              />
+            </div>
 
-        {/* Measurements */}
-        {active.perimPts.length>1&&(
-          <div style={{display:"flex",gap:10}}>
-            <StatCard label="Perimeter" value={\`\${fmt(perimM(active.perimPts))} m\`} sub={\`\${fmt(toFt(perimM(active.perimPts)),0)} ft\`} icon="📏"/>
-            <StatCard label="Area" value={active.closed?\`\${fmt(toAc(area),3)} ac\`:null} sub={active.closed?\`\${fmt(toSqFt(area),0)} sq ft\`:"Close shape first"} icon="📐" accent/>
-          </div>
-        )}
+            {/* Measurements */}
+            {active.perimPts.length>1&&(
+              <div style={{display:"flex",gap:10}}>
+                <StatCard label="Perimeter" value={`${fmt(perimM(active.perimPts))} m`} sub={`${fmt(toFt(perimM(active.perimPts)),0)} ft`} icon="📏"/>
+                <StatCard label="Area" value={active.closed?`${fmt(toAc(area),3)} ac`:null} sub={active.closed?`${fmt(toSqFt(area),0)} sq ft`:"Close shape first"} icon="📐" accent/>
+              </div>
+            )}
 
-        {/* Volume button */}
-        {active.closed&&area>0&&(
-          <button onClick={()=>setShowVolume(true)} style={{width:"100%",background:T.surface,border:\`2px solid \${active.zones?.length?T.orange:T.border}\`,borderRadius:T.radius,padding:"14px 18px",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer",boxShadow:T.shadow,fontFamily:"inherit"}}>
-            <div style={{display:"flex",alignItems:"center",gap:10}}>
-              <span style={{fontSize:22}}>📐</span>
-              <div style={{textAlign:"left"}}>
-                <div style={{fontWeight:700,fontSize:14,color:T.text}}>Volume Calculator</div>
-                <div style={{fontSize:12,color:T.textSub,marginTop:1}}>
-                  {active.zones?.length?\`\${active.zones.length} zone\${active.zones.length!==1?"s":""} defined\`:"Tap to add cut/fill depth zones"}
+            {/* Volume button */}
+            {active.closed&&area>0&&(
+              <button onClick={()=>setShowVolume(true)} style={{width:"100%",background:T.surface,border:`2px solid ${active.zones?.length?T.orange:T.border}`,borderRadius:T.radius,padding:"14px 18px",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer",boxShadow:T.shadow,fontFamily:"inherit"}}>
+                <div style={{display:"flex",alignItems:"center",gap:10}}>
+                  <span style={{fontSize:22}}>📐</span>
+                  <div style={{textAlign:"left"}}>
+                    <div style={{fontWeight:700,fontSize:14,color:T.text}}>Volume Calculator</div>
+                    <div style={{fontSize:12,color:T.textSub,marginTop:1}}>
+                      {active.zones?.length?`${active.zones.length} zone${active.zones.length!==1?"s":""} defined`:"Tap to add cut/fill depth zones"}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <span style={{fontSize:18,color:T.orange}}>›</span>
-          </button>
-        )}
+                <span style={{fontSize:18,color:T.orange}}>›</span>
+              </button>
+            )}
 
-        {/* Feature summary */}
-        {active.features.length>0&&(
-          <div style={{background:T.surface,borderRadius:T.radius,padding:"14px 18px",boxShadow:T.shadow,display:"flex",alignItems:"center",gap:12}}>
-            <div style={{width:44,height:44,borderRadius:12,background:"rgba(244,121,32,0.1)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}>📍</div>
-            <div style={{flex:1}}>
-              <div style={{fontWeight:800,fontSize:15,color:T.text}}>{active.features.length} Site Feature{active.features.length!==1?"s":""}</div>
-              <div style={{fontSize:12,color:T.textSub,marginTop:2}}>
-                {active.features.filter(f=>f.photo).length} photo pin{active.features.filter(f=>f.photo).length!==1?"s":""} · Weather-proof · Exportable
+            {/* Feature summary */}
+            {active.features.length>0&&(
+              <div style={{background:T.surface,borderRadius:T.radius,padding:"14px 18px",boxShadow:T.shadow,display:"flex",alignItems:"center",gap:12}}>
+                <div style={{width:44,height:44,borderRadius:12,background:"rgba(244,121,32,0.1)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}>📍</div>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:800,fontSize:15,color:T.text}}>{active.features.length} Site Feature{active.features.length!==1?"s":""}</div>
+                  <div style={{fontSize:12,color:T.textSub,marginTop:2}}>
+                    {active.features.filter(f=>f.photo).length} photo pin{active.features.filter(f=>f.photo).length!==1?"s":""} · Weather-proof · Exportable
+                  </div>
+                </div>
+                <span style={{width:8,height:8,borderRadius:"50%",background:T.green,animation:"gpsPulse 2s infinite",flexShrink:0}}/>
               </div>
-            </div>
-            <span style={{width:8,height:8,borderRadius:"50%",background:T.green,animation:"gpsPulse 2s infinite",flexShrink:0}}/>
+            )}
+
+            <div style={{fontWeight:800,fontSize:16,color:T.text}}>Site Features Layer</div>
+            <FeatureLegend features={active.features} onRemove={removeFeature} onEdit={setEditingPin}/>
+            <APWAAccordion/>
+
+            {(active.perimPts.length>0||active.features.length>0)&&(
+              <button onClick={()=>updateActive({perimPts:[],closed:false,features:[],zones:[]})}
+                style={{width:"100%",background:"white",border:`1.5px solid ${T.border}`,borderRadius:T.radiusSm,color:T.textSub,padding:13,fontSize:13,fontWeight:700,cursor:"pointer"}}>
+                🗑️  Clear Site & Start Over
+              </button>
+            )}
           </div>
         )}
 
-        <div style={{fontWeight:800,fontSize:16,color:T.text}}>Site Features Layer</div>
-        <FeatureLegend features={active.features} onRemove={removeFeature} onEdit={setEditingPin}/>
-        <APWAAccordion/>
-
-        {(active.perimPts.length>0||active.features.length>0)&&(
-          <button onClick={()=>updateActive({perimPts:[],closed:false,features:[],zones:[]})}
-            style={{width:"100%",background:"white",border:\`1.5px solid \${T.border}\`,borderRadius:T.radiusSm,color:T.textSub,padding:13,fontSize:13,fontWeight:700,cursor:"pointer"}}>
-            🗑️  Clear Site & Start Over
-          </button>
-        )}
+        {tab==="grade"&&<GradeScreen/>}
+        {tab==="export"&&<ExportScreen perimPts={active.perimPts} features={active.features} zones={active.zones||[]}/>}
       </div>
-    )}
 
-    {tab==="grade"&&<GradeScreen/>}
-    {tab==="export"&&<ExportScreen perimPts={active.perimPts} features={active.features} zones={active.zones||[]}/>}
-  </div>
+      <div style={{height:8,background:T.bg}}/>
 
-  <div style={{height:8,background:T.bg}}/>
+      {/* Volume modal */}
+      {showVolume&&(
+        <VolumeModal
+          area={area}
+          zones={active.zones||[]}
+          onSave={zones=>{updateActive({zones});setShowVolume(false);}}
+          onClose={()=>setShowVolume(false)}
+        />
+      )}
 
-  {/* Volume modal */}
-  {showVolume&&(
-    <VolumeModal
-      area={area}
-      zones={active.zones||[]}
-      onSave={zones=>{updateActive({zones});setShowVolume(false);}}
-      onClose={()=>setShowVolume(false)}
-    />
-  )}
-
-  {/* Photo pin edit modal */}
-  {editingPin&&(
-    <PhotoPinModal
-      feature={editingPin}
-      onSave={updated=>{updateFeature(updated);setEditingPin(null);}}
-      onClose={()=>setEditingPin(null)}
-    />
-  )}
-</div>
-```
-
-);
+      {/* Photo pin edit modal */}
+      {editingPin&&(
+        <PhotoPinModal
+          feature={editingPin}
+          onSave={updated=>{updateFeature(updated);setEditingPin(null);}}
+          onClose={()=>setEditingPin(null)}
+        />
+      )}
+    </div>
+  );
 }
-`;
+
+  </script>
+
+  <script>
+    document.getElementById('loader-msg').textContent = 'Rendering…';
+    setTimeout(function(){
+      try{
+        document.getElementById('loader').style.display='none';
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(React.createElement(App));
+      }catch(e){
+        document.getElementById('loader').innerHTML =
+          '<div style="padding:24px;font-family:system-ui;color:#DC2626;max-width:480px">' +
+          '<h2 style="margin-bottom:8px">Error</h2>' +
+          '<pre style="font-size:11px;white-space:pre-wrap;color:#374151">' + e.message + '</pre></div>';
 
 ```
-    const compiled = Babel.transform(appSource, {
-      presets: [['react', {}], ['env', {targets:{esmodules:true}, modules:false}]],
-      filename: 'app.jsx'
-    }).code;
-
-    // Inject React hooks into scope then eval
-    const fn = new Function('React','useState','useRef','useEffect', compiled + '\nreturn App;');
-    const App = fn(React, useState, useRef, useEffect);
-
-    document.getElementById('loader').style.display = 'none';
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(React.createElement(App));
-  } catch(e) {
-    document.getElementById('loader').innerHTML =
-      '<div style="font-family:system-ui;padding:24px;color:#DC2626;max-width:480px">' +
-      '<h2>Load Error</h2><pre style="font-size:11px;margin-top:8px;white-space:pre-wrap">' +
-      e.message + '</pre></div>';
     console.error(e);
   }
-});
+}, 100);
 ```
 
   </script>
