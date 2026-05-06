@@ -5,11 +5,8 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
-<meta name="theme-color" content="#F47920"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <title>Bobcat Digital Station</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;width:100%;overflow:hidden;background:#F7F8FA;
@@ -18,147 +15,129 @@ html,body{height:100%;width:100%;overflow:hidden;background:#F7F8FA;
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-thumb{background:#D1D5DB;border-radius:3px}
 
-/* ─── SPLASH ─────────────────────────────────────────────── */
-#splash{
-position:fixed;inset:0;z-index:9999;
-background:#0F0F0F;
+/* SPLASH */
+#splash{position:fixed;inset:0;z-index:9999;background:#0F0F0F;
 display:flex;flex-direction:column;align-items:center;justify-content:center;
-transition:opacity .7s ease,transform .7s ease;
-}
-#splash.out{opacity:0;transform:scale(1.05);pointer-events:none}
-.sp-ring{
-width:100px;height:100px;border-radius:24px;background:#F47920;
+transition:opacity .6s ease,transform .6s ease}
+#splash.out{opacity:0;transform:scale(1.04);pointer-events:none}
+.sp-icon{width:96px;height:96px;border-radius:24px;background:#F47920;
 display:flex;align-items:center;justify-content:center;
 box-shadow:0 0 80px rgba(244,121,32,.5),0 20px 60px rgba(244,121,32,.2);
-animation:spIn .9s cubic-bezier(.16,1,.3,1) both;
 margin-bottom:28px;
-}
-@keyframes spIn{from{opacity:0;transform:translateY(32px) scale(.88)}to{opacity:1;transform:none}}
-.sp-name{font-size:34px;font-weight:900;color:#FFFFFF;letter-spacing:-1.5px;
-animation:spIn .9s .1s cubic-bezier(.16,1,.3,1) both}
-.sp-sub{font-size:11px;font-weight:600;color:#F47920;letter-spacing:3.5px;
-text-transform:uppercase;margin-top:6px;
-animation:spIn .9s .2s cubic-bezier(.16,1,.3,1) both}
+animation:spup .8s cubic-bezier(.16,1,.3,1) both}
+@keyframes spup{from{opacity:0;transform:translateY(28px) scale(.9)}to{opacity:1;transform:none}}
+.sp-name{font-size:34px;font-weight:900;color:#fff;letter-spacing:-1.5px;
+animation:spup .8s .08s cubic-bezier(.16,1,.3,1) both}
+.sp-sub{font-size:11px;font-weight:700;color:#F47920;letter-spacing:3.5px;
+text-transform:uppercase;margin-top:7px;
+animation:spup .8s .16s cubic-bezier(.16,1,.3,1) both}
 .sp-tag{font-size:13px;color:#555;margin-top:18px;
-animation:spIn .9s .3s cubic-bezier(.16,1,.3,1) both}
-.sp-bar-wrap{position:absolute;bottom:64px;width:200px;
-animation:fadeIn .5s .5s both}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.sp-bar{height:2px;background:#222;border-radius:2px;overflow:hidden}
-.sp-fill{height:100%;background:#F47920;border-radius:2px;
-animation:fill 2s ease-out both}
-@keyframes fill{from{width:0}to{width:100%}}
-.sp-loading{font-size:11px;color:#444;text-align:center;margin-top:10px;letter-spacing:.5px}
+animation:spup .8s .24s cubic-bezier(.16,1,.3,1) both}
+.sp-bot{position:absolute;bottom:60px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.sp-track{width:180px;height:2px;background:#222;border-radius:2px;overflow:hidden}
+.sp-bar{height:100%;background:#F47920;border-radius:2px;width:0;
+transition:width 1.6s ease-out}
+.sp-lbl{font-size:11px;color:#444;letter-spacing:.5px}
 
-/* ─── APP SHELL ──────────────────────────────────────────── */
-#app{width:100%;height:100%;display:flex;flex-direction:column;opacity:0;transition:opacity .5s}
-#app.show{opacity:1}
+/* APP */
+#app{width:100%;height:100%;display:flex;flex-direction:column;
+opacity:0;transition:opacity .5s;pointer-events:none}
+#app.show{opacity:1;pointer-events:all}
 
-/* ─── HEADER ─────────────────────────────────────────────── */
-#hdr{
-height:56px;background:#FFFFFF;
-border-bottom:1px solid #EAECF0;
+/* HEADER */
+#hdr{height:56px;background:#fff;border-bottom:1px solid #EAECF0;
 display:flex;align-items:center;justify-content:space-between;
-padding:0 16px;flex-shrink:0;
-box-shadow:0 1px 0 rgba(0,0,0,.04);
-}
-.h-logo{display:flex;align-items:center;gap:10px}
-.h-icon{width:38px;height:38px;background:#F47920;border-radius:10px;
+padding:0 16px;flex-shrink:0;box-shadow:0 1px 0 rgba(0,0,0,.04)}
+.hlogo{display:flex;align-items:center;gap:10px}
+.hicon{width:38px;height:38px;background:#F47920;border-radius:10px;
 display:flex;align-items:center;justify-content:center;
 box-shadow:0 2px 12px rgba(244,121,32,.3);flex-shrink:0}
-.h-name{font-size:17px;font-weight:800;color:#1A1A1A;letter-spacing:-.5px;line-height:1.1}
-.h-sub{font-size:8px;font-weight:700;color:#F47920;letter-spacing:2.5px;text-transform:uppercase}
-.h-right{display:flex;align-items:center;gap:7px}
-.proj-tag{background:#FFF3EA;border:1px solid #F4792033;border-radius:20px;
+.hname{font-size:17px;font-weight:800;color:#1A1A1A;letter-spacing:-.5px;line-height:1.1}
+.hsub{font-size:8px;font-weight:700;color:#F47920;letter-spacing:2.5px;text-transform:uppercase}
+.hright{display:flex;align-items:center;gap:7px}
+.pchip{background:#FFF3EA;border:1px solid rgba(244,121,32,.25);border-radius:20px;
 padding:4px 11px;font-size:11px;font-weight:600;color:#F47920;
 display:none;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.gps-tag{background:#ECFDF5;border:1px solid #22C55E33;border-radius:20px;
+.gpspill{background:#ECFDF5;border:1px solid rgba(34,197,94,.25);border-radius:20px;
 padding:5px 11px;display:flex;align-items:center;gap:6px}
-.gps-tag span{font-size:11px;font-weight:700;color:#16A34A}
+.gpspill span{font-size:11px;font-weight:700;color:#16A34A}
 .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;animation:blink 2s infinite}
 .dg{background:#22C55E}.do{background:#F47920}.dr{background:#EF4444}
 @keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.2;transform:scale(.6)}}
 
-/* ─── TABS ───────────────────────────────────────────────── */
-#tabs{
-background:#FFFFFF;border-bottom:1px solid #EAECF0;
-display:flex;flex-shrink:0;
-}
+/* TABS */
+#tabs{background:#fff;border-bottom:1px solid #EAECF0;display:flex;flex-shrink:0}
 .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
 padding:8px 0 10px;background:none;border:none;
-border-bottom:2.5px solid transparent;color:#9CA3AF;
-cursor:pointer;font-size:10px;font-weight:700;
-font-family:inherit;letter-spacing:.2px;transition:all .18s}
+border-bottom:2.5px solid transparent;color:#9CA3AF;cursor:pointer;
+font-size:10px;font-weight:700;font-family:inherit;letter-spacing:.2px;transition:all .18s}
 .tab.on{color:#F47920;border-bottom-color:#F47920}
 .ti{font-size:18px;opacity:.4;transition:opacity .18s}
 .tab.on .ti{opacity:1}
 
-/* ─── CONTENT ────────────────────────────────────────────── */
+/* CONTENT */
 #content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;background:#F7F8FA}
 .scr{display:none;flex-direction:column;gap:12px;padding:14px 14px 36px}
 .scr.on{display:flex}
 
-/* ─── CARDS ──────────────────────────────────────────────── */
-.card{background:#FFFFFF;border-radius:14px;
-border:1px solid #EAECF0;overflow:hidden;
+/* CARDS */
+.card{background:#fff;border-radius:14px;border:1px solid #EAECF0;overflow:hidden;
 box-shadow:0 1px 2px rgba(0,0,0,.04)}
 .cp{padding:16px}
 .ct{font-size:15px;font-weight:700;color:#1A1A1A;margin-bottom:13px}
 
-/* ─── BUTTONS ────────────────────────────────────────────── */
+/* BUTTONS */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;
 border:none;border-radius:10px;padding:12px 18px;font-size:14px;font-weight:700;
 cursor:pointer;font-family:inherit;transition:all .15s}
 .btn:active{transform:scale(.96)}
-.bo{background:#F47920;color:#fff;box-shadow:0 3px 16px rgba(244,121,32,.35)}
-.bo:hover{background:#FF9240}
-.bg{background:#F4F5F7;color:#374151;border:1px solid #E5E7EB}
-.br{background:#FEF2F2;color:#DC2626;border:1px solid #FECACA}
-.bgn{background:#F0FDF4;color:#15803D;border:1px solid #BBF7D0}
+.bo{background:#F47920;color:#fff;box-shadow:0 3px 16px rgba(244,121,32,.3)}
+.bg{background:#F4F5F7;color:#374151;border:1.5px solid #E5E7EB}
+.br{background:#FEF2F2;color:#DC2626;border:1.5px solid #FECACA}
 .bw{width:100%;display:flex}
 .bsm{padding:7px 13px;font-size:12px;border-radius:8px}
 
-/* ─── INPUTS ─────────────────────────────────────────────── */
-input,textarea{
-border:1.5px solid #E5E7EB;border-radius:8px;padding:10px 13px;
+/* INPUTS */
+input,textarea{border:1.5px solid #E5E7EB;border-radius:8px;padding:10px 13px;
 font-size:13px;color:#1A1A1A;outline:none;font-family:inherit;
 background:#F9FAFB;width:100%;transition:border-color .15s}
-input:focus,textarea:focus{border-color:#F47920;background:#FFFFFF}
+input:focus,textarea:focus{border-color:#F47920;background:#fff}
 input::placeholder,textarea::placeholder{color:#C4C8D0}
 textarea{resize:none}
-.lbl{font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
+.lbl{font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;
+letter-spacing:.8px;margin-bottom:5px}
 
-/* ─── SEGMENT CTRL ───────────────────────────────────────── */
-.seg{background:#F4F5F7;border-radius:12px;padding:3px;display:grid;gap:2px;border:1px solid #EAECF0}
+/* SEGMENT */
+.seg{background:#F4F5F7;border-radius:12px;padding:3px;
+display:grid;gap:2px;border:1px solid #EAECF0}
 .s3{grid-template-columns:1fr 1fr 1fr}
-.s2{grid-template-columns:1fr 1fr}
 .sb{padding:9px 0;background:transparent;border:none;border-radius:9px;
 color:#6B7280;font-size:11px;font-weight:700;cursor:pointer;
 font-family:inherit;transition:all .18s;text-align:center}
 .sb .si{font-size:17px;display:block;margin-bottom:2px}
-.sb.on{background:#FFFFFF;color:#F47920;
+.sb.on{background:#fff;color:#F47920;
 box-shadow:0 1px 4px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06)}
 
-/* ─── STAT CARDS ─────────────────────────────────────────── */
+/* STATS */
 .sr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.sc{background:#FFFFFF;border-radius:14px;padding:14px 16px;
+.sc{background:#fff;border-radius:14px;padding:14px 16px;
 border:1px solid #EAECF0;box-shadow:0 1px 2px rgba(0,0,0,.04)}
-.sc.ac{border-color:#F4792040;
-background:linear-gradient(135deg,#FFF8F4,#FFFFFF)}
-.sl{font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px}
+.sc.ac{border-color:rgba(244,121,32,.3);
+background:linear-gradient(135deg,#FFF8F4,#fff)}
+.sl{font-size:10px;font-weight:700;color:#9CA3AF;
+text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px}
 .sv{font-size:22px;font-weight:900;color:#1A1A1A;line-height:1}
 .sc.ac .sv{color:#F47920}
 .ss{font-size:11px;color:#9CA3AF;margin-top:3px}
 
-/* ─── BADGES ─────────────────────────────────────────────── */
+/* BADGES */
 .bdg{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700}
-.bdg-g{background:#ECFDF5;color:#15803D;border:1px solid #BBF7D0}
-.bdg-o{background:#FFF3EA;color:#F47920;border:1px solid #F4792030}
-.bdg-b{background:#EFF6FF;color:#2563EB;border:1px solid #BFDBFE}
-.bdg-r{background:#FEF2F2;color:#DC2626;border:1px solid #FECACA}
-.bdg-gray{background:#F9FAFB;color:#6B7280;border:1px solid #E5E7EB}
+.bg2{background:#ECFDF5;color:#15803D;border:1px solid #BBF7D0}
+.bo2{background:#FFF3EA;color:#F47920;border:1px solid rgba(244,121,32,.25)}
+.bb{background:#EFF6FF;color:#2563EB;border:1px solid #BFDBFE}
+.br2{background:#FEF2F2;color:#DC2626;border:1px solid #FECACA}
 
-/* ─── TOGGLE ─────────────────────────────────────────────── */
+/* TOGGLE */
 .trow{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .tog{width:46px;height:26px;border-radius:13px;background:#D1D5DB;
 cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;border:none}
@@ -167,69 +146,72 @@ cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;border:
 border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:left .2s}
 .tog.on::after{left:23px}
 
-/* ─── INFO BOXES ─────────────────────────────────────────── */
+/* INFO */
 .ib{border-radius:8px;padding:10px 13px;font-size:12px;line-height:1.6}
-.ib-b{background:#EFF6FF;color:#1E40AF;border:1px solid #BFDBFE}
-.ib-g{background:#ECFDF5;color:#15803D;border:1px solid #BBF7D0;display:flex;align-items:center;gap:7px}
-.ib-o{background:#FFF8F4;color:#9A4A00;border:1px solid #F4792030}
+.ibb{background:#EFF6FF;color:#1E40AF;border:1px solid #BFDBFE}
+.ibg{background:#ECFDF5;color:#15803D;border:1px solid #BBF7D0;display:flex;align-items:center;gap:7px}
 
-/* ─── MAP ────────────────────────────────────────────────── */
-#mwrap{position:relative;width:100%;border-radius:14px;overflow:hidden;
-box-shadow:0 4px 20px rgba(0,0,0,.1);height:380px;border:1px solid #EAECF0}
-#lmap{width:100%;height:100%}
-.otl{position:absolute;z-index:500}
+/* MAP CANVAS */
+#mapwrap{position:relative;width:100%;height:380px;border-radius:14px;
+overflow:hidden;border:1px solid #EAECF0;
+box-shadow:0 4px 20px rgba(0,0,0,.08)}
+#mc{width:100%;height:100%;display:block;cursor:crosshair;touch-action:pan-y}
+.otl{position:absolute;z-index:10;pointer-events:none}
 .otl-tl{top:10px;left:10px;display:flex;flex-direction:column;gap:5px}
 .otl-tr{top:10px;right:10px}
 .otl-bl{bottom:10px;left:10px}
-.otl-br{bottom:10px;right:10px;display:flex;gap:7px}
-.mchip{background:rgba(255,255,255,.96);backdrop-filter:blur(10px);
--webkit-backdrop-filter:blur(10px);
+.otl-br{bottom:10px;right:10px;display:flex;gap:7px;pointer-events:all}
+.mchip{background:rgba(255,255,255,.95);backdrop-filter:blur(8px);
 border:1px solid rgba(0,0,0,.08);border-radius:20px;
 padding:5px 12px;font-size:11px;font-weight:600;color:#374151;
 display:flex;align-items:center;gap:6px;
-box-shadow:0 1px 6px rgba(0,0,0,.1);white-space:nowrap}
-.mbtn{background:rgba(255,255,255,.96);backdrop-filter:blur(10px);
--webkit-backdrop-filter:blur(10px);
+box-shadow:0 1px 6px rgba(0,0,0,.08);white-space:nowrap}
+.mbtn{background:rgba(255,255,255,.95);backdrop-filter:blur(8px);
 border:1px solid rgba(0,0,0,.1);border-radius:20px;
 padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;
 box-shadow:0 2px 8px rgba(0,0,0,.1);font-family:inherit;color:#1A1A1A;
-display:flex;align-items:center;gap:5px;transition:all .15s}
+display:flex;align-items:center;gap:5px;pointer-events:all}
 .mbo{background:#F47920;color:#fff;border-color:transparent;
 box-shadow:0 3px 12px rgba(244,121,32,.4)}
 .mbg{background:#15803D;color:#fff;border-color:transparent}
 .mbtn:active{transform:scale(.96)}
 
-/* ─── PROX ALERT ─────────────────────────────────────────── */
+/* MAP TILE SWITCHER */
+.tile-row{display:flex;gap:6px}
+.tile-btn{flex:1;padding:5px 0;background:rgba(255,255,255,.9);
+border:1px solid rgba(0,0,0,.1);border-radius:8px;
+font-size:10px;font-weight:700;color:#374151;cursor:pointer;
+font-family:inherit;text-align:center;transition:all .15s;pointer-events:all}
+.tile-btn.on{background:#F47920;color:#fff;border-color:transparent}
+
+/* PROX */
 #prox{display:none;background:linear-gradient(135deg,#7F1D1D,#991B1B);
 border:1px solid rgba(239,68,68,.3);border-radius:14px;padding:13px 16px;
-box-shadow:0 4px 20px rgba(239,68,68,.25);animation:sld .2s ease-out}
+box-shadow:0 4px 20px rgba(239,68,68,.2);animation:sld .2s ease-out}
 #prox.show{display:block}
 @keyframes sld{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
-.px-in{display:flex;align-items:center;gap:12px}
-.px-ico{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.15);
+.px{display:flex;align-items:center;gap:12px}
+.pxico{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.15);
 display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.px-title{font-weight:800;font-size:13px;color:#fff}
-.px-sub{font-size:11px;color:rgba(255,255,255,.65);margin-top:1px}
-.px-num{font-size:28px;font-weight:900;color:#fff;line-height:1}
-.px-unit{font-size:9px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:.8px}
+.pxtit{font-weight:800;font-size:13px;color:#fff}
+.pxsub{font-size:11px;color:rgba(255,255,255,.65);margin-top:1px}
+.pxnum{font-size:28px;font-weight:900;color:#fff;line-height:1}
+.pxunit{font-size:9px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:.8px}
 
-/* ─── FEATURE LEGEND ─────────────────────────────────────── */
+/* FEAT LEGEND */
 .fg{background:#fff;border-radius:14px;border:1px solid #EAECF0;overflow:hidden;margin-bottom:8px}
 .fh{display:flex;align-items:center;gap:9px;padding:12px 14px}
-.fr{display:flex;justify-content:space-between;align-items:center;
-padding:9px 14px;border-top:1px solid #F3F4F6}
-.fc{font-size:11px;color:#9CA3AF;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.fn{font-size:10px;color:#C4C8D0;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fr{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-top:1px solid #F3F4F6}
+.fcoord{font-size:11px;color:#9CA3AF;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fnote{font-size:10px;color:#C4C8D0;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .xbtn{background:#F4F5F7;border:none;border-radius:6px;width:26px;height:26px;
-cursor:pointer;font-size:14px;color:#9CA3AF;
-display:flex;align-items:center;justify-content:center;flex-shrink:0}
+cursor:pointer;font-size:14px;color:#9CA3AF;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 
-/* ─── ACCORDION ──────────────────────────────────────────── */
+/* ACCORDION */
 .acc{background:#fff;border-radius:14px;border:1px solid #EAECF0;overflow:hidden}
 .ahd{display:flex;justify-content:space-between;align-items:center;
 padding:14px 16px;cursor:pointer;font-weight:700;font-size:14px;
-border:none;background:none;width:100%;font-family:inherit;
-text-align:left;color:#1A1A1A}
+border:none;background:none;width:100%;font-family:inherit;text-align:left;color:#1A1A1A}
 .achev{font-size:13px;color:#9CA3AF;transition:transform .2s}
 .ahd.open .achev{transform:rotate(180deg)}
 .abd{display:none;padding:0 16px 16px;border-top:1px solid #F3F4F6}
@@ -237,7 +219,7 @@ text-align:left;color:#1A1A1A}
 .apg{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding-top:10px}
 .api{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px}
 
-/* ─── GRADE ──────────────────────────────────────────────── */
+/* GRADE */
 .strow{display:flex;gap:12px;margin-bottom:16px}
 .stn{width:28px;height:28px;border-radius:50%;background:#F47920;color:#fff;
 display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0}
@@ -247,15 +229,15 @@ display:flex;align-items:center;justify-content:center;font-weight:700;font-size
 .rb{background:#F9FAFB;border-radius:8px;padding:11px 8px;text-align:center;border:1px solid #E5E7EB}
 .rv{font-size:19px;font-weight:800;color:#1A1A1A}
 .rl{font-size:10px;color:#9CA3AF;margin-top:2px}
-.ecard{background:linear-gradient(135deg,#FFF8F4,#FFF3EA);border:1.5px solid #F4792030;border-radius:14px;padding:16px}
+.ecard{background:linear-gradient(135deg,#FFF8F4,#FFF3EA);border:1.5px solid rgba(244,121,32,.25);border-radius:14px;padding:16px}
 .enum{font-size:38px;font-weight:900;color:#F47920;line-height:1}
 .bi{display:flex;justify-content:space-between;align-items:center;
 padding:13px 14px;background:#F9FAFB;border-radius:8px;margin-bottom:7px;border:1.5px solid #E5E7EB}
 .bd{font-size:21px;font-weight:900;line-height:1}
 
-/* ─── EXPORT ─────────────────────────────────────────────── */
+/* EXPORT */
 .fmg{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.fc2{background:#FFFFFF;border:1.5px solid #E5E7EB;border-radius:14px;padding:15px 14px;
+.fc2{background:#fff;border:1.5px solid #E5E7EB;border-radius:14px;padding:15px 14px;
 cursor:pointer;font-family:inherit;text-align:left;position:relative;transition:all .15s}
 .fc2:active{transform:scale(.97)}
 .fc2.done{background:#FFF8F4;border-color:#F47920}
@@ -276,8 +258,8 @@ cursor:pointer;font-weight:700;font-size:11px;font-family:inherit;text-align:cen
 .smv{font-size:17px;font-weight:800;color:#F47920}
 .sml{font-size:10px;color:#9CA3AF;margin-top:2px}
 
-/* ─── PROJECTS ───────────────────────────────────────────── */
-.pc{background:#FFFFFF;border-radius:14px;border:1.5px solid #E5E7EB;
+/* PROJECTS */
+.pc{background:#fff;border-radius:14px;border:1.5px solid #E5E7EB;
 overflow:hidden;transition:border-color .2s;margin-bottom:10px}
 .pc.ap{border-color:#F47920}
 .pc.ap::before{content:’’;display:block;height:3px;background:linear-gradient(90deg,#F47920,#FF9A3C)}
@@ -287,17 +269,17 @@ overflow:hidden;transition:border-color .2s;margin-bottom:10px}
 border-radius:20px;padding:4px 9px;font-size:10px;font-weight:600;color:#6B7280}
 .pacts{display:flex;gap:7px}
 
-/* ─── MODAL ──────────────────────────────────────────────── */
+/* MODALS */
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;
 display:none;align-items:flex-end;justify-content:center;
 backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .ov.open{display:flex}
-.ms{background:#FFFFFF;border-radius:20px 20px 0 0;padding:20px 16px;
+.ms{background:#fff;border-radius:20px 20px 0 0;padding:20px 16px;
 width:100%;max-height:88vh;overflow-y:auto;
-box-shadow:0 -8px 40px rgba(0,0,0,.12)}
+box-shadow:0 -8px 40px rgba(0,0,0,.1)}
 .mh{width:36px;height:4px;background:#E5E7EB;border-radius:2px;margin:0 auto 18px}
 
-/* ─── ZONE CARDS ─────────────────────────────────────────── */
+/* ZONES */
 .zc{background:#F9FAFB;border-radius:8px;padding:13px;margin-bottom:9px;border:1.5px solid #E5E7EB}
 .zrow{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:9px}
 .ztp{display:flex;gap:6px}
@@ -305,52 +287,35 @@ box-shadow:0 -8px 40px rgba(0,0,0,.12)}
 background:#fff;cursor:pointer;font-weight:700;font-size:12px;font-family:inherit;color:#374151;transition:all .15s}
 .zt.cut{background:#FEF2F2;border-color:#FECACA;color:#DC2626}
 .zt.fill{background:#F0FDF4;border-color:#BBF7D0;color:#15803D}
-.vtot{background:#FFF8F4;border:1.5px solid #F4792030;border-radius:8px;
+.vtot{background:#FFF8F4;border:1.5px solid rgba(244,121,32,.25);border-radius:8px;
 padding:13px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}
 
-/* ─── UTIL PICKER ────────────────────────────────────────── */
+/* UTIL PICKER */
 .ug{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
 .uo{padding:13px;border-radius:8px;border:1.5px solid #E5E7EB;cursor:pointer;
 font-family:inherit;font-weight:700;font-size:13px;
 display:flex;align-items:center;gap:10px;transition:all .15s;background:#F9FAFB}
 .uo:active{transform:scale(.97)}
-
-/* ─── UTIL STRIP ─────────────────────────────────────────── */
 .ustrip{display:flex;gap:7px;overflow-x:auto;padding-bottom:3px}
 .ustrip::-webkit-scrollbar{display:none}
 .uchip{flex-shrink:0;display:flex;align-items:center;gap:5px;padding:6px 12px;
-border-radius:20px;border:1.5px solid #E5E7EB;background:#FFFFFF;
-font-size:11px;font-weight:700;color:#6B7280;cursor:pointer;
-font-family:inherit;white-space:nowrap;transition:all .15s}
+border-radius:20px;border:1.5px solid #E5E7EB;background:#fff;
+font-size:11px;font-weight:700;color:#6B7280;cursor:pointer;font-family:inherit;white-space:nowrap}
 
-/* ─── NMEA ────────────────────────────────────────────────── */
-.nmea{background:#0D1117;border-radius:8px;padding:10px 12px;
-font-size:9px;color:#3FB950;font-family:‘Courier New’,monospace;
-word-break:break-all;line-height:1.9;margin-top:6px;border:1px solid #21262D}
+/* NMEA */
+.nmea{background:#0D1117;border-radius:8px;padding:10px 12px;font-size:9px;
+color:#3FB950;font-family:“Courier New”,monospace;word-break:break-all;line-height:1.9;margin-top:6px}
 
-/* ─── DRONE CARD ─────────────────────────────────────────── */
+/* DRONE */
 .drone{background:linear-gradient(135deg,#EFF6FF,#F0F9FF);
 border:1.5px dashed #93C5FD;border-radius:14px;padding:18px}
 
-/* ─── EMPTY ──────────────────────────────────────────────── */
-.empty{background:#FFFFFF;border-radius:14px;padding:32px 20px;
-text-align:center;border:1px solid #EAECF0}
+/* EMPTY */
+.empty{background:#fff;border-radius:14px;padding:32px 20px;text-align:center;border:1px solid #EAECF0}
 .ei{font-size:32px;margin-bottom:10px;opacity:.5}
 .et{font-size:14px;font-weight:700;color:#1A1A1A;margin-bottom:5px}
 .es{font-size:12px;color:#9CA3AF;line-height:1.6}
-
-/* ─── SECTION HEADER ─────────────────────────────────────── */
-.sh{font-size:11px;font-weight:700;color:#9CA3AF;padding:0 2px;
-text-transform:uppercase;letter-spacing:1px}
-
-/* ─── LEAFLET ────────────────────────────────────────────── */
-.leaflet-control-zoom{border:1px solid #E5E7EB!important;border-radius:10px!important;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)!important}
-.leaflet-control-zoom a{background:#FFFFFF!important;color:#1A1A1A!important;border-bottom-color:#E5E7EB!important;font-weight:700!important}
-.leaflet-control-zoom a:hover{background:#F9FAFB!important}
-.leaflet-control-attribution{font-size:8px!important;background:rgba(255,255,255,.8)!important}
-.leaflet-popup-content-wrapper{background:#FFFFFF!important;border:1px solid #E5E7EB!important;border-radius:12px!important;box-shadow:0 4px 16px rgba(0,0,0,.1)!important}
-.leaflet-popup-content{font-family:-apple-system,BlinkMacSystemFont,“Segoe UI”,Helvetica,Arial,sans-serif!important;margin:12px 14px!important;color:#1A1A1A!important}
-.leaflet-popup-tip{background:#FFFFFF!important}
+.sh{font-size:11px;font-weight:700;color:#9CA3AF;padding:0 2px;text-transform:uppercase;letter-spacing:1px}
 </style>
 
 </head>
@@ -359,18 +324,18 @@ text-transform:uppercase;letter-spacing:1px}
 <!-- SPLASH -->
 
 <div id="splash">
-  <div class="sp-ring">
-    <svg viewBox="0 0 56 56" width="48" height="48" fill="white">
+  <div class="sp-icon">
+    <svg viewBox="0 0 56 56" width="46" height="46" fill="white">
       <path d="M8 46L20 12l8 16 8-16 12 34z" opacity=".95"/>
       <rect x="16" y="38" width="24" height="8" rx="4"/>
     </svg>
   </div>
   <div class="sp-name">Bobcat</div>
   <div class="sp-sub">Digital Station</div>
-  <div class="sp-tag">Precision site mapping & grade check</div>
-  <div class="sp-bar-wrap">
-    <div class="sp-bar"><div class="sp-fill"></div></div>
-    <div class="sp-loading">Loading application…</div>
+  <div class="sp-tag">Precision site mapping &amp; grade check</div>
+  <div class="sp-bot">
+    <div class="sp-track"><div class="sp-bar" id="spbar"></div></div>
+    <div class="sp-lbl">Loading application…</div>
   </div>
 </div>
 
@@ -378,28 +343,21 @@ text-transform:uppercase;letter-spacing:1px}
 
 <div id="app">
 
-<!-- HEADER -->
-
 <div id="hdr">
-  <div class="h-logo">
-    <div class="h-icon">
+  <div class="hlogo">
+    <div class="hicon">
       <svg viewBox="0 0 32 32" width="20" height="20" fill="white">
         <path d="M4 26L12 8l4 8 4-8 8 18z" opacity=".95"/>
         <rect x="10" y="21" width="12" height="5" rx="2.5"/>
       </svg>
     </div>
-    <div>
-      <div class="h-name">Bobcat</div>
-      <div class="h-sub">Digital Station</div>
-    </div>
+    <div><div class="hname">Bobcat</div><div class="hsub">Digital Station</div></div>
   </div>
-  <div class="h-right">
-    <span id="pchip" class="proj-tag"></span>
-    <div class="gps-tag"><span class="dot dg"></span><span>GPS Fix</span></div>
+  <div class="hright">
+    <span id="pchip" class="pchip"></span>
+    <div class="gpspill"><span class="dot dg"></span><span>GPS Fix</span></div>
   </div>
 </div>
-
-<!-- TABS -->
 
 <div id="tabs">
   <button class="tab on" onclick="showTab('projects')"><span class="ti">📁</span>Projects</button>
@@ -408,15 +366,13 @@ text-transform:uppercase;letter-spacing:1px}
   <button class="tab" onclick="showTab('export')"><span class="ti">📤</span>Export</button>
 </div>
 
-<!-- CONTENT -->
-
 <div id="content">
 
-<!-- ══ PROJECTS ══ -->
+<!-- PROJECTS -->
 
 <div id="scr-projects" class="scr on">
   <div style="display:flex;justify-content:space-between;align-items:center">
-    <div style="font-size:19px;font-weight:800;color:#1A1A1A">Job Site Projects</div>
+    <div style="font-size:19px;font-weight:800">Job Site Projects</div>
     <button class="btn bo bsm" onclick="toggleNP()">＋ New Site</button>
   </div>
   <div id="npf" style="display:none">
@@ -431,33 +387,22 @@ text-transform:uppercase;letter-spacing:1px}
   <div id="plist"></div>
 </div>
 
-<!-- ══ MAP ══ -->
+<!-- MAP -->
 
 <div id="scr-map" class="scr">
-
   <div id="prox">
-    <div class="px-in">
-      <div class="px-ico" id="pico">⚡</div>
+    <div class="px">
+      <div class="pxico" id="pxico">⚡</div>
       <div style="flex:1">
-        <div class="px-title" id="ptitle">Gas Line Nearby</div>
-        <div class="px-sub">Proceed with extreme caution</div>
+        <div class="pxtit" id="pxtit">Gas Line Nearby</div>
+        <div class="pxsub">Proceed with extreme caution</div>
       </div>
       <div style="text-align:right">
-        <div class="px-num" id="pnum">2.1</div>
-        <div class="px-unit">METRES</div>
+        <div class="pxnum" id="pxnum">2.1</div>
+        <div class="pxunit">METRES</div>
       </div>
     </div>
   </div>
-
-  <!-- Map tile -->
-
-  <div class="seg s3" id="seg-tiles">
-    <button class="sb on" onclick="setTiles('street',this)"><span class="si">🗺️</span>Street</button>
-    <button class="sb" onclick="setTiles('sat',this)"><span class="si">🛰️</span>Satellite</button>
-    <button class="sb" onclick="setTiles('topo',this)"><span class="si">🏔️</span>Topo</button>
-  </div>
-
-  <!-- Draw mode -->
 
   <div class="seg s3" id="seg-mode">
     <button class="sb on" onclick="setMode('perimeter',this)"><span class="si">📏</span>Perimeter</button>
@@ -465,18 +410,19 @@ text-transform:uppercase;letter-spacing:1px}
     <button class="sb" onclick="setMode('view',this)"><span class="si">🔍</span>View All</button>
   </div>
 
-  <!-- Line strip -->
-
   <div id="lstrip" style="display:none">
     <div class="lbl" style="margin-bottom:7px">Select Utility Type</div>
     <div class="ustrip" id="uswrap"></div>
   </div>
 
-  <!-- MAP -->
-
-  <div id="mwrap">
-    <div id="lmap"></div>
+  <div id="mapwrap">
+    <canvas id="mc"></canvas>
     <div class="otl otl-tl">
+      <div class="tile-row" id="tilrow">
+        <button class="tile-btn on" onclick="setTile('street',this)">🗺️ Street</button>
+        <button class="tile-btn" onclick="setTile('sat',this)">🛰️ Satellite</button>
+        <button class="tile-btn" onclick="setTile('topo',this)">🏔️ Topo</button>
+      </div>
       <div id="mchip" style="display:none" class="mchip">
         🚜 <span id="mctxt">Machine</span>
         <span class="dot do" style="width:5px;height:5px"></span>
@@ -494,62 +440,40 @@ text-transform:uppercase;letter-spacing:1px}
     </div>
   </div>
 
-  <!-- Measurements -->
-
   <div id="meas" style="display:none">
     <div class="sr">
-      <div class="sc">
-        <div class="sl">📏 Perimeter</div>
-        <div class="sv" id="sperim">—</div>
-        <div class="ss" id="sperimsub"></div>
-      </div>
-      <div class="sc ac">
-        <div class="sl">📐 Area</div>
-        <div class="sv" id="sarea">—</div>
-        <div class="ss" id="sareasub">Close shape first</div>
-      </div>
+      <div class="sc"><div class="sl">📏 Perimeter</div><div class="sv" id="sperim">—</div><div class="ss" id="spsub"></div></div>
+      <div class="sc ac"><div class="sl">📐 Area</div><div class="sv" id="sarea">—</div><div class="ss" id="sasub">Close shape first</div></div>
     </div>
   </div>
-
-  <!-- Volume btn -->
 
   <div id="volwrap" style="display:none">
     <button class="card cp bw" style="text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center" onclick="openVol()">
       <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:36px;height:36px;border-radius:9px;background:#FFF3EA;border:1px solid #F4792030;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📐</div>
-        <div>
-          <div style="font-size:14px;font-weight:700;color:#1A1A1A">Volume Calculator</div>
-          <div style="font-size:11px;color:#9CA3AF;margin-top:1px" id="volsub">Enter cut/fill depths to estimate material volume</div>
-        </div>
+        <div style="width:36px;height:36px;border-radius:9px;background:#FFF3EA;border:1px solid rgba(244,121,32,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📐</div>
+        <div><div style="font-size:14px;font-weight:700">Volume Calculator</div>
+          <div style="font-size:11px;color:#9CA3AF;margin-top:1px" id="volsub">Enter cut/fill depths to estimate material volume</div></div>
       </div>
       <span style="font-size:18px;color:#F47920;opacity:.6">›</span>
     </button>
   </div>
 
-  <!-- Machine -->
-
   <div class="card cp">
     <div class="trow">
       <div style="display:flex;align-items:center;gap:10px">
         <div style="width:36px;height:36px;border-radius:9px;background:#EFF6FF;border:1px solid #BFDBFE;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🚜</div>
-        <div>
-          <div style="font-weight:700;font-size:14px;color:#1A1A1A">Machine Tracking</div>
-          <div style="font-size:11px;color:#9CA3AF;margin-top:1px" id="mstxt">Off · 3 m proximity alerts when on</div>
-        </div>
+        <div><div style="font-weight:700;font-size:14px">Machine Tracking</div>
+          <div style="font-size:11px;color:#9CA3AF;margin-top:1px" id="mstxt">Off · 3 m proximity alerts when on</div></div>
       </div>
       <button class="tog" id="mtog" onclick="toggleMachine()"></button>
     </div>
   </div>
 
-  <!-- Feat count -->
-
   <div id="fsumm" style="display:none" class="card cp">
     <div style="display:flex;align-items:center;gap:11px">
-      <div style="width:40px;height:40px;border-radius:10px;background:#FFF3EA;border:1px solid #F4792020;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0">📍</div>
-      <div style="flex:1">
-        <div style="font-weight:800;font-size:14px;color:#1A1A1A" id="fctxt">0 Features</div>
-        <div style="font-size:11px;color:#9CA3AF;margin-top:2px">Weather-proof · Exportable · Crew-shareable</div>
-      </div>
+      <div style="width:40px;height:40px;border-radius:10px;background:#FFF3EA;border:1px solid rgba(244,121,32,.15);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0">📍</div>
+      <div style="flex:1"><div style="font-weight:800;font-size:14px" id="fctxt">0 Features</div>
+        <div style="font-size:11px;color:#9CA3AF;margin-top:2px">Weather-proof · Exportable · Crew-shareable</div></div>
       <span class="dot dg"></span>
     </div>
   </div>
@@ -566,7 +490,7 @@ text-transform:uppercase;letter-spacing:1px}
 
 </div>
 
-<!-- ══ GRADE ══ -->
+<!-- GRADE -->
 
 <div id="scr-grade" class="scr">
   <div id="gidle">
@@ -574,19 +498,17 @@ text-transform:uppercase;letter-spacing:1px}
       <div class="ct">Connect Emlid RS3</div>
       <div style="font-size:13px;color:#6B7280;margin-bottom:18px">Follow these steps before connecting</div>
       <div class="strow"><div class="stn">1</div><div><div class="stt">Power on your Emlid RS3</div><div class="std">Hold the power button until the LED flashes. The RS3 broadcasts its WiFi hotspot.</div></div></div>
-      <div class="strow"><div class="stn">2</div><div><div class="stt">Join the RS3 hotspot</div><div class="std">Go to WiFi settings. Connect to <strong>reach:xx:xx</strong>. Password: <strong>emlidreach</strong></div></div></div>
-      <div class="strow" style="margin-bottom:16px"><div class="stn">3</div><div><div class="stt">Return here and tap Connect</div><div class="std">The app opens a direct NMEA TCP stream to the unit at 192.168.42.1:9001.</div></div></div>
-      <div class="ib ib-b" style="margin-bottom:14px">💡 Configure your NTRIP caster after connecting for sub-cm RTK Fix accuracy.</div>
+      <div class="strow"><div class="stn">2</div><div><div class="stt">Join the RS3 hotspot</div><div class="std">Open WiFi settings. Connect to <strong>reach:xx:xx</strong>. Password: <strong>emlidreach</strong></div></div></div>
+      <div class="strow" style="margin-bottom:16px"><div class="stn">3</div><div><div class="stt">Return here and connect</div><div class="std">The app opens a direct NMEA TCP stream to the unit at 192.168.42.1:9001.</div></div></div>
+      <div class="ib ibb" style="margin-bottom:14px">💡 Configure your NTRIP caster after connecting for sub-cm RTK Fix accuracy.</div>
       <button class="btn bo bw" onclick="gradeConn()">I'm connected to the RS3 hotspot — Connect</button>
     </div>
   </div>
   <div id="glive" style="display:none;flex-direction:column;gap:12px">
     <div class="card cp">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <div>
-          <div style="font-weight:800;font-size:15px;color:#1A1A1A">Emlid RS3</div>
-          <div style="font-size:11px;color:#9CA3AF;margin-top:1px">192.168.42.1 : 9001 · NMEA stream</div>
-        </div>
+        <div><div style="font-weight:800;font-size:15px">Emlid RS3</div>
+          <div style="font-size:11px;color:#9CA3AF;margin-top:1px">192.168.42.1 : 9001 · NMEA stream</div></div>
         <div style="display:flex;gap:7px;align-items:center">
           <div class="bdg" id="fbdg"><span class="dot" id="fdot"></span><span id="ftxt">RTK Fix</span></div>
           <button class="btn br bsm" onclick="gradeDisc()">Disconnect</button>
@@ -599,14 +521,11 @@ text-transform:uppercase;letter-spacing:1px}
       </div>
       <div class="ecard">
         <div style="display:flex;justify-content:space-between;align-items:flex-start">
-          <div>
-            <div style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px">Live Elevation (HAE)</div>
+          <div><div style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px">Live Elevation (HAE)</div>
             <div class="enum" id="gelev">—</div>
-            <div style="font-size:12px;color:#9CA3AF;margin-top:6px" id="gelevft"></div>
-          </div>
+            <div style="font-size:12px;color:#9CA3AF;margin-top:6px" id="gelevft"></div></div>
           <div style="text-align:right;font-size:11px;color:#9CA3AF;line-height:2.1">
-            <div id="glat">—</div><div id="glng">—</div>
-          </div>
+            <div id="glat">—</div><div id="glng">—</div></div>
         </div>
       </div>
       <button style="margin-top:11px;background:none;border:none;color:#9CA3AF;font-size:11px;cursor:pointer;font-family:inherit" onclick="tgNmea()">▸ Show raw NMEA</button>
@@ -625,12 +544,12 @@ text-transform:uppercase;letter-spacing:1px}
             <div><div class="lbl">Username</div><input id="nuser"/></div>
             <div><div class="lbl">Password</div><input type="password" id="npass"/></div>
           </div>
-          <button class="btn bo bw" onclick="saveNtrip()">Save & Apply NTRIP Config</button>
+          <button class="btn bo bw" onclick="saveNtrip()">Save &amp; Apply NTRIP Config</button>
         </div>
       </div>
     </div>
     <div class="card cp">
-      <div class="ct">Benchmarks & Grade Points</div>
+      <div class="ct">Benchmarks &amp; Grade Points</div>
       <div style="display:flex;gap:7px;margin-bottom:9px">
         <input id="bmname" placeholder="Label (e.g. BM-1)" style="flex:1"/>
         <input id="bmelev" type="number" placeholder="Elev (m)" style="width:96px"/>
@@ -642,17 +561,17 @@ text-transform:uppercase;letter-spacing:1px}
   </div>
 </div>
 
-<!-- ══ EXPORT ══ -->
+<!-- EXPORT -->
 
 <div id="scr-export" class="scr">
   <div class="card cp">
     <div class="ct">Save Mode</div>
     <div class="srow">
-      <button class="so" onclick="setSaveMode('device',this)"><span class="sic">💾</span>On-Device</button>
-      <button class="so" onclick="setSaveMode('cloud',this)"><span class="sic">☁️</span>Cloud</button>
-      <button class="so on" onclick="setSaveMode('both',this)"><span class="sic">🔄</span>Both</button>
+      <button class="so" onclick="setSM('device',this)"><span class="sic">💾</span>On-Device</button>
+      <button class="so" onclick="setSM('cloud',this)"><span class="sic">☁️</span>Cloud</button>
+      <button class="so on" onclick="setSM('both',this)"><span class="sic">🔄</span>Both</button>
     </div>
-    <div class="ib ib-g" style="margin-top:11px" id="sminfo">
+    <div class="ib ibg" style="margin-top:11px" id="sminfo">
       <span class="dot dg"></span> Auto-save active — your map is weather-proof
     </div>
   </div>
@@ -665,23 +584,21 @@ text-transform:uppercase;letter-spacing:1px}
   <div class="drone">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
       <span style="font-size:22px">🚁</span>
-      <div>
-        <div style="font-size:15px;font-weight:800;color:#2563EB">Drone Site Vision</div>
-        <div style="font-size:9px;font-weight:700;color:#93C5FD;text-transform:uppercase;letter-spacing:.7px">Coming Soon</div>
-      </div>
+      <div><div style="font-size:15px;font-weight:800;color:#2563EB">Drone Site Vision</div>
+        <div style="font-size:9px;font-weight:700;color:#93C5FD;text-transform:uppercase;letter-spacing:.7px">Coming Soon</div></div>
     </div>
     <div style="font-size:12px;color:#1E40AF;line-height:1.7">Pair with DJI Enterprise or Skydio to overlay utility maps, no-dig zones, and benchmarks in real time from the air.</div>
   </div>
 </div>
 
-</div></div>
+</div></div><!-- end content / app -->
 
 <!-- UTIL MODAL -->
 
-<div class="ov" id="umodal" onclick="closeUModal()">
+<div class="ov" id="umodal" onclick="closeUM()">
   <div class="ms" onclick="event.stopPropagation()">
     <div class="mh"></div>
-    <div style="font-size:16px;font-weight:800;color:#1A1A1A;margin-bottom:3px">Place Utility Marker</div>
+    <div style="font-size:16px;font-weight:800;margin-bottom:3px">Place Utility Marker</div>
     <div style="font-size:12px;color:#9CA3AF">Tap a type to drop a pin at this location</div>
     <div class="ug" id="ugrid"></div>
   </div>
@@ -689,13 +606,13 @@ text-transform:uppercase;letter-spacing:1px}
 
 <!-- VOL MODAL -->
 
-<div class="ov" id="vmodal" onclick="closeVModal()">
+<div class="ov" id="vmodal" onclick="closeVM()">
   <div class="ms" onclick="event.stopPropagation()">
     <div class="mh"></div>
-    <div style="font-size:17px;font-weight:800;color:#1A1A1A;margin-bottom:5px">Volume Calculator</div>
+    <div style="font-size:17px;font-weight:800;margin-bottom:5px">Volume Calculator</div>
     <div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:11px 13px;margin-bottom:14px;font-size:12px;color:#6B7280;line-height:1.7">
-      📐 <strong style="color:#374151">How it works:</strong> Enter the average depth you plan to cut or fill in each zone. The app calculates how much material needs to move based on your mapped site area.<br/>
-      <span style="color:#9CA3AF">▼ Cut = digging down &nbsp;·&nbsp; ▲ Fill = adding material</span>
+      📐 <strong style="color:#374151">How it works:</strong> Enter the average depth you plan to cut or fill per zone. The app multiplies that by your site area to calculate cubic metres of material to move.<br/>
+      <span style="color:#9CA3AF">▼ Cut = digging out &nbsp;·&nbsp; ▲ Fill = adding material</span>
     </div>
     <div style="font-size:11px;color:#9CA3AF;margin-bottom:14px" id="varea"></div>
     <div id="zonelist"></div>
@@ -712,9 +629,7 @@ text-transform:uppercase;letter-spacing:1px}
 </div>
 
 <script>
-window.addEventListener('resize',()=>{if(pll)pll.invalidateSize()});
-
-/* ── DATA ─────────────────────────────────────────────────── */
+/* DATA */
 const UTILS=[
   {id:'gas',     label:'Gas / Oil',   color:'#92400E',bg:'#FEF3C7',emoji:'⚡',dot:'#F59E0B'},
   {id:'electric',label:'Electric',    color:'#991B1B',bg:'#FEE2E2',emoji:'🔌',dot:'#EF4444'},
@@ -739,20 +654,25 @@ let projs=[{id:1,name:'Main St Utility Run',created:new Date().toLocaleDateStrin
 let aid=1,mode='perimeter',autil='gas',lpts=[];
 let men=false,mpos=null,mang=0,mtmr=null;
 let gdata=null,gtmr=null,gtick=0,benches=[],snmea=false;
-let zones=[],dfmt=null,smode='both';
-let pll=null,plp=null,mmark=null,draw=null;
-let lpress=null,pendll=null;
+let zones=[],dfmt=null;
+let pendll=null,longTmr=null,tileStyle='street';
+let touchSY=0,touchSX=0;
+
+/* canvas */
+const cv=document.getElementById('mc');
+const ctx=cv.getContext('2d');
+let CW,CH;
 
 function ga(){return projs.find(p=>p.id===aid)||projs[0];}
 
-/* ── GEO ──────────────────────────────────────────────────── */
+/* GEO */
 function hav(a,b){
   const R=6371000,r=x=>x*Math.PI/180;
   const dl=r(b.lat-a.lat),dg=r(b.lng-a.lng);
   const x=Math.sin(dl/2)**2+Math.cos(r(a.lat))*Math.cos(r(b.lat))*Math.sin(dg/2)**2;
   return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
 }
-function area(pts){
+function polyArea(pts){
   if(pts.length<3)return 0;
   const ref=pts[0];
   const xy=pts.map(p=>({
@@ -762,173 +682,343 @@ function area(pts){
   let a=0;for(let i=0;i<xy.length;i++){const j=(i+1)%xy.length;a+=xy[i].x*xy[j].y-xy[j].x*xy[i].y;}
   return Math.abs(a/2);
 }
-function perim(pts){if(pts.length<2)return 0;let d=0;for(let i=0;i<pts.length;i++)d+=hav(pts[i],pts[(i+1)%pts.length]);return d;}
-const toac=m=>m/4046.86,tosf=m=>m*10.7639,toft=m=>m*3.28084;
+function perimM(pts){if(pts.length<2)return 0;let d=0;for(let i=0;i<pts.length;i++)d+=hav(pts[i],pts[(i+1)%pts.length]);return d;}
+const toAc=m=>m/4046.86,toSF=m=>m*10.7639,toFt=m=>m*3.28084;
 function fmt(n,d=1){return Number(n).toLocaleString(undefined,{maximumFractionDigits:d,minimumFractionDigits:d});}
 
-/* ── MAP INIT ─────────────────────────────────────────────── */
-function initMap(){
-  if(pll)return;
-  pll=L.map('lmap',{center:[DLAT,DLNG],zoom:17});
-  const st=L.tileLayer('[https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:]https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM',maxZoom:22}).addTo(pll);
-  const sa=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:20});
-  const to=L.tileLayer('[https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',{attribution:]https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',{attribution:'© OTM',maxZoom:17});
-  window._tiles={street:st,sat:sa,topo:to};
-  draw=L.layerGroup().addTo(pll);
-  pll.on('click',onMClick);
-  pll.on('contextmenu',e=>{e.originalEvent.preventDefault();openUAt(e.latlng);});
-  pll.on('mousedown',e=>{lpress=setTimeout(()=>{lpress=null;openUAt(e.latlng);},500);});
-  pll.on('mouseup mousemove',()=>{if(lpress){clearTimeout(lpress);lpress=null;}});
-  redraw();
+/* PROJECTION */
+function buildRef(pts,feats,lpts){
+  const all=[...pts];
+  feats.forEach(f=>{if(f.lat!=null)all.push({lat:f.lat,lng:f.lng});if(f.pts)all.push(...f.pts);});
+  if(lpts.length)all.push(...lpts);
+  return all.length?all:[DLAT,DLNG].map((_,i)=>i===0?{lat:DLAT,lng:DLNG}:{lat:DLAT+.001,lng:DLNG+.001});
+}
+function proj(ref,p){
+  const pad=52,lats=ref.map(r=>r.lat),lngs=ref.map(r=>r.lng);
+  const minLat=Math.min(...lats),maxLat=Math.max(...lats);
+  const minLng=Math.min(...lngs),maxLng=Math.max(...lngs);
+  const sc=Math.min((CW-pad*2)/(maxLng-minLng||.001),(CH-pad*2)/(maxLat-minLat||.001));
+  const ox=(CW-(maxLng-minLng)*sc)/2,oy=(CH-(maxLat-minLat)*sc)/2;
+  return{x:(p.lng-minLng)*sc+ox,y:CH-((p.lat-minLat)*sc+oy)};
+}
+function unproj(ref,px,py){
+  const pad=52,lats=ref.map(r=>r.lat),lngs=ref.map(r=>r.lng);
+  const minLat=Math.min(...lats),maxLat=Math.max(...lats);
+  const minLng=Math.min(...lngs),maxLng=Math.max(...lngs);
+  const sc=Math.min((CW-pad*2)/(maxLng-minLng||.001),(CH-pad*2)/(maxLat-minLat||.001));
+  const ox=(CW-(maxLng-minLng)*sc)/2,oy=(CH-(maxLat-minLat)*sc)/2;
+  return{lat:(CH-py-oy)/sc+minLat,lng:(px-ox)/sc+minLng};
+}
+function rrect(x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();
 }
 
-function setTiles(s,btn){
-  document.querySelectorAll('#seg-tiles .sb').forEach(b=>b.classList.remove('on'));
+/* CANVAS RESIZE */
+function resizeCV(){
+  const w=cv.parentElement;
+  CW=w.clientWidth;CH=380;
+  cv.width=CW;cv.height=CH;
+  draw();
+}
+
+/* TILE STYLE */
+function setTile(s,btn){
+  tileStyle=s;
+  document.querySelectorAll('#tilrow .tile-btn').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
-  if(!pll)return;
-  Object.values(window._tiles).forEach(t=>{if(pll.hasLayer(t))pll.removeLayer(t);});
-  window._tiles[s].addTo(pll);
+  draw();
 }
 
-function onMClick(e){
-  const p=ga();
-  if(mode==='perimeter'){
-    if(p.closed)return;
-    if(p.pts.length>2&&hav({lat:e.latlng.lat,lng:e.latlng.lng},p.pts[0])<4){closePerim();return;}
-    p.pts.push({lat:e.latlng.lat,lng:e.latlng.lng});
-    redraw();updM();updMA();
-    document.getElementById('clrbtn').style.display='block';
-  } else if(mode==='line'){
-    lpts.push({lat:e.latlng.lat,lng:e.latlng.lng});
-    redraw();updMA();
-  }
-}
-
-function openUAt(ll){pendll={lat:ll.lat,lng:ll.lng};document.getElementById('umodal').classList.add('open');}
-
-/* ── REDRAW ───────────────────────────────────────────────── */
-function mkPin(em,bg,dot,al){
-  const b=al?`border:2.5px solid #EF4444;box-shadow:0 0 0 3px rgba(239,68,68,.2),0 2px 10px rgba(0,0,0,.2)`
-            :`border:2px solid rgba(255,255,255,.9);box-shadow:0 2px 10px rgba(0,0,0,.2)`;
-  return L.divIcon({className:'',
-    html:`<div style="width:36px;height:36px;border-radius:50%;background:${bg};${b};display:flex;align-items:center;justify-content:center;font-size:18px">${em}</div>`,
-    iconSize:[36,36],iconAnchor:[18,18]});
-}
-function mkNode(lbl,first){
-  const s=first?28:22;
-  return L.divIcon({className:'',
-    html:`<div style="width:${s}px;height:${s}px;border-radius:50%;background:#F47920;border:2.5px solid #fff;box-shadow:0 0 12px rgba(244,121,32,.4),0 2px 6px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;color:#fff;font-size:${first?11:9}px;font-weight:800">${lbl}</div>`,
-    iconSize:[s,s],iconAnchor:[s/2,s/2]});
-}
-function mkMach(al){
-  const c=al?'#DC2626':'#2563EB',g=al?'rgba(220,38,38,.35)':'rgba(37,99,235,.35)';
-  return L.divIcon({className:'',
-    html:`<div style="position:relative">
-      <div style="position:absolute;top:-23px;left:50%;transform:translateX(-50%);background:${c};color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:7px;white-space:nowrap;font-family:-apple-system,sans-serif">Machine</div>
-      <div style="width:38px;height:38px;border-radius:50%;background:${c};border:3px solid rgba(255,255,255,.9);box-shadow:0 0 18px ${g},0 3px 12px rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;font-size:18px">🚜</div>
-    </div>`,
-    iconSize:[38,61],iconAnchor:[19,50]});
-}
-
-function redraw(){
-  if(!pll||!draw)return;
-  draw.clearLayers();
+/* DRAW */
+function draw(){
+  if(!ctx||!CW)return;
+  ctx.clearRect(0,0,CW,CH);
   const{pts,closed,feats}=ga();
+  const ref=buildRef(pts,feats,lpts);
 
-  if(pts.length>1){
-    const ll=pts.map(p=>[p.lat,p.lng]);
-    if(closed&&pts.length>2){
-      L.polygon(ll,{color:'#F47920',weight:2.5,fillColor:'#F47920',fillOpacity:.08}).addTo(draw);
-    } else {
-      L.polyline(ll,{color:'#F47920',weight:2.5,dashArray:'8,5'}).addTo(draw);
-    }
-    pts.forEach((p,i)=>L.marker([p.lat,p.lng],{icon:mkNode(i===0?'A':String(i+1),i===0)}).addTo(draw));
+  /* Background by tile style */
+  if(tileStyle==='sat'){
+    ctx.fillStyle='#2C3A24';ctx.fillRect(0,0,CW,CH);
+    [[0,0,CW*.55,CH*.45,'#374D2A'],[CW*.55,0,CW*.45,CH*.42,'#2A3820'],
+     [0,CH*.45,CW*.6,CH*.55,'#3A5030'],[CW*.6,CH*.42,CW*.4,CH*.58,'#273420']]
+    .forEach(([x,y,w,h,c])=>{ctx.fillStyle=c;ctx.fillRect(x,y,w,h);});
+    ctx.strokeStyle='rgba(180,150,80,.6)';ctx.lineWidth=6;ctx.setLineDash([]);
+    ctx.beginPath();ctx.moveTo(0,CH*.42);ctx.lineTo(CW,CH*.42);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(CW*.63,0);ctx.lineTo(CW*.63,CH);ctx.stroke();
+  } else if(tileStyle==='topo'){
+    ctx.fillStyle='#EEE8D5';ctx.fillRect(0,0,CW,CH);
+    ctx.strokeStyle='rgba(160,130,60,.3)';ctx.lineWidth=1;
+    for(let i=0;i<7;i++){ctx.beginPath();ctx.ellipse(CW*.38,CH*.52,60+i*34,38+i*22,.3,0,Math.PI*2);ctx.stroke();}
+    ctx.strokeStyle='rgba(180,150,70,.7)';ctx.lineWidth=5;ctx.setLineDash([]);
+    ctx.beginPath();ctx.moveTo(0,CH*.42);ctx.lineTo(CW,CH*.42);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(CW*.63,0);ctx.lineTo(CW*.63,CH);ctx.stroke();
+    ctx.strokeStyle='rgba(150,120,50,.35)';ctx.lineWidth=1;ctx.setLineDash([6,6]);
+    ctx.beginPath();ctx.moveTo(0,CH*.42);ctx.lineTo(CW,CH*.42);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(CW*.63,0);ctx.lineTo(CW*.63,CH);ctx.stroke();
+    ctx.setLineDash([]);
+  } else {
+    /* Street */
+    ctx.fillStyle='#E8ECF0';ctx.fillRect(0,0,CW,CH);
+    /* grid */
+    ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=1;
+    for(let x=0;x<CW;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,CH);ctx.stroke();}
+    for(let y=0;y<CH;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(CW,y);ctx.stroke();}
+    /* roads */
+    ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=7;ctx.setLineDash([]);
+    ctx.beginPath();ctx.moveTo(0,CH*.42);ctx.lineTo(CW,CH*.42);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(CW*.63,0);ctx.lineTo(CW*.63,CH);ctx.stroke();
+    ctx.strokeStyle='rgba(200,200,200,.5)';ctx.lineWidth=1;ctx.setLineDash([8,8]);
+    ctx.beginPath();ctx.moveTo(0,CH*.42);ctx.lineTo(CW,CH*.42);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(CW*.63,0);ctx.lineTo(CW*.63,CH);ctx.stroke();
+    ctx.setLineDash([]);
   }
 
-  if(mode==='line'&&lpts.length>0){
-    const u=UTILS.find(u=>u.id===autil)||UTILS[0];
-    L.polyline(lpts.map(p=>[p.lat,p.lng]),{color:u.dot,weight:4,dashArray:'10,5'}).addTo(draw);
-    lpts.forEach(p=>{
-      L.marker([p.lat,p.lng],{icon:L.divIcon({className:'',
-        html:`<div style="width:10px;height:10px;border-radius:50%;background:${u.dot};border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2)"></div>`,
-        iconSize:[10,10],iconAnchor:[5,5]})}).addTo(draw);
+  /* empty hint */
+  if(!pts.length&&!feats.length&&!lpts.length){
+    const tc=tileStyle==='sat'?'rgba(255,255,255,.55)':'rgba(0,0,0,.2)';
+    ctx.fillStyle=tc;ctx.font='600 13px -apple-system,sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('Hold = Place utility  ·  Tap = Draw boundary',CW/2,CH/2-8);
+    ctx.font='400 11px -apple-system,sans-serif';
+    ctx.fillStyle=tileStyle==='sat'?'rgba(255,255,255,.3)':'rgba(0,0,0,.13)';
+    ctx.fillText('Perimeters, utility lines & markers in one map',CW/2,CH/2+14);
+    return;
+  }
+
+  /* polygon fill */
+  if(pts.length>2&&closed){
+    const xys=pts.map(p=>proj(ref,p));
+    ctx.beginPath();ctx.moveTo(xys[0].x,xys[0].y);
+    xys.forEach(p=>ctx.lineTo(p.x,p.y));ctx.closePath();
+    ctx.fillStyle='rgba(244,121,32,.1)';ctx.fill();
+  }
+
+  /* perimeter */
+  if(pts.length>1){
+    const xys=pts.map(p=>proj(ref,p));
+    ctx.beginPath();ctx.moveTo(xys[0].x,xys[0].y);
+    xys.forEach(p=>ctx.lineTo(p.x,p.y));
+    if(closed)ctx.closePath();
+    ctx.strokeStyle='#F47920';ctx.lineWidth=closed?2.5:2;
+    ctx.setLineDash(closed?[]:[8,5]);ctx.stroke();ctx.setLineDash([]);
+
+    /* segment labels */
+    const segs=closed?pts.length:pts.length-1;
+    for(let i=0;i<segs;i++){
+      const a=xys[i],b=xys[(i+1)%xys.length];
+      const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+      const d=hav(pts[i],pts[(i+1)%pts.length]);
+      const txt=d<1000?`${d.toFixed(1)} m`:`${(d/1000).toFixed(2)} km`;
+      ctx.font='600 10px -apple-system,sans-serif';
+      const tw=ctx.measureText(txt).width;
+      ctx.fillStyle='rgba(255,255,255,.95)';ctx.shadowBlur=6;ctx.shadowColor='rgba(0,0,0,.1)';
+      rrect(mx-tw/2-7,my-9,tw+14,18,5);ctx.fill();ctx.shadowBlur=0;
+      ctx.fillStyle='#F47920';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(txt,mx,my);
+    }
+
+    /* nodes */
+    pts.forEach((p,i)=>{
+      const{x,y}=proj(ref,p);
+      ctx.shadowBlur=10;ctx.shadowColor='rgba(244,121,32,.3)';
+      ctx.beginPath();ctx.arc(x,y,i===0?11:7,0,Math.PI*2);
+      ctx.fillStyle='#F47920';ctx.fill();ctx.shadowBlur=0;
+      ctx.strokeStyle='#fff';ctx.lineWidth=2.5;ctx.stroke();
+      ctx.fillStyle='#fff';ctx.font=`800 ${i===0?10:9}px -apple-system,sans-serif`;
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(i===0?'A':String(i+1),x,y);
     });
   }
 
+  /* active line */
+  if(mode==='line'&&lpts.length>0){
+    const u=UTILS.find(u=>u.id===autil)||UTILS[0];
+    const xys=lpts.map(p=>proj(ref,p));
+    ctx.beginPath();ctx.moveTo(xys[0].x,xys[0].y);xys.forEach(p=>ctx.lineTo(p.x,p.y));
+    ctx.strokeStyle=u.dot;ctx.lineWidth=3.5;ctx.setLineDash([10,5]);
+    ctx.shadowBlur=6;ctx.shadowColor=u.dot+'88';ctx.stroke();
+    ctx.setLineDash([]);ctx.shadowBlur=0;
+    xys.forEach(({x,y})=>{
+      ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fillStyle=u.dot;ctx.fill();
+      ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();
+    });
+  }
+
+  /* saved feature lines */
   feats.filter(f=>f.pts&&f.pts.length>1).forEach(f=>{
     const u=UTILS.find(u=>u.id===f.type)||UTILS[0];
-    L.polyline(f.pts.map(p=>[p.lat,p.lng]),{color:u.dot,weight:4,dashArray:'12,5'}).addTo(draw)
-     .bindTooltip(`<span style="font-size:12px;font-weight:600;color:${u.color}">${u.emoji} ${u.label}</span>`,{direction:'top'});
+    const xys=f.pts.map(p=>proj(ref,p));
+    ctx.beginPath();ctx.moveTo(xys[0].x,xys[0].y);xys.forEach(p=>ctx.lineTo(p.x,p.y));
+    ctx.strokeStyle=u.dot;ctx.lineWidth=4;ctx.setLineDash([12,5]);
+    ctx.shadowBlur=5;ctx.shadowColor=u.dot+'66';ctx.stroke();
+    ctx.setLineDash([]);ctx.shadowBlur=0;
+    [xys[0],xys[xys.length-1]].forEach(({x,y})=>{
+      ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fillStyle=u.dot;ctx.fill();
+      ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();
+    });
+    const mid=xys[Math.floor(xys.length/2)];
+    ctx.font='600 10px -apple-system,sans-serif';
+    const tw=ctx.measureText(u.label).width;
+    ctx.fillStyle=u.bg;ctx.shadowBlur=4;ctx.shadowColor='rgba(0,0,0,.08)';
+    rrect(mid.x-tw/2-9,mid.y-21,tw+18,16,5);ctx.fill();ctx.shadowBlur=0;
+    ctx.fillStyle=u.color;ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(u.label,mid.x,mid.y-13);
   });
 
+  /* feature point pins */
   feats.filter(f=>f.lat!=null).forEach(f=>{
     const u=UTILS.find(u=>u.id===f.type)||UTILS[0];
+    const{x,y}=proj(ref,{lat:f.lat,lng:f.lng});
     const al=men&&mpos&&hav(mpos,{lat:f.lat,lng:f.lng})<=3;
-    L.marker([f.lat,f.lng],{icon:mkPin(u.emoji,u.bg,u.dot,al)}).addTo(draw)
-     .bindPopup(`<div style="min-width:150px"><div style="font-weight:700;font-size:14px;margin-bottom:5px">${u.emoji} ${u.label}</div>${f.note?`<div style="font-size:12px;color:#6B7280;margin-bottom:4px">📝 ${f.note}</div>`:''}<div style="font-size:10px;color:#9CA3AF">${f.lat.toFixed(6)}, ${f.lng.toFixed(6)}</div></div>`);
+    /* glow ring */
+    ctx.beginPath();ctx.arc(x,y,20,0,Math.PI*2);ctx.fillStyle=u.bg+'BB';ctx.fill();
+    /* circle */
+    ctx.shadowBlur=al?14:8;ctx.shadowColor=al?'rgba(239,68,68,.4)':u.dot+'44';
+    ctx.beginPath();ctx.arc(x,y,13,0,Math.PI*2);ctx.fillStyle=u.bg;ctx.fill();
+    ctx.strokeStyle=al?'#EF4444':u.dot;ctx.lineWidth=al?2.5:2;ctx.stroke();
+    ctx.shadowBlur=0;
+    ctx.font='15px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(u.emoji,x,y+1);
+    if(f.photo){
+      ctx.beginPath();ctx.arc(x+9,y-9,6,0,Math.PI*2);
+      ctx.fillStyle='#2563EB';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();
+    }
   });
 
+  /* machine dot */
   if(men&&mpos){
-    if(mmark)mmark.remove();
-    mmark=L.marker([mpos.lat,mpos.lng],{icon:mkMach(nearA()!=null),zIndexOffset:1000}).addTo(draw);
+    const{x,y}=proj(ref,{lat:mpos.lat,lng:mpos.lng});
+    const al=nearA()!=null;
+    const c=al?'#DC2626':'#2563EB',g=al?'rgba(220,38,38,.35)':'rgba(37,99,235,.3)';
+    ctx.beginPath();ctx.arc(x,y,18,0,Math.PI*2);
+    ctx.fillStyle=al?'rgba(220,38,38,.12)':'rgba(37,99,235,.1)';ctx.fill();
+    ctx.shadowBlur=12;ctx.shadowColor=g;
+    ctx.beginPath();ctx.arc(x,y,11,0,Math.PI*2);
+    ctx.fillStyle=c;ctx.fill();ctx.shadowBlur=0;
+    ctx.strokeStyle='#fff';ctx.lineWidth=2.5;ctx.stroke();
+    ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();
+    /* label */
+    ctx.font='700 10px -apple-system,sans-serif';
+    const lw=ctx.measureText('🚜 Machine').width;
+    ctx.fillStyle=c;ctx.shadowBlur=4;ctx.shadowColor='rgba(0,0,0,.1)';
+    rrect(x-lw/2-7,y-30,lw+14,18,5);ctx.fill();ctx.shadowBlur=0;
+    ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('🚜 Machine',x,y-21);
   }
 }
 
-/* ── MAP CONTROLS ─────────────────────────────────────────── */
+/* CANVAS EVENTS */
+function getXY(e){
+  const r=cv.getBoundingClientRect();
+  const cx=e.touches?e.touches[0].clientX:e.clientX;
+  const cy=e.touches?e.touches[0].clientY:e.clientY;
+  return{px:(cx-r.left)*(CW/r.width),py:(cy-r.top)*(CH/r.height),cx,cy};
+}
+
+cv.addEventListener('pointerdown',e=>{
+  const{px,py,cx,cy}=getXY(e);
+  touchSX=cx;touchSY=cy;
+  longTmr=setTimeout(()=>{longTmr=null;openUM(px,py);},480);
+});
+cv.addEventListener('pointermove',e=>{
+  if(!longTmr)return;
+  const{cx,cy}=getXY(e);
+  if(Math.abs(cy-touchSY)>10){clearTimeout(longTmr);longTmr=null;}
+});
+cv.addEventListener('pointerup',e=>{
+  if(!longTmr)return;
+  clearTimeout(longTmr);longTmr=null;
+  const{px,py,cx,cy}=getXY(e);
+  if(Math.abs(cx-touchSX)>8||Math.abs(cy-touchSY)>8)return;
+  const ref=buildRef(ga().pts,ga().feats,lpts);
+  /* check tap on existing pin */
+  const tapped=ga().feats.find(f=>{
+    if(f.lat==null)return false;
+    const{x,y}=proj(ref,{lat:f.lat,lng:f.lng});
+    return Math.hypot(px-x,py-y)<22;
+  });
+  if(tapped){const n=prompt(`Note for ${tapped.label}:`,tapped.note||'');if(n!==null){tapped.note=n;updFL();draw();}return;}
+  const pt=unproj(ref,px,py);
+  if(mode==='perimeter'){
+    if(ga().closed)return;
+    if(ga().pts.length>2){const fp=proj(ref,ga().pts[0]);if(Math.hypot(px-fp.x,py-fp.y)<24){closePerim();return;}}
+    ga().pts.push(pt);draw();updM();updMA();
+    document.getElementById('clrbtn').style.display='block';
+  } else if(mode==='line'){
+    lpts.push(pt);draw();updMA();
+  }
+});
+
+function openUM(px,py){
+  const ref=buildRef(ga().pts,ga().feats,lpts);
+  pendll=unproj(ref,px,py);
+  document.getElementById('umodal').classList.add('open');
+}
+function closeUM(){document.getElementById('umodal').classList.remove('open');}
+function placeU(u){
+  if(!pendll)return;
+  ga().feats.push({type:u.id,lat:pendll.lat,lng:pendll.lng,label:u.label,id:Date.now()});
+  pendll=null;closeUM();draw();updFL();updFS();
+  document.getElementById('clrbtn').style.display='block';
+}
+
+/* MAP CONTROLS */
 function setMode(m,btn){
   mode=m;
   document.querySelectorAll('#seg-mode .sb').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
   document.getElementById('lstrip').style.display=m==='line'?'block':'none';
   if(m!=='line')lpts=[];
-  redraw();updMA();
+  draw();updMA();
 }
 function updMA(){
-  const{pts,closed}=ga();
-  let h='';
-  if(pts.length>0&&!closed&&mode==='perimeter')h+=`<button class="mbtn" onclick="upPerim()">↩ Undo</button>`;
-  if(pts.length>2&&!closed&&mode==='perimeter')h+=`<button class="mbtn mbo" onclick="closePerim()">Close ✓</button>`;
-  if(mode==='line'&&lpts.length>1)h+=`<button class="mbtn mbg" onclick="finLine()">Save Line ✓</button>`;
+  const{pts,closed}=ga();let h='';
+  if(pts.length>0&&!closed&&mode==='perimeter')h+=`<button class="mbtn" onpointerdown="upPerim()">↩ Undo</button>`;
+  if(pts.length>2&&!closed&&mode==='perimeter')h+=`<button class="mbtn mbo" onpointerdown="closePerim()">Close ✓</button>`;
+  if(mode==='line'&&lpts.length>1)h+=`<button class="mbtn mbg" onpointerdown="finLine()">Save Line ✓</button>`;
   document.getElementById('macts').innerHTML=h;
 }
-function upPerim(){ga().pts.pop();redraw();updM();updMA();}
-function closePerim(){ga().closed=true;redraw();updM();updMA();updVB();}
+function upPerim(){ga().pts.pop();draw();updM();updMA();}
+function closePerim(){ga().closed=true;draw();updM();updMA();updVB();}
 function finLine(){
   if(lpts.length<2)return;
   const u=UTILS.find(u=>u.id===autil)||UTILS[0];
   ga().feats.push({type:autil,pts:[...lpts],label:u.label,id:Date.now()});
-  lpts=[];redraw();updMA();updFL();updFS();
+  lpts=[];draw();updMA();updFL();updFS();
 }
 function clearSite(){
   const p=ga();p.pts=[];p.closed=false;p.feats=[];p.zones=[];lpts=[];
-  redraw();updM();updVB();updFL();updFS();updMA();
+  draw();updM();updVB();updFL();updFS();updMA();
   document.getElementById('clrbtn').style.display='none';
   document.getElementById('prox').classList.remove('show');
 }
 
-/* ── MEASUREMENTS ─────────────────────────────────────────── */
+/* MEASUREMENTS */
 function updM(){
   const{pts,closed}=ga();
   const el=document.getElementById('meas');
   if(pts.length>1){
     el.style.display='block';
-    const pm=perim(pts);
+    const pm=perimM(pts);
     document.getElementById('sperim').textContent=`${fmt(pm)} m`;
-    document.getElementById('sperimsub').textContent=`${fmt(toft(pm),0)} ft`;
-    const ar=area(pts);
+    document.getElementById('spsub').textContent=`${fmt(toFt(pm),0)} ft`;
+    const ar=polyArea(pts);
     if(closed&&ar>0){
-      document.getElementById('sarea').textContent=`${fmt(toac(ar),3)} ac`;
-      document.getElementById('sareasub').textContent=`${fmt(tosf(ar),0)} sq ft`;
+      document.getElementById('sarea').textContent=`${fmt(toAc(ar),3)} ac`;
+      document.getElementById('sasub').textContent=`${fmt(toSF(ar),0)} sq ft`;
     } else {
       document.getElementById('sarea').textContent='—';
-      document.getElementById('sareasub').textContent='Close shape first';
+      document.getElementById('sasub').textContent='Close shape first';
     }
   } else el.style.display='none';
 }
 function updVB(){
   const{pts,closed,zones}=ga();
   const el=document.getElementById('volwrap');
-  const ar=area(pts);
+  const ar=polyArea(pts);
   if(closed&&ar>0){
     el.style.display='block';
     const z=zones&&zones.length;
@@ -940,22 +1030,7 @@ function updVB(){
   } else el.style.display='none';
 }
 
-/* ── UTIL PICKER ──────────────────────────────────────────── */
-function placeU(u){
-  if(!pendll)return;
-  ga().feats.push({type:u.id,lat:pendll.lat,lng:pendll.lng,label:u.label,id:Date.now()});
-  pendll=null;closeUModal();redraw();updFL();updFS();
-  document.getElementById('clrbtn').style.display='block';
-}
-function closeUModal(){document.getElementById('umodal').classList.remove('open');}
-function buildUGrid(){
-  document.getElementById('ugrid').innerHTML=UTILS.map(u=>
-    `<button class="uo" style="background:${u.bg};border-color:${u.dot}30" onclick="placeU({id:'${u.id}',label:'${u.label}',emoji:'${u.emoji}'})">
-      <span style="font-size:22px">${u.emoji}</span><span style="color:${u.color};font-size:13px">${u.label}</span>
-    </button>`).join('');
-}
-
-/* ── FEAT LEGEND ──────────────────────────────────────────── */
+/* FEAT LEGEND */
 function updFL(){
   const feats=ga().feats;
   const el=document.getElementById('fleg');
@@ -970,27 +1045,26 @@ function updFL(){
       <div class="fh" style="background:${u.bg}">
         <span style="width:8px;height:8px;border-radius:50%;background:${u.dot};display:inline-block;flex-shrink:0"></span>
         <span style="font-size:13px;font-weight:700;color:${u.color}">${u.emoji} ${u.label}</span>
-        <span style="margin-left:auto;background:rgba(255,255,255,.8);border-radius:20px;padding:1px 9px;font-size:11px;font-weight:700;color:${u.color}">${items.length}</span>
+        <span style="margin-left:auto;background:rgba(255,255,255,.85);border-radius:20px;padding:1px 9px;font-size:11px;font-weight:700;color:${u.color}">${items.length}</span>
       </div>
       ${items.map(f=>`<div class="fr">
         <div style="flex:1;min-width:0">
-          <div class="fc">${f.pts?`Line · ${f.pts.length} nodes`:`${f.lat.toFixed(5)}, ${f.lng.toFixed(5)}`}</div>
-          ${f.note?`<div class="fn">📝 ${f.note}</div>`:''}
+          <div class="fcoord">${f.pts?`Line · ${f.pts.length} nodes`:`${f.lat.toFixed(5)}, ${f.lng.toFixed(5)}`}</div>
+          ${f.note?`<div class="fnote">📝 ${f.note}</div>`:''}
         </div>
-        <button class="xbtn" onclick="rmFeat(${f.id})">×</button>
+        <button class="xbtn" onclick="rmF(${f.id})">×</button>
       </div>`).join('')}
     </div>`;
   }).join('');
 }
-function rmFeat(id){const p=ga();p.feats=p.feats.filter(f=>f.id!==id);redraw();updFL();updFS();}
+function rmF(id){const p=ga();p.feats=p.feats.filter(f=>f.id!==id);draw();updFL();updFS();}
 function updFS(){
   const f=ga().feats;
-  const el=document.getElementById('fsumm');
-  el.style.display=f.length?'block':'none';
+  document.getElementById('fsumm').style.display=f.length?'block':'none';
   document.getElementById('fctxt').textContent=`${f.length} Site Feature${f.length!==1?'s':''}`;
 }
 
-/* ── UTIL STRIP + APWA ────────────────────────────────────── */
+/* UTIL STRIP */
 function buildStrip(){
   document.getElementById('uswrap').innerHTML=UTILS.filter(u=>u.id!=='nodig').map(u=>
     `<button class="uchip${autil===u.id?' on':''}" onclick="setAU('${u.id}')"
@@ -998,6 +1072,14 @@ function buildStrip(){
     >${u.emoji} ${u.label}</button>`).join('');
 }
 function setAU(id){autil=id;buildStrip();}
+function buildUGrid(){
+  document.getElementById('ugrid').innerHTML=UTILS.map(u=>
+    `<button class="uo" style="background:${u.bg};border-color:${u.dot}40" onclick="placeU({id:'${u.id}',label:'${u.label}',emoji:'${u.emoji}'})">
+      <span style="font-size:22px">${u.emoji}</span><span style="color:${u.color}">${u.label}</span>
+    </button>`).join('');
+}
+
+/* APWA */
 function buildAPWA(){
   document.getElementById('apwagrid').innerHTML=UTILS.map(u=>
     `<div class="api" style="background:${u.bg}">
@@ -1006,7 +1088,7 @@ function buildAPWA(){
     </div>`).join('');
 }
 
-/* ── MACHINE ──────────────────────────────────────────────── */
+/* MACHINE */
 function toggleMachine(){
   men=!men;
   document.getElementById('mtog').classList.toggle('on',men);
@@ -1014,10 +1096,9 @@ function toggleMachine(){
   if(men){chip.style.display='flex';startSim();}
   else{
     chip.style.display='none';stopSim();mpos=null;
-    if(mmark){mmark.remove();mmark=null;}
     document.getElementById('mstxt').textContent='Off · 3 m proximity alerts when on';
     document.getElementById('prox').classList.remove('show');
-    redraw();
+    draw();
   }
 }
 function startSim(){
@@ -1027,7 +1108,7 @@ function startSim(){
     mpos={lat:DLAT+Math.sin(mang)*0.00025,lng:DLNG+Math.cos(mang)*0.00025};
     document.getElementById('mstxt').textContent=`Simulated · RTK Fix · ${mpos.lat.toFixed(6)}N`;
     document.getElementById('mctxt').textContent='Machine · RTK Fix';
-    updProx();redraw();
+    updProx();draw();
   },800);
 }
 function stopSim(){if(mtmr){clearInterval(mtmr);mtmr=null;}}
@@ -1045,14 +1126,14 @@ function updProx(){
   const el=document.getElementById('prox');
   if(a&&men){
     const u=UTILS.find(u=>u.id===a.f.type)||UTILS[0];
-    document.getElementById('pico').textContent=u.emoji;
-    document.getElementById('ptitle').textContent=`⚠️ ${a.f.label} Nearby`;
-    document.getElementById('pnum').textContent=a.d.toFixed(1);
+    document.getElementById('pxico').textContent=u.emoji;
+    document.getElementById('pxtit').textContent=`⚠️ ${a.f.label} Nearby`;
+    document.getElementById('pxnum').textContent=a.d.toFixed(1);
     el.classList.add('show');
   } else el.classList.remove('show');
 }
 
-/* ── PROJECTS ─────────────────────────────────────────────── */
+/* PROJECTS */
 function toggleNP(){
   const el=document.getElementById('npf');
   el.style.display=el.style.display==='none'?'block':'none';
@@ -1072,11 +1153,7 @@ function selProj(id){
   const ch=document.getElementById('pchip');ch.textContent=p.name;ch.style.display='block';
   updM();updVB();updFL();updFS();updMA();
   document.getElementById('clrbtn').style.display=(p.pts.length||p.feats.length)?'block':'none';
-  renderProjs();redraw();
-  if(p.pts.length>0&&pll){
-    const lats=p.pts.map(x=>x.lat),lngs=p.pts.map(x=>x.lng);
-    pll.setView([(Math.min(...lats)+Math.max(...lats))/2,(Math.min(...lngs)+Math.max(...lngs))/2],17);
-  }
+  renderProjs();draw();
 }
 function delProj(id){
   if(projs.length===1)return;
@@ -1092,16 +1169,14 @@ function renderProjs(){
     return `<div class="pc${ia?' ap':''}">
       <div class="pb">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
-          <div>
-            <div style="font-weight:800;font-size:15px;color:#1A1A1A">${p.name}</div>
-            <div style="font-size:11px;color:#9CA3AF;margin-top:2px">Created ${p.created}</div>
-          </div>
-          ${ia?`<span class="bdg bdg-o">Active</span>`:''}
+          <div><div style="font-weight:800;font-size:15px">${p.name}</div>
+            <div style="font-size:11px;color:#9CA3AF;margin-top:2px">Created ${p.created}</div></div>
+          ${ia?`<span class="bdg bo2">Active</span>`:''}
         </div>
         <div class="ptgs">
           <span class="ptg" style="${hp?'color:#15803D;border-color:#BBF7D0;background:#ECFDF5':''}">📏 ${hp?'Perimeter mapped':'No perimeter'}</span>
           <span class="ptg" style="${fc>0?'color:#2563EB;border-color:#BFDBFE;background:#EFF6FF':''}">📍 ${fc} feature${fc!==1?'s':''}</span>
-          <span class="ptg" style="${vz?'color:#F47920;border-color:#F4792030;background:#FFF3EA':''}">📐 ${vz?vz+' zone'+(vz!==1?'s':''):'No volume data'}</span>
+          <span class="ptg" style="${vz?'color:#F47920;border-color:rgba(244,121,32,.25);background:#FFF3EA':''}">📐 ${vz?vz+' zone'+(vz!==1?'s':''):'No volume data'}</span>
         </div>
         <div class="pacts">
           <button class="btn ${ia?'bo':'bg'}" style="flex:1;font-size:13px" onclick="selProj(${p.id});showTab('map')">${ia?'Currently Editing':'Open Site'}</button>
@@ -1112,18 +1187,18 @@ function renderProjs(){
   }).join('');
 }
 
-/* ── VOLUME ───────────────────────────────────────────────── */
+/* VOLUME */
 function openVol(){
   zones=[...(ga().zones||[])];
   if(!zones.length)zones=[{id:Date.now(),lbl:'Zone A',d:'',t:'cut'}];
-  const ar=area(ga().pts);
-  document.getElementById('varea').textContent=`Site area: ${fmt(toac(ar),3)} ac (${fmt(tosf(ar),0)} sq ft)`;
+  const ar=polyArea(ga().pts);
+  document.getElementById('varea').textContent=`Site area: ${fmt(toAc(ar),3)} ac (${fmt(toSF(ar),0)} sq ft)`;
   renderZones();document.getElementById('vmodal').classList.add('open');
 }
-function closeVModal(){document.getElementById('vmodal').classList.remove('open');}
+function closeVM(){document.getElementById('vmodal').classList.remove('open');}
 function addZone(){zones.push({id:Date.now(),lbl:`Zone ${String.fromCharCode(65+zones.length)}`,d:'',t:'cut'});renderZones();}
 function renderZones(){
-  const ar=area(ga().pts);
+  const ar=polyArea(ga().pts);
   document.getElementById('zonelist').innerHTML=zones.map((z,i)=>{
     const vol=z.d&&parseFloat(z.d)>0?(ar/zones.length)*parseFloat(z.d):0;
     return `<div class="zc">
@@ -1160,9 +1235,9 @@ function renderZones(){
     document.getElementById('vtotsub').textContent=`${fmt(tot*1.308,1)} cubic yards`;
   } else tv.style.display='none';
 }
-function saveVol(){ga().zones=[...zones];closeVModal();updVB();}
+function saveVol(){ga().zones=[...zones];closeVM();updVB();}
 
-/* ── GRADE ────────────────────────────────────────────────── */
+/* GRADE */
 function gradeConn(){
   document.getElementById('gidle').style.display='none';
   document.getElementById('glive').style.display='flex';
@@ -1192,7 +1267,7 @@ function updGrade(){
   const cols={4:'#15803D',5:'#D97706',2:'#2563EB',1:'#6B7280'};
   const bgs={4:'#ECFDF5',5:'#FFFBEB',2:'#EFF6FF',1:'#F9FAFB'};
   const bbs={4:'#BBF7D0',5:'#FDE68A',2:'#BFDBFE',1:'#E5E7EB'};
-  const col=cols[fq]||'#6B7280',bg=bgs[fq]||'#F9FAFB',bb=bbs[fq]||'#E5E7EB';
+  const col=cols[fq],bg=bgs[fq],bb=bbs[fq];
   const b=document.getElementById('fbdg');
   b.style.background=bg;b.style.color=col;b.style.borderColor=bb;
   document.getElementById('fdot').style.background=col;
@@ -1201,7 +1276,7 @@ function updGrade(){
   document.getElementById('ghdop').textContent=hdop.toFixed(1);
   document.getElementById('gfixq').textContent=fq+' / 4';
   document.getElementById('gelev').textContent=elev.toFixed(4);
-  document.getElementById('gelevft').textContent=`${fmt(toft(elev),3)} ft · AMSL`;
+  document.getElementById('gelevft').textContent=`${fmt(toFt(elev),3)} ft · AMSL`;
   document.getElementById('glat').textContent=`${lat.toFixed(7)}°N`;
   document.getElementById('glng').textContent=`${Math.abs(lng).toFixed(7)}°W`;
 }
@@ -1223,7 +1298,7 @@ function renderBenches(){
   el.innerHTML=benches.map(bm=>{
     const d=live!=null?live-bm.e:null,cut=d!=null&&d>0;
     return `<div class="bi" style="border-color:${d!=null?(cut?'#FECACA':'#BBF7D0'):'#E5E7EB'}">
-      <div><div style="font-weight:700;font-size:14px;color:#1A1A1A">${bm.n}</div>
+      <div><div style="font-weight:700;font-size:14px">${bm.n}</div>
         <div style="font-size:11px;color:#9CA3AF;margin-top:1px">Design: ${bm.e.toFixed(4)} m</div></div>
       <div style="text-align:right">
         ${d!=null?`<div class="bd" style="color:${cut?'#DC2626':'#15803D'}">${cut?'+':''}${d.toFixed(4)} m</div>
@@ -1234,9 +1309,9 @@ function renderBenches(){
   }).join('');
 }
 
-/* ── EXPORT ───────────────────────────────────────────────── */
-function setSaveMode(m,btn){
-  smode=m;document.querySelectorAll('.so').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
+/* EXPORT */
+function setSM(m,btn){
+  document.querySelectorAll('.so').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
   document.getElementById('sminfo').style.display=m!=='device'?'flex':'none';
 }
 function buildFmts(){
@@ -1249,20 +1324,20 @@ function buildFmts(){
 }
 function doExp(f){dfmt=f;buildFmts();setTimeout(()=>{dfmt=null;buildFmts();},2500);}
 function buildExSumm(){
-  const p=ga(),ar=area(p.pts);
+  const p=ga(),ar=polyArea(p.pts);
   const items=[[String(p.pts.length),'Perimeter pts','📏'],[String(p.feats.length),'Features','📍'],
-    ...(ar>0?[[`${toac(ar).toFixed(3)} ac`,'Total area','📐']]:[])];
+    ...(ar>0?[[`${toAc(ar).toFixed(3)} ac`,'Total area','📐']]:[])];
   document.getElementById('exsumm').innerHTML=items.map(([v,l,ic])=>
     `<div class="smi"><div class="smico">${ic}</div><div class="smv">${v}</div><div class="sml">${l}</div></div>`).join('');
 }
 
-/* ── ACCORDION ────────────────────────────────────────────── */
+/* ACCORDION */
 function toggleAcc(btn){
-  const body=btn.nextElementSibling,open=body.classList.toggle('open');
-  btn.classList.toggle('open',open);
+  const b=btn.nextElementSibling,o=b.classList.toggle('open');
+  btn.classList.toggle('open',o);
 }
 
-/* ── TABS ─────────────────────────────────────────────────── */
+/* TABS */
 function showTab(id){
   document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
@@ -1270,26 +1345,29 @@ function showTab(id){
   ['projects','map','grade','export'].forEach((t,i)=>{
     if(t===id)document.querySelectorAll('.tab')[i].classList.add('on');
   });
-  if(id==='map')setTimeout(()=>{initMap();if(pll)pll.invalidateSize();},60);
+  if(id==='map'){setTimeout(()=>resizeCV(),30);}
   if(id==='export'){buildExSumm();buildFmts();}
 }
 
-/* ── INIT ─────────────────────────────────────────────────── */
-window.addEventListener('DOMContentLoaded',()=>{
-  buildAPWA();buildUGrid();buildStrip();renderProjs();updFL();
-  const ch=document.getElementById('pchip');
-  ch.textContent=ga().name;ch.style.display='block';
+/* INIT — fires immediately, no network needed */
+document.addEventListener('DOMContentLoaded',()=>{
+  /* animate splash bar */
+  setTimeout(()=>document.getElementById('spbar').style.width='100%',50);
 
-  // Dismiss splash as soon as app is ready - no network dependency
+  buildAPWA();buildUGrid();buildStrip();renderProjs();updFL();
+  document.getElementById('pchip').textContent=ga().name;
+  document.getElementById('pchip').style.display='block';
+
+  /* dismiss splash and show app */
   setTimeout(()=>{
     document.getElementById('splash').classList.add('out');
     document.getElementById('app').classList.add('show');
-    setTimeout(()=>{
-      const s=document.getElementById('splash');
-      if(s)s.style.display='none';
-    },800);
-  },1800);
+    resizeCV();
+    setTimeout(()=>document.getElementById('splash').style.display='none',700);
+  },1600);
 });
+
+window.addEventListener('resize',resizeCV);
 </script>
 
 </body>
