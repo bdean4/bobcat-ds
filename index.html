@@ -9,36 +9,21 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-title" content="Bobcat DS"/>
 <title>Bobcat Digital Station</title>
-<link rel="preconnect" href="[https://fonts.googleapis.com"/]https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-/* ── DESIGN TOKENS ───────────────────────────────────────── */
-:root {
-  --o:#F47920; --o2:#FF9A3C; --o3:rgba(244,121,32,0.15); --o4:rgba(244,121,32,0.08);
-  --bg:#0A0A0A; --s1:#111111; --s2:#181818; --s3:#202020; --s4:#2A2A2A;
-  --b1:#2E2E2E; --b2:#383838; --b3:#444;
-  --t1:#F0F0F0; --t2:#A0A0A0; --t3:#606060;
-  --green:#22C55E; --green-d:rgba(34,197,94,0.12);
-  --red:#EF4444; --red-d:rgba(239,68,68,0.12);
-  --blue:#3B82F6; --blue-d:rgba(59,130,246,0.12);
-  --r:14px; --r-sm:10px; --r-xs:7px;
-  --sh:0 4px 24px rgba(0,0,0,0.5);
-  --sh-sm:0 2px 12px rgba(0,0,0,0.4);
-  --font:'Inter',system-ui,sans-serif;
-}
 
 /* ── RESET ───────────────────────────────────────────────── */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;width:100%;overflow:hidden;background:var(–bg);
-color:var(–t1);font-family:var(–font)}
+html,body{height:100%;width:100%;overflow:hidden;background:#0A0A0A;
+color:#F0F0F0;font-family:-apple-system,BlinkMacSystemFont,‘Segoe UI’,Helvetica,Arial,sans-serif}
 ::-webkit-scrollbar{width:2px}
-::-webkit-scrollbar-thumb{background:var(–b2);border-radius:2px}
+::-webkit-scrollbar-thumb{background:#383838;border-radius:2px}
 
 /* ── SPLASH SCREEN ───────────────────────────────────────── */
 #splash{
-position:fixed;inset:0;background:var(–bg);z-index:9999;
+position:fixed;inset:0;background:#0A0A0A;z-index:9999;
 display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
 transition:opacity 0.6s ease,transform 0.6s ease;
 }
@@ -53,24 +38,24 @@ from{opacity:0;transform:translateY(24px) scale(0.92)}
 to{opacity:1;transform:translateY(0) scale(1)}
 }
 .splash-icon{
-width:90px;height:90px;background:var(–o);border-radius:24px;
+width:90px;height:90px;background:#F47920;border-radius:24px;
 display:flex;align-items:center;justify-content:center;
 box-shadow:0 0 60px rgba(244,121,32,0.45),0 20px 60px rgba(244,121,32,0.2);
 margin-bottom:28px;
 }
-.splash-brand{font-size:32px;font-weight:900;color:var(–t1);letter-spacing:-1px;line-height:1}
-.splash-sub{font-size:12px;font-weight:600;color:var(–o);letter-spacing:3px;text-transform:uppercase;margin-top:6px}
-.splash-tagline{font-size:13px;color:var(–t3);margin-top:16px;letter-spacing:0.2px}
+.splash-brand{font-size:32px;font-weight:900;color:#F0F0F0;letter-spacing:-1px;line-height:1}
+.splash-sub{font-size:12px;font-weight:600;color:#F47920;letter-spacing:3px;text-transform:uppercase;margin-top:6px}
+.splash-tagline{font-size:13px;color:#606060;margin-top:16px;letter-spacing:0.2px}
 
 .splash-loader{
 position:absolute;bottom:60px;display:flex;flex-direction:column;align-items:center;gap:14px;
 animation:fadeIn 0.5s 0.6s both;
 }
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.splash-bar{width:180px;height:2px;background:var(–b2);border-radius:2px;overflow:hidden}
-.splash-fill{height:100%;background:var(–o);border-radius:2px;animation:fillBar 1.8s ease-out both}
+.splash-bar{width:180px;height:2px;background:#383838;border-radius:2px;overflow:hidden}
+.splash-fill{height:100%;background:#F47920;border-radius:2px;animation:fillBar 1.8s ease-out both}
 @keyframes fillBar{from{width:0%}to{width:100%}}
-.splash-loading-txt{font-size:11px;color:var(–t3);letter-spacing:0.5px}
+.splash-loading-txt{font-size:11px;color:#606060;letter-spacing:0.5px}
 
 /* ── APP SHELL ───────────────────────────────────────────── */
 #app{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;
@@ -79,52 +64,52 @@ opacity:0;transition:opacity 0.5s ease}
 
 /* ── HEADER ──────────────────────────────────────────────── */
 #header{
-background:var(–s1);
-border-bottom:1px solid var(–b1);
+background:#111111;
+border-bottom:1px solid #2E2E2E;
 padding:0 16px;height:56px;
 display:flex;align-items:center;justify-content:space-between;
 flex-shrink:0;position:relative;z-index:100;
 }
 .hlogo{display:flex;align-items:center;gap:11px}
 .hlogo-icon{
-width:38px;height:38px;background:var(–o);border-radius:10px;
+width:38px;height:38px;background:#F47920;border-radius:10px;
 display:flex;align-items:center;justify-content:center;
 box-shadow:0 0 20px rgba(244,121,32,0.3);flex-shrink:0;
 }
-.hlogo-name{font-size:16px;font-weight:800;color:var(–t1);letter-spacing:-0.5px;line-height:1}
-.hlogo-sub{font-size:8px;font-weight:700;color:var(–o);letter-spacing:2.5px;text-transform:uppercase;margin-top:2px}
+.hlogo-name{font-size:16px;font-weight:800;color:#F0F0F0;letter-spacing:-0.5px;line-height:1}
+.hlogo-sub{font-size:8px;font-weight:700;color:#F47920;letter-spacing:2.5px;text-transform:uppercase;margin-top:2px}
 
 .hright{display:flex;align-items:center;gap:8px}
 .proj-pill{
-background:var(–s3);border:1px solid var(–b1);border-radius:20px;
-padding:5px 12px;font-size:11px;font-weight:600;color:var(–o);
+background:#202020;border:1px solid #2E2E2E;border-radius:20px;
+padding:5px 12px;font-size:11px;font-weight:600;color:#F47920;
 max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:none;
 }
 .gps-pill{
 display:flex;align-items:center;gap:6px;
-background:var(–green-d);border:1px solid rgba(34,197,94,0.2);
+background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.2);
 border-radius:20px;padding:5px 11px;
 }
-.gps-pill span{font-size:11px;font-weight:700;color:var(–green)}
+.gps-pill span{font-size:11px;font-weight:700;color:#22C55E}
 .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;animation:blink 2s infinite}
-.dot-g{background:var(–green)}
-.dot-o{background:var(–o)}
-.dot-r{background:var(–red);animation-duration:0.7s}
+.dot-g{background:#22C55E}
+.dot-o{background:#F47920}
+.dot-r{background:#EF4444;animation-duration:0.7s}
 @keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.25;transform:scale(.6)}}
 
 /* ── TABS ────────────────────────────────────────────────── */
 #tabbar{
-background:var(–s1);border-bottom:1px solid var(–b1);
+background:#111111;border-bottom:1px solid #2E2E2E;
 display:flex;padding:0;flex-shrink:0;
 }
 .tab{
 flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
 padding:8px 0 10px;background:none;border:none;
 border-bottom:2px solid transparent;
-color:var(–t3);cursor:pointer;font-size:10px;font-weight:600;
-font-family:var(–font);letter-spacing:0.3px;transition:all .2s;
+color:#606060;cursor:pointer;font-size:10px;font-weight:600;
+font-family:-apple-system,BlinkMacSystemFont,‘Segoe UI’,Helvetica,Arial,sans-serif;letter-spacing:0.3px;transition:all .2s;
 }
-.tab.on{color:var(–o);border-bottom-color:var(–o)}
+.tab.on{color:#F47920;border-bottom-color:#F47920}
 .tab-ico{font-size:17px;opacity:0.4;transition:opacity .2s}
 .tab.on .tab-ico{opacity:1}
 
@@ -135,11 +120,11 @@ font-family:var(–font);letter-spacing:0.3px;transition:all .2s;
 
 /* ── CARDS ───────────────────────────────────────────────── */
 .card{
-background:var(–s2);border-radius:var(–r);
-border:1px solid var(–b1);overflow:hidden;
+background:#181818;border-radius:14px;
+border:1px solid #2E2E2E;overflow:hidden;
 }
 .cp{padding:16px}
-.ctitle{font-size:15px;font-weight:700;color:var(–t1);margin-bottom:13px}
+.ctitle{font-size:15px;font-weight:700;color:#F0F0F0;margin-bottom:13px}
 
 /* ── GLASS CARD ──────────────────────────────────────────── */
 .glass{
@@ -147,98 +132,98 @@ background:rgba(255,255,255,0.04);
 backdrop-filter:blur(20px);
 -webkit-backdrop-filter:blur(20px);
 border:1px solid rgba(255,255,255,0.08);
-border-radius:var(–r);
+border-radius:14px;
 }
 
 /* ── BUTTONS ─────────────────────────────────────────────── */
 .btn{
 display:inline-flex;align-items:center;justify-content:center;gap:6px;
-border:none;border-radius:var(–r-sm);padding:12px 18px;
-font-size:14px;font-weight:600;cursor:pointer;font-family:var(–font);
+border:none;border-radius:10px;padding:12px 18px;
+font-size:14px;font-weight:600;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,‘Segoe UI’,Helvetica,Arial,sans-serif;
 transition:all .15s;letter-spacing:-0.1px;
 }
 .btn:active{transform:scale(.96)}
-.btn-o{background:var(–o);color:#fff;box-shadow:0 4px 20px rgba(244,121,32,0.35)}
-.btn-o:hover{background:var(–o2)}
-.btn-ghost{background:var(–s3);color:var(–t2);border:1px solid var(–b2)}
-.btn-red{background:var(–red-d);color:var(–red);border:1px solid rgba(239,68,68,0.2)}
-.btn-grn{background:var(–green-d);color:var(–green);border:1px solid rgba(34,197,94,0.2)}
+.btn-o{background:#F47920;color:#fff;box-shadow:0 4px 20px rgba(244,121,32,0.35)}
+.btn-o:hover{background:#FF9A3C}
+.btn-ghost{background:#202020;color:#A0A0A0;border:1px solid #383838}
+.btn-red{background:rgba(239,68,68,0.12);color:#EF4444;border:1px solid rgba(239,68,68,0.2)}
+.btn-grn{background:rgba(34,197,94,0.12);color:#22C55E;border:1px solid rgba(34,197,94,0.2)}
 .btn-w{width:100%;display:flex}
-.btn-sm{padding:7px 13px;font-size:12px;border-radius:var(–r-xs)}
+.btn-sm{padding:7px 13px;font-size:12px;border-radius:7px}
 
 /* ── INPUTS ──────────────────────────────────────────────── */
 input,textarea{
-border:1px solid var(–b2);border-radius:var(–r-xs);
-padding:11px 13px;font-size:13px;color:var(–t1);
-outline:none;font-family:var(–font);background:var(–s3);width:100%;
+border:1px solid #383838;border-radius:7px;
+padding:11px 13px;font-size:13px;color:#F0F0F0;
+outline:none;font-family:-apple-system,BlinkMacSystemFont,‘Segoe UI’,Helvetica,Arial,sans-serif;background:#202020;width:100%;
 transition:border-color .15s;
 }
-input:focus,textarea:focus{border-color:var(–o);background:var(–s2)}
-input::placeholder,textarea::placeholder{color:var(–t3)}
+input:focus,textarea:focus{border-color:#F47920;background:#181818}
+input::placeholder,textarea::placeholder{color:#606060}
 textarea{resize:none}
-.ilabel{font-size:10px;font-weight:600;color:var(–t3);text-transform:uppercase;
+.ilabel{font-size:10px;font-weight:600;color:#606060;text-transform:uppercase;
 letter-spacing:.8px;margin-bottom:5px}
 
 /* ── SEGMENT CONTROL ─────────────────────────────────────── */
 .seg{
-background:var(–s2);border-radius:var(–r);
-padding:4px;border:1px solid var(–b1);display:grid;gap:3px;
+background:#181818;border-radius:14px;
+padding:4px;border:1px solid #2E2E2E;display:grid;gap:3px;
 }
 .seg3{grid-template-columns:1fr 1fr 1fr}
 .seg2{grid-template-columns:1fr 1fr}
 .seg-b{
 padding:9px 0;background:transparent;border:none;border-radius:10px;
-color:var(–t3);font-size:11px;font-weight:600;cursor:pointer;
-font-family:var(–font);transition:all .2s;text-align:center;
+color:#606060;font-size:11px;font-weight:600;cursor:pointer;
+font-family:-apple-system,BlinkMacSystemFont,‘Segoe UI’,Helvetica,Arial,sans-serif;transition:all .2s;text-align:center;
 }
 .seg-b .si{font-size:16px;display:block;margin-bottom:2px}
-.seg-b.on{background:var(–s4);color:var(–o);box-shadow:0 2px 8px rgba(0,0,0,0.4)}
+.seg-b.on{background:#2A2A2A;color:#F47920;box-shadow:0 2px 8px rgba(0,0,0,0.4)}
 
 /* ── STATS ───────────────────────────────────────────────── */
 .stats-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .stat{
-background:var(–s2);border-radius:var(–r);padding:15px 16px;
-border:1px solid var(–b1);
+background:#181818;border-radius:14px;padding:15px 16px;
+border:1px solid #2E2E2E;
 }
 .stat.ac{
 border-color:rgba(244,121,32,0.25);
-background:linear-gradient(135deg,rgba(244,121,32,0.08),var(–s2));
+background:linear-gradient(135deg,rgba(244,121,32,0.08),#181818);
 }
-.slabel{font-size:10px;font-weight:600;color:var(–t3);text-transform:uppercase;
+.slabel{font-size:10px;font-weight:600;color:#606060;text-transform:uppercase;
 letter-spacing:.7px;margin-bottom:7px}
-.sval{font-size:22px;font-weight:800;color:var(–t1);line-height:1}
-.stat.ac .sval{color:var(–o)}
-.ssub{font-size:11px;color:var(–t3);margin-top:3px}
+.sval{font-size:22px;font-weight:800;color:#F0F0F0;line-height:1}
+.stat.ac .sval{color:#F47920}
+.ssub{font-size:11px;color:#606060;margin-top:3px}
 
 /* ── BADGES ──────────────────────────────────────────────── */
 .badge{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600}
-.badge-g{background:var(–green-d);color:var(–green);border:1px solid rgba(34,197,94,0.2)}
-.badge-o{background:var(–o3);color:var(–o);border:1px solid rgba(244,121,32,0.25)}
-.badge-b{background:var(–blue-d);color:var(–blue);border:1px solid rgba(59,130,246,0.2)}
-.badge-r{background:var(–red-d);color:var(–red);border:1px solid rgba(239,68,68,0.2)}
-.badge-gray{background:var(–s3);color:var(–t3);border:1px solid var(–b2)}
+.badge-g{background:rgba(34,197,94,0.12);color:#22C55E;border:1px solid rgba(34,197,94,0.2)}
+.badge-o{background:rgba(244,121,32,0.15);color:#F47920;border:1px solid rgba(244,121,32,0.25)}
+.badge-b{background:rgba(59,130,246,0.12);color:#3B82F6;border:1px solid rgba(59,130,246,0.2)}
+.badge-r{background:rgba(239,68,68,0.12);color:#EF4444;border:1px solid rgba(239,68,68,0.2)}
+.badge-gray{background:#202020;color:#606060;border:1px solid #383838}
 
 /* ── TOGGLE ──────────────────────────────────────────────── */
 .tog-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.tog{width:46px;height:26px;border-radius:13px;background:var(–b2);
+.tog{width:46px;height:26px;border-radius:13px;background:#383838;
 cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;border:none}
-.tog.on{background:var(–blue)}
+.tog.on{background:#3B82F6}
 .tog::after{content:’’;position:absolute;top:3px;left:3px;
 width:20px;height:20px;border-radius:50%;background:#fff;
 box-shadow:0 1px 4px rgba(0,0,0,0.4);transition:left .2s}
 .tog.on::after{left:23px}
 
 /* ── INFO BOXES ──────────────────────────────────────────── */
-.ibox{border-radius:var(–r-xs);padding:11px 13px;font-size:12px;line-height:1.6}
-.ibox-b{background:var(–blue-d);color:#93C5FD;border:1px solid rgba(59,130,246,0.2)}
-.ibox-g{background:var(–green-d);color:var(–green);border:1px solid rgba(34,197,94,0.2);display:flex;align-items:center;gap:7px}
-.ibox-o{background:var(–o4);color:var(–o);border:1px solid rgba(244,121,32,0.2)}
+.ibox{border-radius:7px;padding:11px 13px;font-size:12px;line-height:1.6}
+.ibox-b{background:rgba(59,130,246,0.12);color:#93C5FD;border:1px solid rgba(59,130,246,0.2)}
+.ibox-g{background:rgba(34,197,94,0.12);color:#22C55E;border:1px solid rgba(34,197,94,0.2);display:flex;align-items:center;gap:7px}
+.ibox-o{background:rgba(244,121,32,0.08);color:#F47920;border:1px solid rgba(244,121,32,0.2)}
 
 /* ── MAP ─────────────────────────────────────────────────── */
 #map-wrap{
-position:relative;width:100%;border-radius:var(–r);
-overflow:hidden;box-shadow:var(–sh);height:360px;
-border:1px solid var(–b1);
+position:relative;width:100%;border-radius:14px;
+overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.5);height:360px;
+border:1px solid #2E2E2E;
 }
 #lmap{width:100%;height:100%}
 
@@ -250,17 +235,17 @@ border:1px solid var(–b1);
 .mchip{
 background:rgba(17,17,17,0.9);backdrop-filter:blur(12px);
 border:1px solid rgba(255,255,255,0.1);border-radius:20px;
-padding:6px 12px;font-size:11px;font-weight:600;color:var(–t2);
-display:flex;align-items:center;gap:6px;box-shadow:var(–sh-sm);white-space:nowrap;
+padding:6px 12px;font-size:11px;font-weight:600;color:#A0A0A0;
+display:flex;align-items:center;gap:6px;box-shadow:0 2px 12px rgba(0,0,0,0.4);white-space:nowrap;
 }
 .mbtn{
 background:rgba(17,17,17,0.9);backdrop-filter:blur(12px);
 border:1px solid rgba(255,255,255,0.1);border-radius:20px;
 padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;
-box-shadow:var(–sh-sm);font-family:var(–font);color:var(–t1);
+box-shadow:0 2px 12px rgba(0,0,0,0.4);font-family:-apple-system,BlinkMacSystemFont,‘Segoe UI’,Helvetica,Arial,sans-serif;color:#F0F0F0;
 display:flex;align-items:center;gap:5px;transition:all .15s;
 }
-.mbtn-o{background:var(–o);color:#fff;border-color:transparent;box-shadow:0 4px 16px rgba(244,121,32,0.4)}
+.mbtn-o{background:#F47920;color:#fff;border-color:transparent;box-shadow:0 4px 16px rgba(244,121,32,0.4)}
 .mbtn-g{background:#15803D;color:#fff;border-color:transparent}
 .mbtn:active{transform:scale(.96)}
 
@@ -269,7 +254,7 @@ display:flex;align-items:center;gap:5px;transition:all .15s;
 display:none;
 background:linear-gradient(135deg,#7F1D1D,#991B1B);
 border:1px solid rgba(239,68,68,0.4);
-border-radius:var(–r);padding:14px 16px;
+border-radius:14px;padding:14px 16px;
 box-shadow:0 4px 24px rgba(239,68,68,0.3);
 animation:sld .22s cubic-bezier(0.16,1,0.3,1);
 }
@@ -285,105 +270,105 @@ display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrin
 
 /* ── FEATURE LEGEND ──────────────────────────────────────── */
 .fgroup{
-background:var(–s2);border-radius:var(–r);
-border:1px solid var(–b1);overflow:hidden;margin-bottom:8px;
+background:#181818;border-radius:14px;
+border:1px solid #2E2E2E;overflow:hidden;margin-bottom:8px;
 }
 .fhead{display:flex;align-items:center;gap:9px;padding:12px 14px}
 .frow{
 display:flex;justify-content:space-between;align-items:center;
-padding:9px 14px;border-top:1px solid var(–b1);
+padding:9px 14px;border-top:1px solid #2E2E2E;
 }
-.fcoord{font-size:11px;color:var(–t3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.fnote{font-size:10px;color:var(–t3);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rmbtn{background:var(–s3);border:none;border-radius:6px;width:26px;height:26px;
-cursor:pointer;font-size:14px;color:var(–t3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fcoord{font-size:11px;color:#606060;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fnote{font-size:10px;color:#606060;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rmbtn{background:#202020;border:none;border-radius:6px;width:26px;height:26px;
+cursor:pointer;font-size:14px;color:#606060;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 
 /* ── ACCORDION ───────────────────────────────────────────── */
-.acc{background:var(–s2);border-radius:var(–r);border:1px solid var(–b1);overflow:hidden}
+.acc{background:#181818;border-radius:14px;border:1px solid #2E2E2E;overflow:hidden}
 .acc-hd{
 display:flex;justify-content:space-between;align-items:center;
 padding:14px 16px;cursor:pointer;font-weight:600;font-size:14px;
-border:none;background:none;width:100%;font-family:var(–font);
-text-align:left;color:var(–t1);
+border:none;background:none;width:100%;font-family:-apple-system,BlinkMacSystemFont,‘Segoe UI’,Helvetica,Arial,sans-serif;
+text-align:left;color:#F0F0F0;
 }
-.acc-hd .chev{font-size:13px;color:var(–t3);transition:transform .2s}
+.acc-hd .chev{font-size:13px;color:#606060;transition:transform .2s}
 .acc-hd.open .chev{transform:rotate(180deg)}
-.acc-body{display:none;padding:4px 16px 16px;border-top:1px solid var(–b1)}
+.acc-body{display:none;padding:4px 16px 16px;border-top:1px solid #2E2E2E}
 .acc-body.open{display:block}
 .apwa-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding-top:10px}
-.apwa-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(–r-xs)}
+.apwa-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:7px}
 
 /* ── GRADE ───────────────────────────────────────────────── */
 .step-row{display:flex;gap:12px;margin-bottom:16px}
 .step-n{
-width:28px;height:28px;border-radius:50%;background:var(–o);color:#fff;
+width:28px;height:28px;border-radius:50%;background:#F47920;color:#fff;
 display:flex;align-items:center;justify-content:center;
 font-weight:700;font-size:12px;flex-shrink:0;
 }
-.step-title{font-weight:600;font-size:13px;color:var(–t1);margin-bottom:3px}
-.step-desc{font-size:12px;color:var(–t3);line-height:1.6}
+.step-title{font-weight:600;font-size:13px;color:#F0F0F0;margin-bottom:3px}
+.step-desc{font-size:12px;color:#606060;line-height:1.6}
 .rtk3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
-.rbox{background:var(–s3);border-radius:var(–r-xs);padding:12px 8px;text-align:center;border:1px solid var(–b2)}
-.rval{font-size:19px;font-weight:800;color:var(–t1)}
-.rlbl{font-size:10px;color:var(–t3);margin-top:2px}
+.rbox{background:#202020;border-radius:7px;padding:12px 8px;text-align:center;border:1px solid #383838}
+.rval{font-size:19px;font-weight:800;color:#F0F0F0}
+.rlbl{font-size:10px;color:#606060;margin-top:2px}
 .elevcard{
 background:linear-gradient(135deg,rgba(244,121,32,0.1),rgba(244,121,32,0.04));
-border:1px solid rgba(244,121,32,0.2);border-radius:var(–r);padding:16px;
+border:1px solid rgba(244,121,32,0.2);border-radius:14px;padding:16px;
 }
-.elevnum{font-size:38px;font-weight:900;color:var(–o);line-height:1}
+.elevnum{font-size:38px;font-weight:900;color:#F47920;line-height:1}
 .bitem{
 display:flex;justify-content:space-between;align-items:center;
-padding:13px 14px;background:var(–s3);border-radius:var(–r-xs);
-margin-bottom:7px;border:1px solid var(–b2);
+padding:13px 14px;background:#202020;border-radius:7px;
+margin-bottom:7px;border:1px solid #383838;
 }
 .bdelta{font-size:21px;font-weight:900;line-height:1}
 
 /* ── EXPORT ──────────────────────────────────────────────── */
 .fmtgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .fcard{
-background:var(–s2);border:1px solid var(–b1);border-radius:var(–r);
-padding:15px 14px;cursor:pointer;font-family:var(–font);text-align:left;
+background:#181818;border:1px solid #2E2E2E;border-radius:14px;
+padding:15px 14px;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,‘Segoe UI’,Helvetica,Arial,sans-serif;text-align:left;
 position:relative;transition:all .15s;
 }
 .fcard:active{transform:scale(.97)}
-.fcard.done{background:var(–o4);border-color:rgba(244,121,32,0.35)}
+.fcard.done{background:rgba(244,121,32,0.08);border-color:rgba(244,121,32,0.35)}
 .fico{font-size:24px;margin-bottom:6px}
-.fname{font-size:13px;font-weight:700;color:var(–t1)}
-.fcard.done .fname{color:var(–o)}
-.fdesc{font-size:10px;color:var(–t3);margin-top:2px}
+.fname{font-size:13px;font-weight:700;color:#F0F0F0}
+.fcard.done .fname{color:#F47920}
+.fdesc{font-size:10px;color:#606060;margin-top:2px}
 .fbadge{position:absolute;top:9px;right:9px;border-radius:20px;padding:2px 7px;font-size:9px;font-weight:600}
-.fdone{position:absolute;bottom:9px;right:11px;font-size:10px;font-weight:600;color:var(–green)}
+.fdone{position:absolute;bottom:9px;right:11px;font-size:10px;font-weight:600;color:#22C55E}
 .saverow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .sopt{
-padding:12px 6px;background:var(–s3);border:1px solid var(–b2);
-border-radius:var(–r-xs);cursor:pointer;font-weight:600;font-size:11px;
-font-family:var(–font);text-align:center;transition:all .15s;color:var(–t2);
+padding:12px 6px;background:#202020;border:1px solid #383838;
+border-radius:7px;cursor:pointer;font-weight:600;font-size:11px;
+font-family:-apple-system,BlinkMacSystemFont,‘Segoe UI’,Helvetica,Arial,sans-serif;text-align:center;transition:all .15s;color:#A0A0A0;
 }
 .sopt .sico{font-size:20px;display:block;margin-bottom:4px}
-.sopt.on{background:var(–o);border-color:var(–o);color:#fff}
+.sopt.on{background:#F47920;border-color:#F47920;color:#fff}
 .sumrow{display:flex;gap:9px;flex-wrap:wrap}
-.sumitem{background:var(–s3);border-radius:var(–r-xs);padding:12px 13px;flex:1;min-width:80px;border:1px solid var(–b2)}
+.sumitem{background:#202020;border-radius:7px;padding:12px 13px;flex:1;min-width:80px;border:1px solid #383838}
 .sumico{font-size:17px;margin-bottom:3px}
-.sumval{font-size:17px;font-weight:800;color:var(–o)}
-.sumlbl{font-size:10px;color:var(–t3);margin-top:2px}
+.sumval{font-size:17px;font-weight:800;color:#F47920}
+.sumlbl{font-size:10px;color:#606060;margin-top:2px}
 
 /* ── PROJECTS ────────────────────────────────────────────── */
 .pcard{
-background:var(–s2);border-radius:var(–r);
-border:1px solid var(–b1);overflow:hidden;
+background:#181818;border-radius:14px;
+border:1px solid #2E2E2E;overflow:hidden;
 transition:border-color .2s;margin-bottom:10px;
 }
 .pcard.ap{border-color:rgba(244,121,32,0.4)}
 .pcard.ap::before{
 content:’’;display:block;height:2px;
-background:linear-gradient(90deg,var(–o),var(–o2));
+background:linear-gradient(90deg,#F47920,#FF9A3C);
 }
 .pbody{padding:15px 16px}
 .ptags{display:flex;gap:6px;flex-wrap:wrap;margin:9px 0 12px}
 .ptag{
-display:flex;align-items:center;gap:4px;background:var(–s3);
-border:1px solid var(–b2);border-radius:20px;padding:4px 9px;
-font-size:10px;font-weight:500;color:var(–t3);
+display:flex;align-items:center;gap:4px;background:#202020;
+border:1px solid #383838;border-radius:20px;padding:4px 9px;
+font-size:10px;font-weight:500;color:#606060;
 }
 .pacts{display:flex;gap:7px}
 
@@ -395,37 +380,37 @@ backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
 }
 .moverlay.open{display:flex}
 .msheet{
-background:var(–s1);border-radius:20px 20px 0 0;
+background:#111111;border-radius:20px 20px 0 0;
 padding:20px 16px;width:100%;max-width:100%;
 max-height:88vh;overflow-y:auto;
-border-top:1px solid var(–b2);
+border-top:1px solid #383838;
 box-shadow:0 -8px 40px rgba(0,0,0,0.6);
 }
-.mhandle{width:36px;height:3px;background:var(–b2);border-radius:2px;margin:0 auto 18px}
+.mhandle{width:36px;height:3px;background:#383838;border-radius:2px;margin:0 auto 18px}
 
 /* ── VOLUME ──────────────────────────────────────────────── */
-.zcard{background:var(–s3);border-radius:var(–r-xs);padding:13px;margin-bottom:9px;border:1px solid var(–b2)}
+.zcard{background:#202020;border-radius:7px;padding:13px;margin-bottom:9px;border:1px solid #383838}
 .zrow{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:9px}
 .ztype{display:flex;gap:6px}
 .ztbtn{
-flex:1;padding:8px 0;border:1px solid var(–b2);border-radius:var(–r-xs);
-background:var(–s2);cursor:pointer;font-weight:600;font-size:12px;
-font-family:var(–font);color:var(–t2);transition:all .15s;
+flex:1;padding:8px 0;border:1px solid #383838;border-radius:7px;
+background:#181818;cursor:pointer;font-weight:600;font-size:12px;
+font-family:-apple-system,BlinkMacSystemFont,‘Segoe UI’,Helvetica,Arial,sans-serif;color:#A0A0A0;transition:all .15s;
 }
-.ztbtn.cut{background:var(–red-d);border-color:rgba(239,68,68,0.3);color:var(–red)}
-.ztbtn.fill{background:var(–green-d);border-color:rgba(34,197,94,0.3);color:var(–green)}
+.ztbtn.cut{background:rgba(239,68,68,0.12);border-color:rgba(239,68,68,0.3);color:#EF4444}
+.ztbtn.fill{background:rgba(34,197,94,0.12);border-color:rgba(34,197,94,0.3);color:#22C55E}
 .voltotal{
-background:var(–o4);border:1px solid rgba(244,121,32,0.25);
-border-radius:var(–r-xs);padding:14px 16px;
+background:rgba(244,121,32,0.08);border:1px solid rgba(244,121,32,0.25);
+border-radius:7px;padding:14px 16px;
 display:flex;justify-content:space-between;align-items:center;margin-bottom:13px;
 }
 
 /* ── UTIL PICKER ─────────────────────────────────────────── */
 .ugrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
 .uopt{
-padding:13px;border-radius:var(–r-xs);border:1px solid var(–b2);
-cursor:pointer;font-family:var(–font);font-weight:600;font-size:13px;
-display:flex;align-items:center;gap:10px;transition:all .15s;background:var(–s3);
+padding:13px;border-radius:7px;border:1px solid #383838;
+cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,‘Segoe UI’,Helvetica,Arial,sans-serif;font-weight:600;font-size:13px;
+display:flex;align-items:center;gap:10px;transition:all .15s;background:#202020;
 }
 .uopt:active{transform:scale(.97)}
 
@@ -434,15 +419,15 @@ display:flex;align-items:center;gap:10px;transition:all .15s;background:var(–s
 .ustrip::-webkit-scrollbar{display:none}
 .uchip{
 flex-shrink:0;display:flex;align-items:center;gap:5px;
-padding:6px 12px;border-radius:20px;border:1px solid var(–b2);
-background:var(–s3);font-size:11px;font-weight:600;color:var(–t3);
-cursor:pointer;font-family:var(–font);white-space:nowrap;transition:all .15s;
+padding:6px 12px;border-radius:20px;border:1px solid #383838;
+background:#202020;font-size:11px;font-weight:600;color:#606060;
+cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,‘Segoe UI’,Helvetica,Arial,sans-serif;white-space:nowrap;transition:all .15s;
 }
 
 /* ── NMEA ────────────────────────────────────────────────── */
 .nmea{
-background:#050505;border:1px solid var(–b1);
-border-radius:var(–r-xs);padding:10px 12px;font-size:9px;
+background:#050505;border:1px solid #2E2E2E;
+border-radius:7px;padding:10px 12px;font-size:9px;
 color:#4ADE80;font-family:‘Courier New’,monospace;
 word-break:break-all;line-height:1.9;margin-top:6px;
 }
@@ -450,35 +435,35 @@ word-break:break-all;line-height:1.9;margin-top:6px;
 /* ── DRONE TEASER ────────────────────────────────────────── */
 .drone{
 background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(59,130,246,0.04));
-border:1px dashed rgba(59,130,246,0.25);border-radius:var(–r);padding:18px;
+border:1px dashed rgba(59,130,246,0.25);border-radius:14px;padding:18px;
 }
 
 /* ── EMPTY STATE ─────────────────────────────────────────── */
 .empty{
-background:var(–s2);border-radius:var(–r);padding:32px 20px;
-text-align:center;border:1px solid var(–b1);
+background:#181818;border-radius:14px;padding:32px 20px;
+text-align:center;border:1px solid #2E2E2E;
 }
 .empty-ico{font-size:32px;margin-bottom:10px;opacity:0.6}
-.empty-title{font-size:14px;font-weight:700;color:var(–t1);margin-bottom:5px}
-.empty-sub{font-size:12px;color:var(–t3);line-height:1.6}
+.empty-title{font-size:14px;font-weight:700;color:#F0F0F0;margin-bottom:5px}
+.empty-sub{font-size:12px;color:#606060;line-height:1.6}
 
 /* ── SECTION HEADER ──────────────────────────────────────── */
-.sh{font-size:11px;font-weight:700;color:var(–t3);padding:0 2px;
+.sh{font-size:11px;font-weight:700;color:#606060;padding:0 2px;
 text-transform:uppercase;letter-spacing:1px}
 
 /* ── DIVIDER ─────────────────────────────────────────────── */
-.divider{height:1px;background:var(–b1);margin:0 -1px}
+.divider{height:1px;background:#2E2E2E;margin:0 -1px}
 
 /* ── LEAFLET DARK OVERRIDES ──────────────────────────────── */
 .leaflet-tile-pane{filter:brightness(0.85) saturate(0.9)}
-.leaflet-control-zoom{border:1px solid var(–b2)!important;border-radius:10px!important;overflow:hidden;box-shadow:var(–sh-sm)!important}
-.leaflet-control-zoom a{background:var(–s2)!important;color:var(–t1)!important;border-bottom-color:var(–b2)!important}
-.leaflet-control-zoom a:hover{background:var(–s3)!important}
-.leaflet-control-attribution{background:rgba(10,10,10,0.7)!important;color:var(–t3)!important;font-size:8px!important;backdrop-filter:blur(4px)}
-.leaflet-popup-content-wrapper{background:var(–s2)!important;border:1px solid var(–b2)!important;border-radius:12px!important;box-shadow:var(–sh)!important;color:var(–t1)!important}
-.leaflet-popup-content{font-family:var(–font)!important;color:var(–t1)!important;margin:12px 14px!important}
-.leaflet-popup-tip{background:var(–s2)!important}
-.leaflet-popup-close-button{color:var(–t3)!important}
+.leaflet-control-zoom{border:1px solid #383838!important;border-radius:10px!important;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.4)!important}
+.leaflet-control-zoom a{background:#181818!important;color:#F0F0F0!important;border-bottom-color:#383838!important}
+.leaflet-control-zoom a:hover{background:#202020!important}
+.leaflet-control-attribution{background:rgba(10,10,10,0.7)!important;color:#606060!important;font-size:8px!important;backdrop-filter:blur(4px)}
+.leaflet-popup-content-wrapper{background:#181818!important;border:1px solid #383838!important;border-radius:12px!important;box-shadow:0 4px 24px rgba(0,0,0,0.5)!important;color:#F0F0F0!important}
+.leaflet-popup-content{font-family:-apple-system,BlinkMacSystemFont,‘Segoe UI’,Helvetica,Arial,sans-serif!important;color:#F0F0F0!important;margin:12px 14px!important}
+.leaflet-popup-tip{background:#181818!important}
+.leaflet-popup-close-button{color:#606060!important}
 </style>
 
 </head>
@@ -534,7 +519,7 @@ text-transform:uppercase;letter-spacing:1px}
 <div id="tabbar">
   <button class="tab on" onclick="showTab('projects')"><span class="tab-ico">📁</span>Projects</button>
   <button class="tab" onclick="showTab('map')"><span class="tab-ico">🗺️</span>Site Map</button>
-  <button class="tab" onclick="showTab('grade')"><span class="tab-ico">📡</span>Grade</button>
+  <button class="tab" onclick="showTab('grade')"><span class="tab-ico">🚧</span>Grade</button>
   <button class="tab" onclick="showTab('export')"><span class="tab-ico">📤</span>Export</button>
 </div>
 
@@ -546,7 +531,7 @@ text-transform:uppercase;letter-spacing:1px}
 
 <div id="screen-projects" class="screen active">
   <div style="display:flex;justify-content:space-between;align-items:center">
-    <div style="font-size:18px;font-weight:800;color:var(--t1)">Job Site Projects</div>
+    <div style="font-size:18px;font-weight:800;color:#F0F0F0">Job Site Projects</div>
     <button class="btn btn-o btn-sm" onclick="toggleNewProj()">＋ New Site</button>
   </div>
   <div id="new-proj-form" style="display:none">
@@ -615,12 +600,12 @@ text-transform:uppercase;letter-spacing:1px}
     <div class="map-tr">
       <div class="mchip">
         <span class="dot dot-g" style="width:5px;height:5px"></span>
-        <span style="color:var(--green)">GPS Active</span>
+        <span style="color:#22C55E">GPS Active</span>
       </div>
     </div>
     <div class="map-br" id="map-actions"></div>
     <div class="map-bl">
-      <div class="mchip" style="font-size:9px;color:var(--t3)">Hold = Utility &nbsp;·&nbsp; Tap = Draw</div>
+      <div class="mchip" style="font-size:9px;color:#606060">Hold = Utility &nbsp;·&nbsp; Tap = Draw</div>
     </div>
   </div>
 
@@ -646,13 +631,13 @@ text-transform:uppercase;letter-spacing:1px}
   <div id="vol-btn-wrap" style="display:none">
     <button class="card cp btn-w" style="text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center" onclick="openVolModal()">
       <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:36px;height:36px;border-radius:9px;background:var(--o4);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;border:1px solid rgba(244,121,32,.2)">📐</div>
+        <div style="width:36px;height:36px;border-radius:9px;background:rgba(244,121,32,0.08);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;border:1px solid rgba(244,121,32,.2)">📐</div>
         <div>
-          <div style="font-size:14px;font-weight:600;color:var(--t1)">Volume Calculator</div>
-          <div style="font-size:11px;color:var(--t3);margin-top:1px" id="vol-btn-sub">Enter cut/fill depths to estimate material volume</div>
+          <div style="font-size:14px;font-weight:600;color:#F0F0F0">Volume Calculator</div>
+          <div style="font-size:11px;color:#606060;margin-top:1px" id="vol-btn-sub">Enter cut/fill depths to estimate material volume</div>
         </div>
       </div>
-      <span style="font-size:18px;color:var(--o);opacity:.7">›</span>
+      <span style="font-size:18px;color:#F47920;opacity:.7">›</span>
     </button>
   </div>
 
@@ -662,10 +647,10 @@ text-transform:uppercase;letter-spacing:1px}
     <div class="cp" style="padding-bottom:13px">
       <div class="tog-row">
         <div style="display:flex;align-items:center;gap:10px">
-          <div style="width:36px;height:36px;border-radius:9px;background:var(--blue-d);border:1px solid rgba(59,130,246,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🚜</div>
+          <div style="width:36px;height:36px;border-radius:9px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🚜</div>
           <div>
-            <div style="font-weight:600;font-size:14px;color:var(--t1)">Machine Tracking</div>
-            <div style="font-size:11px;color:var(--t3);margin-top:1px" id="machine-status-txt">Off · 3 m proximity alerts when on</div>
+            <div style="font-weight:600;font-size:14px;color:#F0F0F0">Machine Tracking</div>
+            <div style="font-size:11px;color:#606060;margin-top:1px" id="machine-status-txt">Off · 3 m proximity alerts when on</div>
           </div>
         </div>
         <button class="tog" id="machine-tog" onclick="toggleMachine()"></button>
@@ -677,10 +662,10 @@ text-transform:uppercase;letter-spacing:1px}
 
   <div id="feat-summary" style="display:none" class="card cp">
     <div style="display:flex;align-items:center;gap:11px">
-      <div style="width:40px;height:40px;border-radius:10px;background:var(--o4);border:1px solid rgba(244,121,32,.15);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0">📍</div>
+      <div style="width:40px;height:40px;border-radius:10px;background:rgba(244,121,32,0.08);border:1px solid rgba(244,121,32,.15);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0">📍</div>
       <div style="flex:1">
-        <div style="font-weight:700;font-size:14px;color:var(--t1)" id="feat-count-txt">0 Features</div>
-        <div style="font-size:11px;color:var(--t3);margin-top:2px">Weather-proof · Exportable · Crew-shareable</div>
+        <div style="font-weight:700;font-size:14px;color:#F0F0F0" id="feat-count-txt">0 Features</div>
+        <div style="font-size:11px;color:#606060;margin-top:2px">Weather-proof · Exportable · Crew-shareable</div>
       </div>
       <span class="dot dot-g"></span>
     </div>
@@ -704,9 +689,9 @@ text-transform:uppercase;letter-spacing:1px}
   <div id="grade-idle">
     <div class="card cp">
       <div class="ctitle">Connect Emlid RS3</div>
-      <div style="font-size:13px;color:var(--t3);margin-bottom:18px">Follow these steps before connecting</div>
+      <div style="font-size:13px;color:#606060;margin-bottom:18px">Follow these steps before connecting</div>
       <div class="step-row"><div class="step-n">1</div><div><div class="step-title">Power on your Emlid RS3</div><div class="step-desc">Hold the power button until the LED flashes. The RS3 broadcasts its WiFi hotspot.</div></div></div>
-      <div class="step-row"><div class="step-n">2</div><div><div class="step-title">Join the RS3 hotspot</div><div class="step-desc">Go to WiFi settings. Connect to <strong style="color:var(--t1)">reach:xx:xx</strong>. Password: <strong style="color:var(--t1)">emlidreach</strong></div></div></div>
+      <div class="step-row"><div class="step-n">2</div><div><div class="step-title">Join the RS3 hotspot</div><div class="step-desc">Go to WiFi settings. Connect to <strong style="color:#F0F0F0">reach:xx:xx</strong>. Password: <strong style="color:#F0F0F0">emlidreach</strong></div></div></div>
       <div class="step-row" style="margin-bottom:16px"><div class="step-n">3</div><div><div class="step-title">Return here and connect</div><div class="step-desc">The app opens a direct NMEA TCP stream at 192.168.42.1:9001.</div></div></div>
       <div class="ibox ibox-b" style="margin-bottom:14px">💡 Configure your NTRIP caster after connecting for sub-cm RTK Fix accuracy.</div>
       <button class="btn btn-o btn-w" onclick="gradeConnect()">I'm connected to the RS3 hotspot — Connect</button>
@@ -716,8 +701,8 @@ text-transform:uppercase;letter-spacing:1px}
     <div class="card cp">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
         <div>
-          <div style="font-weight:700;font-size:15px;color:var(--t1)">Emlid RS3</div>
-          <div style="font-size:11px;color:var(--t3);margin-top:1px">192.168.42.1 : 9001 · NMEA stream</div>
+          <div style="font-weight:700;font-size:15px;color:#F0F0F0">Emlid RS3</div>
+          <div style="font-size:11px;color:#606060;margin-top:1px">192.168.42.1 : 9001 · NMEA stream</div>
         </div>
         <div style="display:flex;align-items:center;gap:7px">
           <div class="badge" id="fix-badge"><span class="dot" id="fix-dot"></span><span id="fix-txt">RTK Fix</span></div>
@@ -732,20 +717,20 @@ text-transform:uppercase;letter-spacing:1px}
       <div class="elevcard">
         <div style="display:flex;justify-content:space-between;align-items:flex-start">
           <div>
-            <div style="font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px">Live Elevation (HAE)</div>
+            <div style="font-size:10px;font-weight:600;color:#606060;text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px">Live Elevation (HAE)</div>
             <div class="elevnum" id="g-elev">—</div>
-            <div style="font-size:12px;color:var(--t3);margin-top:6px" id="g-elev-ft"></div>
+            <div style="font-size:12px;color:#606060;margin-top:6px" id="g-elev-ft"></div>
           </div>
-          <div style="text-align:right;font-size:11px;color:var(--t3);line-height:2.1">
+          <div style="text-align:right;font-size:11px;color:#606060;line-height:2.1">
             <div id="g-lat">—</div><div id="g-lng">—</div>
           </div>
         </div>
       </div>
-      <button style="margin-top:11px;background:none;border:none;color:var(--t3);font-size:11px;cursor:pointer;font-family:var(--font)" onclick="toggleNmea()">▸ Show raw NMEA</button>
+      <button style="margin-top:11px;background:none;border:none;color:#606060;font-size:11px;cursor:pointer;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" onclick="toggleNmea()">▸ Show raw NMEA</button>
       <div class="nmea" id="nmea-box" style="display:none"></div>
     </div>
     <div class="acc">
-      <button class="acc-hd" onclick="toggleAcc(this)">🛰️ &nbsp;NTRIP Corrections <span class="chev">▾</span></button>
+      <button class="acc-hd" onclick="toggleAcc(this)">📡 &nbsp;NTRIP Corrections <span class="chev">▾</span></button>
       <div class="acc-body">
         <div style="display:flex;flex-direction:column;gap:9px;padding-top:10px">
           <div><div class="ilabel">Caster Host</div><input id="ntrip-host" placeholder="e.g. ntrip.state.mn.us"/></div>
@@ -798,7 +783,7 @@ text-transform:uppercase;letter-spacing:1px}
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
       <span style="font-size:22px">🚁</span>
       <div>
-        <div style="font-size:15px;font-weight:700;color:var(--blue)">Drone Site Vision</div>
+        <div style="font-size:15px;font-weight:700;color:#3B82F6">Drone Site Vision</div>
         <div style="font-size:9px;font-weight:600;color:rgba(59,130,246,.5);text-transform:uppercase;letter-spacing:.7px">Coming Soon</div>
       </div>
     </div>
@@ -814,8 +799,8 @@ text-transform:uppercase;letter-spacing:1px}
 <div class="moverlay" id="util-modal" onclick="closeUtilModal()">
   <div class="msheet" onclick="event.stopPropagation()">
     <div class="mhandle"></div>
-    <div style="font-size:16px;font-weight:700;color:var(--t1);margin-bottom:3px">Place Utility Marker</div>
-    <div style="font-size:12px;color:var(--t3)">Tap a type to drop a pin at this location</div>
+    <div style="font-size:16px;font-weight:700;color:#F0F0F0;margin-bottom:3px">Place Utility Marker</div>
+    <div style="font-size:12px;color:#606060">Tap a type to drop a pin at this location</div>
     <div class="ugrid" id="ugrid"></div>
   </div>
 </div>
@@ -825,23 +810,23 @@ text-transform:uppercase;letter-spacing:1px}
 <div class="moverlay" id="vol-modal" onclick="closeVolModal()">
   <div class="msheet" onclick="event.stopPropagation()">
     <div class="mhandle"></div>
-    <div style="font-size:17px;font-weight:700;color:var(--t1);margin-bottom:6px">Volume Calculator</div>
+    <div style="font-size:17px;font-weight:700;color:#F0F0F0;margin-bottom:6px">Volume Calculator</div>
 
 ```
 <!-- Explainer -->
-<div style="background:var(--s3);border:1px solid var(--b2);border-radius:var(--r-xs);padding:12px 13px;margin-bottom:16px;font-size:12px;color:var(--t3);line-height:1.7">
-  📐 <strong style="color:var(--t2)">How it works:</strong> Divide your site into zones, enter the average depth you're cutting or filling each one, and the app calculates the total cubic meters of material to move.<br/>
-  <span style="color:var(--t3)">▼ Cut = digging down &nbsp;·&nbsp; ▲ Fill = adding material</span>
+<div style="background:#202020;border:1px solid #383838;border-radius:7px;padding:12px 13px;margin-bottom:16px;font-size:12px;color:#606060;line-height:1.7">
+  📐 <strong style="color:#A0A0A0">How it works:</strong> Divide your site into zones, enter the average depth you're cutting or filling each one, and the app calculates the total cubic meters of material to move.<br/>
+  <span style="color:#606060">▼ Cut = digging down &nbsp;·&nbsp; ▲ Fill = adding material</span>
 </div>
 
-<div style="font-size:11px;color:var(--t3);margin-bottom:14px" id="vol-area-lbl"></div>
+<div style="font-size:11px;color:#606060;margin-bottom:14px" id="vol-area-lbl"></div>
 <div id="zone-list"></div>
 <button class="btn btn-ghost btn-w" style="margin-bottom:13px" onclick="addZone()">＋ Add Another Zone</button>
 <div class="voltotal" id="vol-total" style="display:none">
   <div>
-    <div style="font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Total Material to Move</div>
-    <div style="font-size:24px;font-weight:900;color:var(--o)" id="vol-total-num">—</div>
-    <div style="font-size:11px;color:var(--t3);margin-top:2px" id="vol-total-sub"></div>
+    <div style="font-size:10px;font-weight:600;color:#606060;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Total Material to Move</div>
+    <div style="font-size:24px;font-weight:900;color:#F47920" id="vol-total-num">—</div>
+    <div style="font-size:11px;color:#606060;margin-top:2px" id="vol-total-sub"></div>
   </div>
 </div>
 <button class="btn btn-o btn-w" onclick="saveVol()">Save Volume Data</button>
@@ -1288,15 +1273,15 @@ function renderProjs(){
       <div class="pbody">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
           <div>
-            <div style="font-weight:700;font-size:15px;color:var(--t1)">${p.name}</div>
-            <div style="font-size:11px;color:var(--t3);margin-top:2px">Created ${p.created}</div>
+            <div style="font-weight:700;font-size:15px;color:#F0F0F0">${p.name}</div>
+            <div style="font-size:11px;color:#606060;margin-top:2px">Created ${p.created}</div>
           </div>
           ${isA?`<span class="badge badge-o">Active</span>`:''}
         </div>
         <div class="ptags">
           <span class="ptag" style="${hasP?'color:#4ADE80;border-color:rgba(74,222,128,0.2)':''}">📏 ${hasP?'Perimeter mapped':'No perimeter'}</span>
           <span class="ptag" style="${fc>0?'color:#60A5FA;border-color:rgba(96,165,250,0.2)':''}">📍 ${fc} feature${fc!==1?'s':''}</span>
-          <span class="ptag" style="${vz?'color:var(--o);border-color:rgba(244,121,32,0.2)':''}">📐 ${vz?vz+' vol zone'+(vz!==1?'s':''):'No volume data'}</span>
+          <span class="ptag" style="${vz?'color:#F47920;border-color:rgba(244,121,32,0.2)':''}">📐 ${vz?vz+' vol zone'+(vz!==1?'s':''):'No volume data'}</span>
         </div>
         <div class="pacts">
           <button class="btn ${isA?'btn-o':'btn-ghost'}" style="flex:1;font-size:13px" onclick="selectProject(${p.id});showTab('map')">${isA?'Currently Editing':'Open Site'}</button>
@@ -1324,16 +1309,16 @@ function renderZones(){
     const yd3=vol*1.30795;
     return `<div class="zcard">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
-        <input value="${z.label}" onchange="zones[${i}].label=this.value" style="font-weight:700;font-size:14px;border:none;background:transparent;width:140px;font-family:var(--font);color:var(--t1)"/>
-        ${zones.length>1?`<button onclick="zones.splice(${i},1);renderZones()" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:16px;padding:0 4px">×</button>`:''}
+        <input value="${z.label}" onchange="zones[${i}].label=this.value" style="font-weight:700;font-size:14px;border:none;background:transparent;width:140px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#F0F0F0"/>
+        ${zones.length>1?`<button onclick="zones.splice(${i},1);renderZones()" style="background:none;border:none;color:#606060;cursor:pointer;font-size:16px;padding:0 4px">×</button>`:''}
       </div>
       <div class="zrow">
         <div>
           <div class="ilabel">Avg Depth (metres)</div>
           <input type="number" value="${z.depth}" placeholder="e.g. 0.30" step="0.01" min="0"
             oninput="zones[${i}].depth=this.value;renderZones()"
-            style="font-size:15px;font-weight:700;color:var(--t1)"/>
-          <div style="font-size:10px;color:var(--t3);margin-top:4px">How deep you're cutting or filling</div>
+            style="font-size:15px;font-weight:700;color:#F0F0F0"/>
+          <div style="font-size:10px;color:#606060;margin-top:4px">How deep you're cutting or filling</div>
         </div>
         <div>
           <div class="ilabel">Operation</div>
@@ -1341,11 +1326,11 @@ function renderZones(){
             <button class="ztbtn${z.type==='cut'?' cut':''}" onclick="zones[${i}].type='cut';renderZones()">▼ Cut</button>
             <button class="ztbtn${z.type==='fill'?' fill':''}" onclick="zones[${i}].type='fill';renderZones()">▲ Fill</button>
           </div>
-          <div style="font-size:10px;color:var(--t3);margin-top:4px">${z.type==='cut'?'Digging material out':'Adding material in'}</div>
+          <div style="font-size:10px;color:#606060;margin-top:4px">${z.type==='cut'?'Digging material out':'Adding material in'}</div>
         </div>
       </div>
-      ${vol>0?`<div style="margin-top:11px;padding-top:10px;border-top:1px solid var(--b2);display:flex;justify-content:space-between;align-items:center">
-        <span style="font-size:11px;color:var(--t3)">Zone volume</span>
+      ${vol>0?`<div style="margin-top:11px;padding-top:10px;border-top:1px solid #383838;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:11px;color:#606060">Zone volume</span>
         <span style="font-size:14px;font-weight:700;color:${z.type==='cut'?'#EF4444':'#22C55E'}">${fmt(vol,1)} m³ &nbsp;(${fmt(yd3,1)} yd³)</span>
       </div>`:''}
     </div>`;
@@ -1392,7 +1377,7 @@ function updateGradeUI(){
   if(!gradeData)return;
   const{fixType,fixQ,sats,hdop,elev,lat,lng}=gradeData;
   const cols={4:'#22C55E',5:'#F59E0B',2:'#60A5FA',1:'#A0A0A0'};
-  const bgs={4:'var(--green-d)',5:'rgba(245,158,11,0.12)',2:'var(--blue-d)',1:'rgba(160,160,160,0.1)'};
+  const bgs={4:'rgba(34,197,94,0.12)',5:'rgba(245,158,11,0.12)',2:'rgba(59,130,246,0.12)',1:'rgba(160,160,160,0.1)'};
   const col=cols[fixQ]||'#A0A0A0',bg=bgs[fixQ]||'rgba(160,160,160,0.1)';
   const b=document.getElementById('fix-badge');b.style.background=bg;b.style.color=col;b.style.borderColor=col+'44';
   document.getElementById('fix-dot').style.background=col;
@@ -1418,17 +1403,17 @@ function snapBench(){if(!gradeData)return;benches.push({id:Date.now(),name:`BM-$
 function saveNtrip(){const h=document.getElementById('ntrip-host').value;if(!h){alert('Enter a caster host');return;}alert(`NTRIP saved!\nHost: ${h}:${document.getElementById('ntrip-port').value}`);}
 function renderBenches(){
   const el=document.getElementById('bench-list');
-  if(!benches.length){el.innerHTML=`<div style="text-align:center;color:var(--t3);font-size:12px;padding:14px">No benchmarks set yet</div>`;return;}
+  if(!benches.length){el.innerHTML=`<div style="text-align:center;color:#606060;font-size:12px;padding:14px">No benchmarks set yet</div>`;return;}
   const live=gradeData?gradeData.elev:null;
   el.innerHTML=benches.map(bm=>{
     const delta=live!=null?live-bm.elev:null,cut=delta!=null&&delta>0;
-    return `<div class="bitem" style="border-color:${delta!=null?(cut?'rgba(239,68,68,0.25)':'rgba(34,197,94,0.25)'):'var(--b2)'}">
-      <div><div style="font-weight:600;font-size:14px;color:var(--t1)">${bm.name}</div>
-        <div style="font-size:11px;color:var(--t3);margin-top:1px">Design: ${bm.elev.toFixed(4)} m</div></div>
+    return `<div class="bitem" style="border-color:${delta!=null?(cut?'rgba(239,68,68,0.25)':'rgba(34,197,94,0.25)'):'#383838'}">
+      <div><div style="font-weight:600;font-size:14px;color:#F0F0F0">${bm.name}</div>
+        <div style="font-size:11px;color:#606060;margin-top:1px">Design: ${bm.elev.toFixed(4)} m</div></div>
       <div style="text-align:right">
         ${delta!=null?`<div class="bdelta" style="color:${cut?'#EF4444':'#22C55E'}">${cut?'+':''}${delta.toFixed(4)} m</div>
         <div style="font-size:10px;font-weight:600;color:${cut?'#EF4444':'#22C55E'};margin-top:1px">${cut?'▲ Fill':'▼ Cut'}</div>`
-        :'<div style="font-size:12px;color:var(--t3)">Waiting…</div>'}
+        :'<div style="font-size:12px;color:#606060">Waiting…</div>'}
       </div>
     </div>`;
   }).join('');
