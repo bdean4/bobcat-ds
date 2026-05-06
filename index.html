@@ -712,14 +712,7 @@ text-transform:uppercase;letter-spacing:1px}
 </div>
 
 <script>
-/* ── SPLASH ───────────────────────────────────────────────── */
-window.addEventListener('load',()=>{
-  setTimeout(()=>{
-    document.getElementById('splash').classList.add('out');
-    document.getElementById('app').classList.add('show');
-    setTimeout(()=>document.getElementById('splash').style.display='none',750);
-  },2300);
-});
+window.addEventListener('resize',()=>{if(pll)pll.invalidateSize()});
 
 /* ── DATA ─────────────────────────────────────────────────── */
 const UTILS=[
@@ -1286,8 +1279,17 @@ window.addEventListener('DOMContentLoaded',()=>{
   buildAPWA();buildUGrid();buildStrip();renderProjs();updFL();
   const ch=document.getElementById('pchip');
   ch.textContent=ga().name;ch.style.display='block';
+
+  // Dismiss splash as soon as app is ready - no network dependency
+  setTimeout(()=>{
+    document.getElementById('splash').classList.add('out');
+    document.getElementById('app').classList.add('show');
+    setTimeout(()=>{
+      const s=document.getElementById('splash');
+      if(s)s.style.display='none';
+    },800);
+  },1800);
 });
-window.addEventListener('resize',()=>{if(pll)pll.invalidateSize();});
 </script>
 
 </body>
